@@ -21,9 +21,9 @@ const routes: Routes = [
     FuseWidgetModule
   ],
   declarations: [
-    EventSourcingMonitorComponent    
+    EventSourcingMonitorComponent
   ],
   providers: [ EventSourcingMonitorService, DatePipe]
 })
 
-export class EventSourcingMonitorModule {}
+export class EventSourcingMonitorModule { }

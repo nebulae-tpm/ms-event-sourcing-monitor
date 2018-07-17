@@ -4,18 +4,17 @@ import gql from "graphql-tag";
 
 //Hello world sample, please remove
 export const getHelloWorld = gql`
-  query getHelloWorldFromEventSourcingMonitor{
-    getHelloWorldFromEventSourcingMonitor{
-      sn      
+  query getHelloWorldFromEventSourcingMonitor {
+    getHelloWorldFromEventSourcingMonitor {
+      sn
     }
   }
 `;
 
-
 //Hello world sample, please remove
 export const EventSourcingMonitorHelloWorldSubscription = gql`
-  subscription{
-    EventSourcingMonitorHelloWorldSubscription{
+  subscription {
+    EventSourcingMonitorHelloWorldSubscription {
       sn
-  }
-}`;
+    }
+  }`;
