@@ -1,8 +1,8 @@
 [
     {
-        "name": "msname",
+        "name": "event-sourcing-monitor",
         "type": "graphql",        
-        "src": "api/apiid/graphql/msname",
+        "src": "api/gateway/graphql/event-sourcing-monitor",
         "preBuildCommands": []
     }
 ]

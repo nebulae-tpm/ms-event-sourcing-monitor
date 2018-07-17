@@ -1,18 +1,18 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: msshortname-mongo
+  name: esm-mongo
 spec:
   ports:
   - port: 27017
-    name: msshortname-mongo
+    name: esm-mongo
   selector:
-    app: msshortname-mongo
+    app: esm-mongo
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: msshortname-mongo-pv-claim
+  name: esm-mongo-pv-claim
 spec:
   accessModes:
     - ReadWriteOnce
@@ -23,26 +23,26 @@ spec:
 apiVersion: apps/v1beta2 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: msshortname-mongo
+  name: esm-mongo
 spec:
   selector:
     matchLabels:
-      app: msshortname-mongo
+      app: esm-mongo
   template:
     metadata:
       labels:
-        app: msshortname-mongo
+        app: esm-mongo
     spec:
       containers:
       - image: mongo:3.7-jessie
-        name: msshortname-mongo        
+        name: esm-mongo        
         ports:
         - containerPort: 27017
-          name: msshortname-mongo
+          name: esm-mongo
         volumeMounts:
-        - name: msshortname-mongo-persistent-storage
+        - name: esm-mongo-persistent-storage
           mountPath: /data/db
       volumes:
-      - name: msshortname-mongo-persistent-storage
+      - name: esm-mongo-persistent-storage
         persistentVolumeClaim:
-          claimName: msshortname-mongo-pv-claim
+          claimName: esm-mongo-pv-claim
