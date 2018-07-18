@@ -1,12 +1,11 @@
 'use strict'
 
-const mongoDB = require('./MongoDB')();
 const Rx = require('rxjs');
 const CollectionName = "CollectionName";//please change
 const { CustomError } = require('../tools/customError');
 
 
-class HelloWorldDA {
+class HourAccumulatorDA{
   /**
    * get hello world data
    * @param {string} type
@@ -16,4 +15,4 @@ class HelloWorldDA {
   }
 }
 
-module.exports =  HelloWorldDA 
+module.exports =  HourAccumulatorDA 

@@ -27,7 +27,8 @@
   "homepage": "https://github.com/nebulae-tpm/ms-event-sourcing-monitor#readme",
   "devDependencies": {
     "chai": "^4.1.2",
-    "mocha": "^5.0.5"
+    "mocha": "^5.0.5",
+    "uuid-v4": "^0.1.0"
   },
   "dependencies": {
     "@nebulae/event-store": "^0.3.3",
