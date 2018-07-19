@@ -3,12 +3,12 @@
 let mongoDB = undefined;
 const AccumulatorDAHelper = require("./AccumulatorDAHelper");
 const Rx = require("rxjs");
-const CollectionName = "minuteBoxes"; //please change
+const CollectionName = "dayBoxes"; 
 const { CustomError } = require("../tools/customError");
-const TIMERANGE_KEY = "MINUTE";
-const MILLIS_QUANTITY_IN_TIMERANGE = 60000;
+const TIMERANGE_KEY = "DAY";
+const MILLIS_QUANTITY_IN_TIMERANGE = 86400000;
 
-class MinuteAccumulatorDA {
+class HourAccumulatorDA {
   static start$(mongoDbInstance) {
     return Rx.Observable.create(observer => {
       if (mongoDbInstance) {
@@ -116,4 +116,4 @@ class MinuteAccumulatorDA {
   }
 }
 
-module.exports = MinuteAccumulatorDA;
+module.exports = HourAccumulatorDA;

@@ -10,7 +10,7 @@ const MATERIALIZED_VIEW_TOPIC = "materialized-view-updates";
  */
 let instance;
 
-class HelloWorld {
+class EventSourcingMonitor {
   constructor() {
     this.initHelloWorldEventGenerator();
   }
@@ -32,6 +32,13 @@ class HelloWorld {
    */
   handleHelloWorld$(evt) {
     return Rx.Observable.of('Some process for HelloWorld event');
+  }
+/**
+ * 
+ * @param {Event} evt 
+ */
+  handleEvent$(evt){
+    
   }
 
 
@@ -88,7 +95,7 @@ class HelloWorld {
 
 module.exports = () => {
   if (!instance) {
-    instance = new HelloWorld();
+    instance = new EventSourcingMonitor();
     console.log(`${instance.constructor.name} Singleton created`);
   }
   return instance;

@@ -11,23 +11,25 @@ class AccumulatorDAHelper {
    * Converts a timestamp to a desired precision
    * @param {number} timestamp utc millis
    * @param {string} precision MINUTE, HOUR, DAY, MONTH or YAER
+   * @returns <Rx.Observable>
    */
   static changeTimeStampPrecision$(timestamp, precision) {
     return Rx.Observable.of(timestamp)
       .map(ts => {
+        const date = new Date(ts);
         switch (precision) {
           case 'MINUTE':
-            return new Date(ts).setSeconds(0, 0);
+            return date.setSeconds(0,0);
           case 'HOUR':
-            return new Date(ts).setMinutes(0, 0, 0);
+            return date.setMinutes(0, 0, 0);
           case 'DAY':
-            throw new Error();
-          case 'MONTH':
-            throw new Error();
+            return date.setHours(0, 0, 0, 0);
+          case 'MONTH': 
+            return new Date(date.getFullYear(), date.getMonth()).setMilliseconds(0);
           case 'YEAR':
-            throw new Error();
+            return new Date(date.getFullYear(), 0).setMilliseconds(0);
           default:
-            throw new Error();
+            throw new Error("precision time given is not supported");
         }
       });
   }

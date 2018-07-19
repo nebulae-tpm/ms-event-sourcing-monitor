@@ -4,7 +4,7 @@ const Rx = require('rxjs');
 const uuid = require('uuid-v4');
 
 //LIBS FOR TESTING
-const MinuteAccumulatorDA = require('../../bin/data/MinuteAccumulatorDA');
+const HourAccumulatorDA = require('../../bin/data/HourAccumulatorDA');
 const MongoDB = require('../../bin/data/MongoDB').MongoDB;
 
 //GLOABAL VARS to use between tests
@@ -18,7 +18,7 @@ before run please start docker-compose:
   docker-compose up
 */
 
-describe('Minute Accumultor Data Access', () => {
+describe('Hour Accumultor Data Access', () => {
     describe("Prepare Environment", () => {
       it("Create Mongo instance", done => {
         mongoDB = new MongoDB({
@@ -27,7 +27,7 @@ describe('Minute Accumultor Data Access', () => {
         });
         mongoDB
           .start$()
-          .mergeMap(() => MinuteAccumulatorDA.start$(mongoDB))
+          .mergeMap(() => HourAccumulatorDA.start$(mongoDB))
           .subscribe(evt => console.log(`MongoDB start: ${evt}`), error => {
               console.error(`MongoDB start: ${error}`);
               return done(error);
@@ -37,7 +37,6 @@ describe('Minute Accumultor Data Access', () => {
             });
       });
     });
-
 
     describe('event accumulators', () => {
         const users = ["Felipe", "Esteban", "Daniel", "Sebas", "Camilo", "Leon"];
@@ -59,7 +58,7 @@ describe('Minute Accumultor Data Access', () => {
                             _id: "1"
                         }
                     })
-                    .mergeMap(evt => MinuteAccumulatorDA.cumulateEvent$(evt))
+                    .mergeMap(evt => HourAccumulatorDA.cumulateEvent$(evt))
                     .toArray())
                 .subscribe(
                     (result) => {
@@ -78,12 +77,16 @@ describe('Minute Accumultor Data Access', () => {
         it('commulate 1 and check', (done) => {
             const event = { et: "DeviceConnected", etv: "1_4_Beta", at: "Device", data: {}, user: "Felipe Santa", timestamp: 1531943220000, _id: "1" };            
             Rx.Observable.concat(
-                MinuteAccumulatorDA.getAccumulateData$(event.timestamp),
-                MinuteAccumulatorDA.cumulateEvent$(event),
-                MinuteAccumulatorDA.getAccumulateData$(event.timestamp)
+                HourAccumulatorDA.getAccumulateData$(event.timestamp),
+                HourAccumulatorDA.cumulateEvent$(event),
+                HourAccumulatorDA.getAccumulateData$(event.timestamp)
             ).toArray()
             .subscribe(               
                 ([prevAcc, evt, acc]) => {
+                    console.log("########################");
+                    console.log(prevAcc, acc);
+                    console.log("########################");
+
                     if (prevAcc == null) {
                         assert.equal(acc["globalHits"], 1, 'Global hits'  )
                         assert.equal(acc["eventsHits"][evt.et], 1, 'Hits by event');
@@ -111,10 +114,10 @@ describe('Minute Accumultor Data Access', () => {
 
         it('Event Searcher since a timestamp',  (done) => {
             const timeFalg = 1532029894991;
-            MinuteAccumulatorDA.getAccumulateDataInTimeRange$(timeFalg, 10)
+            HourAccumulatorDA.getAccumulateDataInTimeRange$(timeFalg, 10)
             .subscribe(
                 (result) => {
-                   // console.log(result);
+                    // console.log(result);
                 },
                 (error) => {
                     console.error(`Error getting Accumulated events in range: ${error}`);
@@ -129,7 +132,7 @@ describe('Minute Accumultor Data Access', () => {
         it('Event Searcher around the timestamp',  (done) => {
             const timeFalg = 1532029894991;
             console.log("########",new Date(timeFalg).toLocaleString(), "########");
-            MinuteAccumulatorDA.getAccumulateDataAroundTimestamp$(timeFalg, 2)
+            HourAccumulatorDA.getAccumulateDataAroundTimestamp$(timeFalg, 2)
             .subscribe(
                 (result) => {
                     console.log(result);
@@ -143,7 +146,6 @@ describe('Minute Accumultor Data Access', () => {
                 }
             );
         });
-
     });
 
 
