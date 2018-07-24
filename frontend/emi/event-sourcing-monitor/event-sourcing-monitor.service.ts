@@ -1,12 +1,10 @@
-import { Injectable } from "@angular/core";
-import { Observable } from "rxjs/Observable";
-// tslint:disable-next-line:import-blacklist
-import * as Rx from "rxjs";
-import { GatewayService } from "../../../api/gateway.service";
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { GatewayService } from '../../../api/gateway.service';
 import {
   getHelloWorld,
   EventSourcingMonitorHelloWorldSubscription
-} from "./gql/EventSourcingMonitor";
+} from './gql/EventSourcingMonitor';
 
 @Injectable()
 export class EventSourcingMonitorService {
@@ -19,7 +17,7 @@ export class EventSourcingMonitorService {
     return this.gateway.apollo
       .watchQuery<any>({
         query: getHelloWorld,
-        fetchPolicy: "network-only"
+        fetchPolicy: 'network-only'
       })
       .valueChanges.map(
         resp => resp.data.getHelloWorldFromEventSourcingMonitor.sn

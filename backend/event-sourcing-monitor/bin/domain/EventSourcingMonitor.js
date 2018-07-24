@@ -1,7 +1,11 @@
 "use strict";
 
 const Rx = require("rxjs");
-const HelloWorldDA = require("../data/HelloWorldDA");
+const MinuteAccumulatorDA = require("../data/MinuteAccumulatorDA");
+const HourAccumulatorDA = require("../data/HourAccumulatorDA");
+const DayAccumulatorDA = require("../data/DayAccumulatorDA");
+const MonthAccumulatorDA = require("../data/MonthAccumulatorDA");
+const YearAccumulatorDA = require("../data/YearAccumulatorDA");
 const broker = require("../tools/broker/BrokerFactory")();
 const MATERIALIZED_VIEW_TOPIC = "materialized-view-updates";
 
@@ -12,7 +16,7 @@ let instance;
 
 class EventSourcingMonitor {
   constructor() {
-    this.initHelloWorldEventGenerator();
+    // this.initHelloWorldEventGenerator();
   }
 
   /**
@@ -20,8 +24,7 @@ class EventSourcingMonitor {
    *  this is a queiry form GraphQL
    */
   getHelloWorld$(request) {
-    console.log(`request: request`)
-    return HelloWorldDA.getHelloWorld$()
+    return MinuteAccumulatorDA.getHelloWorld$()
       .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
       .catch(err => this.errorHandler$(err));
   }
@@ -38,22 +41,28 @@ class EventSourcingMonitor {
  * @param {Event} evt 
  */
   handleEvent$(evt){
-    
+    return Rx.Observable.forkJoin(
+      MinuteAccumulatorDA.cumulateEvent$(evt),
+      HourAccumulatorDA.cumulateEvent$(evt),
+      DayAccumulatorDA.cumulateEvent$(evt),
+      MonthAccumulatorDA.cumulateEvent$(evt),
+      YearAccumulatorDA.cumulateEvent$(evt)
+    )
   }
 
 
-  initHelloWorldEventGenerator(){
-    Rx.Observable.interval(1000)
-    .take(120)
-    .mergeMap(id =>  HelloWorldDA.getHelloWorld$())    
-    .mergeMap(evt => {
-      return broker.send$(MATERIALIZED_VIEW_TOPIC, 'EventSourcingMonitorHelloWorldEvent',evt);
-    }).subscribe(
-      (evt) => console.log('Gateway GraphQL sample event sent, please remove'),
-      (err) => console.error('Gateway GraphQL sample event sent ERROR, please remove'),
-      () => console.log('Gateway GraphQL sample event sending STOPPED, please remove'),
-    );
-  }
+  // initHelloWorldEventGenerator(){
+  //   Rx.Observable.interval(1000)
+  //   .take(120)
+  //   .mergeMap(id =>  MinuteAccumulatorDA.getHelloWorld$())    
+  //   .mergeMap(evt => {
+  //     return broker.send$(MATERIALIZED_VIEW_TOPIC, 'EventSourcingMonitorHelloWorldEvent',evt);
+  //   }).subscribe(
+  //     (evt) => console.log('Gateway GraphQL sample event sent, please remove'),
+  //     (err) => console.error('Gateway GraphQL sample event sent ERROR, please remove'),
+  //     () => console.log('Gateway GraphQL sample event sending STOPPED, please remove'),
+  //   );
+  // }
 
 
 

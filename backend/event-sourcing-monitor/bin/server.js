@@ -6,7 +6,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const eventSourcing = require('./tools/EventSourcing')();
 const eventStoreService = require('./services/event-store/EventStoreService')();
-const mongoDB = require('./data/MongoDB')();
+const mongoDB = require('./data/MongoDB').singleton();
 const graphQlService = require('./services/gateway/GraphQlService')();
 const Rx = require('rxjs');
 

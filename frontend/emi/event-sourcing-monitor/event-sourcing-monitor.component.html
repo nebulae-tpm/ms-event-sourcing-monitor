@@ -1,6 +1,93 @@
-<div class="page-layout blank p-24" fusePerfectScrollbar>
+<div class="page-layout simple fullwidth">
+  <!-- CONTENT -->
+  <div class="content p-24 w-100-p">
+    <div class="widget-group" fxLayout="row" fxFlex="100" fxLayoutWrap fxLayoutAlign="start start" *fuseIfOnDom [@animateStagger]="{value:'50'}">
 
-  <h2> {{helloWorld}} </h2>
-  <h2>{{ helloWorldLabelQuery$ | async}}</h2>
-  <h2>{{ helloWorldLabelSubscription$ | async}}</h2>
+      <!-- top event types and balances -->
+      <fuse-widget style="background: rgb(68, 98, 165)" class="mb-48" [ngClass.lt-lg]="'mr-32'" class="widget" fxLayout="column"
+        fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="30">
+
+        <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
+
+          <div class="p-10" fxLayout="row" fxLayoutAlign="center center">
+            <div class="h2 pr-16">Top event Types</div>
+          </div>
+
+          <table class="simple clickable">
+            <thead>
+              <tr>
+                <th>Event type</th>
+                <th class="text-right">total</th>
+                <th class="text-right">balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of topEvents">
+                <td>{{row.eventType}}</td>
+                <td class="text-right">{{row.total}}</td>
+                <td class="text-right">{{row.balance}}</td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- <div class="card-divider full-width"></div> -->
+
+        </div>
+
+
+
+      </fuse-widget>
+
+      <!-- General events overview -->
+      <fuse-widget style="background: red" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column" fxFlex="100"
+        fxFlex.gt-xs="100" fxFlex.gt-md="70">
+
+        <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
+
+          <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
+            <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
+              <strong> {{ 'ESMONITOR.GENERAL_OVERVIEW' | translate }} </strong>
+            </div>
+            <!-- <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="100" fxFlex.gt-sm="25">
+              <mat-select class="simplified" [(ngModel)]="successfulAndFailedTransactionWidget.currentTimeRange"
+              (change)="successfulAndFailedTransactionWidget.onRangeChanged($event.value)"
+                aria-label="Change range">
+                <mat-option *ngFor="let range of successfulAndFailedTransactionWidget.timeRanges | keys" [value]="range.value">
+                  {{ 'DASHBOARD.MINI_WIDGET.TIMERANGES.' + range.key | translate }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field> -->
+          </div>
+          <div class="h-400">
+            <canvas baseChart [datasets]="successfulAndFailedTransactionWidget.datasets" [labels]="successfulAndFailedTransactionWidget.labels"
+              [colors]="successfulAndFailedTransactionWidget.colors" [options]="successfulAndFailedTransactionWidget.options"
+              (click)="printEvent($event)" [chartType]="successfulAndFailedTransactionWidget.chartType">
+            </canvas>
+          </div>
+        </div>
+
+      </fuse-widget>
+
+
+
+
+
+
+
+      <fuse-widget [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column" fxFlex="100" fxFlex.gt-xs="100"
+        fxFlex.gt-md="25" style="background: yellowgreen">
+        <app-monitor-filter-helper></app-monitor-filter-helper>
+      </fuse-widget>
+
+      <fuse-widget fxLayoutWrap style="background: violet" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column"
+        fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="75">
+        <div class="h-400">
+          <canvas baseChart [datasets]="successfulAndFailedTransactionWidget.datasets" [labels]="successfulAndFailedTransactionWidget.labels"
+            [colors]="successfulAndFailedTransactionWidget.colors" [options]="successfulAndFailedTransactionWidget.options"
+            (click)="printEvent($event)" [chartType]="successfulAndFailedTransactionWidget.chartType">
+          </canvas>
+        </div>
+      </fuse-widget>
+
+    </div>
+  </div>
 </div>

@@ -1,6 +1,6 @@
 "use strict";
 
-const helloWorld = require("../../domain/HelloWorld")();
+const helloWorld = require("../../domain/EventSourcingMonitor")();
 const broker = require("../../tools/broker/BrokerFactory")();
 const Rx = require("rxjs");
 const jsonwebtoken = require("jsonwebtoken");

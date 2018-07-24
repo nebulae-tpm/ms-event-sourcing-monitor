@@ -1,14 +1,14 @@
 "use strict";
-
-let mongoDB = undefined;
+// const mongoDB = require("./MongoDB").singleton(); // to prod
+let mongoDB = undefined; // to test
 const AccumulatorDAHelper = require("./AccumulatorDAHelper");
 const Rx = require("rxjs");
-const CollectionName = "hourBoxes"; 
+const CollectionName = "hourBoxes"; //please change
 const { CustomError } = require("../tools/customError");
 const TIMERANGE_KEY = "HOUR";
-const MILLIS_QUANTITY_IN_TIMERANGE = 3600000;
+const MAXIMUM_DOCUMENT_NUMBER = 72;
 
-class HourAccumulatorDA {
+class MinuteAccumulatorDA {
   static start$(mongoDbInstance) {
     return Rx.Observable.create(observer => {
       if (mongoDbInstance) {
@@ -20,6 +20,10 @@ class HourAccumulatorDA {
       }
       observer.complete();
     });
+  }
+
+  static getHelloWorld$(evt) {    
+    return Rx.Observable.of( {sn:`Hello World ${Date.now()}`} );
   }
 
   /**
@@ -38,6 +42,7 @@ class HourAccumulatorDA {
     update["$inc"][`userHits.${event.user}`] = 1;
     update["$inc"][`eventTypes.${event.et}.userHits.${event.user}`] = 1;
     update["$inc"][`eventTypes.${event.et}.versionHits.${event.etv}`] = 1;
+    update["$inc"][`aggregateTypeHits.${event.at}`] = 1;
 
     return AccumulatorDAHelper.changeTimeStampPrecision$(
       event.timestamp,
@@ -50,7 +55,6 @@ class HourAccumulatorDA {
           )
         //TODO: comprobar que el result o modif count haya cambiado
       )
-      // .do(r => console.log(r.result))
       .mapTo(event);
   }
 
@@ -65,7 +69,7 @@ class HourAccumulatorDA {
     return AccumulatorDAHelper.changeTimeStampPrecision$(
       documentId,
       TIMERANGE_KEY
-    ).mergeMap(documentId => 
+    ).mergeMap(documentId =>
       Rx.Observable.defer(() => collection.findOne({ id: documentId }))
     );
   }
@@ -82,38 +86,76 @@ class HourAccumulatorDA {
       TIMERANGE_KEY
     ).mergeMap(initialTime =>
       Rx.Observable.range(0, quantity + 1)
-        .mergeMap(i => {
-          const idToSearch = initialTime + i * MILLIS_QUANTITY_IN_TIMERANGE;
-          return Rx.Observable.defer(() =>
-            collection.findOne({ id: idToSearch })
-          ).mapTo(new Date(idToSearch).toLocaleString());
-        })
+        .mergeMap(i =>
+          Rx.Observable.defer(() =>
+            AccumulatorDAHelper.changeTimeStampPrecision$(
+              new Date(
+                new Date(initialTime).getFullYear(),
+                new Date(initialTime).getMonth(),
+                new Date(initialTime).getDate(),
+                new Date(initialTime).getHours() + i,
+                1, 0).setMilliseconds(0),
+              TIMERANGE_KEY
+            )
+              .do(r => console.log(new Date(r).toLocaleString()))
+              .mergeMap(idToSearch => collection.findOne({ id: idToSearch })))
+        )
         .toArray()
     );
   }
-/**
- * 
- * @param {timestamp on the center of the time range wished} timeReference 
- * @param { number of timeframes before and after the timeReference} timeRadio 
- * @returns {Array with the data of each time range} 
- */
+
+  /**
+   * 
+   * @param {timestamp on the center of the time range wished} timeReference 
+   * @param { number of timeframes before and after the timeReference} timeRadio 
+   * @returns {Array with the data of each time range} 
+   */
   static getAccumulateDataAroundTimestamp$(timeReference, timeRadio) {
     const collection = mongoDB.db.collection(CollectionName);
     return AccumulatorDAHelper.changeTimeStampPrecision$(
       timeReference,
       TIMERANGE_KEY
     )
-      .map(reference => reference - timeRadio * MILLIS_QUANTITY_IN_TIMERANGE)
+      .map(referenceDate => new Date(
+        new Date(referenceDate).getFullYear(),
+        new Date(referenceDate).getMonth(),
+        new Date(referenceDate).getDate(),
+        new Date(referenceDate).getHours() - timeRadio,
+        new Date(referenceDate).getMinutes() 
+      ).setMilliseconds(0))
       .mergeMap(initialTime =>
-        Rx.Observable.range(0, (timeRadio * 2) + 1).mergeMap(i => {
-          const idToSearch = initialTime + i * MILLIS_QUANTITY_IN_TIMERANGE;
-          return Rx.Observable.defer(() =>
-            collection.findOne({ id: idToSearch })
-          ).mapTo(new Date(idToSearch).toLocaleString());
-        })
+        Rx.Observable.range(0, (timeRadio * 2) + 1).mergeMap(i =>
+          Rx.Observable.defer(() =>
+            AccumulatorDAHelper.changeTimeStampPrecision$(
+              new Date(
+                new Date(initialTime).getFullYear(),
+                new Date(initialTime).getMonth(),
+                new Date(initialTime).getDate(),
+                new Date(initialTime).getHours() + i,
+                new Date(initialTime).getMinutes(),
+                0, 0)
+                .setMilliseconds(0),
+              TIMERANGE_KEY)
+            .do(r => console.log(new Date(r).toLocaleString()))
+            .mergeMap(idToSearch => collection.findOne({ id: idToSearch }))
+          )
+        )
       )
       .toArray();
   }
+
+   /**
+   * delete all obsoletes documents 
+   */
+  static clearTrashDocuments() {
+    const collection = mongoDB.db.collection(CollectionName);
+    return AccumulatorDAHelper.calculateObsoleteThreshold(TIMERANGE_KEY, MAXIMUM_DOCUMENT_NUMBER)
+    .mergeMap(obsoleteThreshold => Rx.Observable.defer(() =>
+      collection.remove({ id: { $lt: obsoleteThreshold } })
+    ))
+  }
+
+
 }
 
-module.exports = HourAccumulatorDA;
+module.exports = MinuteAccumulatorDA;

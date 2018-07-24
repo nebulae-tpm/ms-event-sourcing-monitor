@@ -4,7 +4,7 @@ const Rx = require('rxjs');
 const uuid = require('uuid-v4');
 
 //LIBS FOR TESTING
-const HourAccumulatorDA = require('../../bin/data/HourAccumulatorDA');
+const YearAccumulatorDA = require('../../bin/data/YearAccumulatorDA');
 const MongoDB = require('../../bin/data/MongoDB').MongoDB;
 
 //GLOABAL VARS to use between tests
@@ -18,7 +18,7 @@ before run please start docker-compose:
   docker-compose up
 */
 
-describe('Hour Accumultor Data Access', () => {
+describe('YEAR Accumulator Data Access', () => {
     describe("Prepare Environment", () => {
       it("Create Mongo instance", done => {
         mongoDB = new MongoDB({
@@ -27,7 +27,7 @@ describe('Hour Accumultor Data Access', () => {
         });
         mongoDB
           .start$()
-          .mergeMap(() => HourAccumulatorDA.start$(mongoDB))
+          .mergeMap(() => YearAccumulatorDA.start$(mongoDB))
           .subscribe(evt => console.log(`MongoDB start: ${evt}`), error => {
               console.error(`MongoDB start: ${error}`);
               return done(error);
@@ -45,44 +45,17 @@ describe('Hour Accumultor Data Access', () => {
         const eventTypes = ["DeviceConnected", "DeviceRamuUsageAlarmActivated"]
 
 
-        it('Commulate several events', (done) => {
-            Rx.Observable.of({})
-                .mergeMap(() => Rx.Observable.range(0, 500)
-                    .map((i) => {
-                        return {
-                            et: eventTypes[Math.floor(Math.random() * 2)],
-                            etv: versions[Math.floor(Math.random() * 3)],
-                            at: agreggateTypes[Math.floor(Math.random() * 2)],
-                            user: users[Math.floor(Math.random() * 6)],
-                            timestamp: Date.now() + (i * 10000),
-                            _id: "1"
-                        }
-                    })
-                    .mergeMap(evt => HourAccumulatorDA.cumulateEvent$(evt))
-                    .toArray())
-                .subscribe(
-                    (result) => {
-                    },
-                    (error) => {
-                        console.error(`Error comulating events: ${error}`);
-                        return done(error);
-                    },
-                    () => {
-                        return done();
-                    }
-                )
-        });
+       
 
         it('commulate 1 and check', (done) => {
-            const event = { et: "DeviceConnected", etv: "1_4_Beta", at: "Device", data: {}, user: "Felipe Santa", timestamp: 1531943220000, _id: "1" };            
+            const event = { et: "DeviceConnected", etv: "1_4_Beta", at: "Device", data: {}, user: "Felipe_Santa", timestamp: 1531943220000, _id: "1" };            
             Rx.Observable.concat(
-                HourAccumulatorDA.getAccumulateData$(event.timestamp),
-                HourAccumulatorDA.cumulateEvent$(event),
-                HourAccumulatorDA.getAccumulateData$(event.timestamp)
+                YearAccumulatorDA.getAccumulateData$(event.timestamp),
+                YearAccumulatorDA.cumulateEvent$(event),
+                YearAccumulatorDA.getAccumulateData$(event.timestamp)
             ).toArray()
             .subscribe(               
                 ([prevAcc, evt, acc]) => {
-
                     if (prevAcc == null) {
                         assert.equal(acc["globalHits"], 1, 'Global hits'  )
                         assert.equal(acc["eventsHits"][evt.et], 1, 'Hits by event');
@@ -102,15 +75,43 @@ describe('Hour Accumultor Data Access', () => {
                     return done(error);
                 },
                 () => {
-                    // assert.equal(respCount, 1,'respCount missmatch');
                     return done();
                 }
             );
         });
 
+
+        it('Commulate several events', (done) => {
+            Rx.Observable.of({})
+                .mergeMap(() => Rx.Observable.range(0, 500)
+                    .map((i) => {
+                        return {
+                            et: eventTypes[Math.floor(Math.random() * 2)],
+                            etv: versions[Math.floor(Math.random() * 3)],
+                            at: agreggateTypes[Math.floor(Math.random() * 2)],
+                            user: users[Math.floor(Math.random() * 6)],
+                            timestamp: Date.now() + (i * 10000),
+                            _id: "1"
+                        }
+                    })
+                    .mergeMap(evt => YearAccumulatorDA.cumulateEvent$(evt))
+                    .toArray())
+                .subscribe(
+                    (result) => {
+                    },
+                    (error) => {
+                        console.error(`Error comulating events: ${error}`);
+                        return done(error);
+                    },
+                    () => {
+                        return done();
+                    }
+                )
+        });
+
         it('Event Searcher since a timestamp',  (done) => {
             const timeFalg = 1532029894991;
-            HourAccumulatorDA.getAccumulateDataInTimeRange$(timeFalg, 10)
+            YearAccumulatorDA.getAccumulateDataInTimeRange$(timeFalg, 10)
             .subscribe(
                 (result) => {
                 },
@@ -127,7 +128,7 @@ describe('Hour Accumultor Data Access', () => {
         it('Event Searcher around the timestamp',  (done) => {
             const timeFalg = 1532029894991;
             console.log("########",new Date(timeFalg).toLocaleString(), "########");
-            HourAccumulatorDA.getAccumulateDataAroundTimestamp$(timeFalg, 2)
+            YearAccumulatorDA.getAccumulateDataAroundTimestamp$(timeFalg, 2)
             .subscribe(
                 (result) => {
                 },

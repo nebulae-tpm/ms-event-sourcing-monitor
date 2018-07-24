@@ -3,10 +3,10 @@
 let mongoDB = undefined; // to test
 const AccumulatorDAHelper = require("./AccumulatorDAHelper");
 const Rx = require("rxjs");
-const CollectionName = "minuteBoxes"; //please change
+const CollectionName = "yearBoxes"; //please change
 const { CustomError } = require("../tools/customError");
-const TIMERANGE_KEY = "MINUTE";
-const MAXIMUM_DOCUMENT_NUMBER = 180;
+const TIMERANGE_KEY = "YEAR";
+const MAXIMUM_DOCUMENT_NUMBER = 5;
 
 class MinuteAccumulatorDA {
   static start$(mongoDbInstance) {
@@ -22,8 +22,8 @@ class MinuteAccumulatorDA {
     });
   }
 
-  static getHelloWorld$(evt) {    
-    return Rx.Observable.of( {sn:`Hello World ${Date.now()}`} );
+  static getHelloWorld$(evt) {
+    return Rx.Observable.of({ sn: `Hello World ${Date.now()}` });
   }
 
   /**
@@ -44,19 +44,21 @@ class MinuteAccumulatorDA {
     update["$inc"][`eventTypes.${event.et}.versionHits.${event.etv}`] = 1;
     update["$inc"][`aggregateTypeHits.${event.at}`] = 1;
 
-    return AccumulatorDAHelper.changeTimeStampPrecision$(
-      event.timestamp,
-      TIMERANGE_KEY
-    )
-      .mergeMap(
-        id =>
-          Rx.Observable.defer(() =>
-            collection.updateOne({ id: id }, update, updateOps)
-          )
-        //TODO: comprobar que el result o modif count haya cambiado
+    return (
+      AccumulatorDAHelper.changeTimeStampPrecision$(
+        event.timestamp,
+        TIMERANGE_KEY
       )
-      // .do(r => console.log(r.result))
-      .mapTo(event);
+        .mergeMap(
+          id =>
+            Rx.Observable.defer(() =>
+              collection.updateOne({ id: id }, update, updateOps)
+            )
+          //TODO: comprobar que el result o modif count haya cambiado
+        )
+        // .do(r => console.log(r.result))
+        .mapTo(event)
+    );
   }
 
   /**
@@ -70,7 +72,7 @@ class MinuteAccumulatorDA {
     return AccumulatorDAHelper.changeTimeStampPrecision$(
       documentId,
       TIMERANGE_KEY
-    ).mergeMap(documentId => 
+    ).mergeMap(documentId =>
       Rx.Observable.defer(() => collection.findOne({ id: documentId }))
     );
   }
@@ -87,31 +89,30 @@ class MinuteAccumulatorDA {
       TIMERANGE_KEY
     ).mergeMap(initialTime =>
       Rx.Observable.range(0, quantity + 1)
-        .mergeMap(i => {
-          return Rx.Observable.defer(() =>
-          AccumulatorDAHelper.changeTimeStampPrecision$(
-            new Date(
-                new Date(initialTime).getFullYear(),
+        .mergeMap(i =>
+          Rx.Observable.defer(() =>
+            AccumulatorDAHelper.changeTimeStampPrecision$(
+              new Date(
+                new Date(initialTime).getFullYear() + i,
                 new Date(initialTime).getMonth(),
                 new Date(initialTime).getDate(),
                 new Date(initialTime).getHours(),
-                new Date(initialTime).getMinutes() + i,
-                0)
-                .setMilliseconds(0),
-            TIMERANGE_KEY
+                1,
+                0
+              ).setMilliseconds(0),
+              TIMERANGE_KEY
+            ).mergeMap(idToSearch => collection.findOne({ id: idToSearch }))
           )
-          .do(r => console.log(new Date(r).toLocaleString()))
-          .mergeMap(idToSearch => collection.findOne({ id: idToSearch })))
-        })
+        )
         .toArray()
     );
   }
 
   /**
-   * 
-   * @param {timestamp on the center of the time range wished} timeReference 
-   * @param { number of timeframes before and after the timeReference} timeRadio 
-   * @returns {Array with the data of each time range} 
+   *
+   * @param {timestamp on the center of the time range wished} timeReference
+   * @param { number of timeframes before and after the timeReference} timeRadio
+   * @returns {Array with the data of each time range}
    */
   static getAccumulateDataAroundTimestamp$(timeReference, timeRadio) {
     const collection = mongoDB.db.collection(CollectionName);
@@ -119,35 +120,39 @@ class MinuteAccumulatorDA {
       timeReference,
       TIMERANGE_KEY
     )
-      .map(referenceDate => new Date(
-        new Date(referenceDate).getFullYear(),
-        new Date(referenceDate).getMonth(),
-        new Date(referenceDate).getDate(),
-        new Date(referenceDate).getHours(),
-        new Date(referenceDate).getMinutes() - timeRadio
-      ).setMilliseconds(0))
+      .map(referenceDate =>
+        new Date(
+          new Date(referenceDate).getFullYear() - timeRadio,
+          new Date(referenceDate).getMonth(),
+          new Date(referenceDate).getDate(),
+          new Date(referenceDate).getHours(),
+          new Date(referenceDate).getMinutes()
+        ).setMilliseconds(0)
+      )
       .mergeMap(initialTime =>
-        Rx.Observable.range(0, (timeRadio * 2) + 1).mergeMap(i =>
+        Rx.Observable.range(0, timeRadio * 2 + 1).mergeMap(i =>
           Rx.Observable.defer(() =>
             AccumulatorDAHelper.changeTimeStampPrecision$(
               new Date(
-                new Date(initialTime).getFullYear(),
+                new Date(initialTime).getFullYear() + i,
                 new Date(initialTime).getMonth(),
                 new Date(initialTime).getDate(),
                 new Date(initialTime).getHours(),
-                new Date(initialTime).getMinutes() + i,
-                0, 0)
-                .setMilliseconds(0),
-              TIMERANGE_KEY)
-            .do(r => console.log(new Date(r).toLocaleString()))
-            .mergeMap(idToSearch => collection.findOne({ id: idToSearch }))
+                new Date(initialTime).getMinutes(),
+                0,
+                0
+              ).setMilliseconds(0),
+              TIMERANGE_KEY
+            )
+              .do(r => console.log(new Date(r).toLocaleString()))
+              .mergeMap(idToSearch => collection.findOne({ id: idToSearch }))
           )
         )
       )
       .toArray();
   }
 
-  /**
+ /**
    * delete all obsoletes documents 
    */
   static clearTrashDocuments() {
@@ -157,7 +162,6 @@ class MinuteAccumulatorDA {
       collection.remove({ id: { $lt: obsoleteThreshold } })
     ))
   }
-
 }
 
 module.exports = MinuteAccumulatorDA;

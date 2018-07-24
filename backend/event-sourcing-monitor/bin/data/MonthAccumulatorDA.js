@@ -3,10 +3,10 @@
 let mongoDB = undefined; // to test
 const AccumulatorDAHelper = require("./AccumulatorDAHelper");
 const Rx = require("rxjs");
-const CollectionName = "minuteBoxes"; //please change
+const CollectionName = "monthBoxes"; //please change
 const { CustomError } = require("../tools/customError");
-const TIMERANGE_KEY = "MINUTE";
-const MAXIMUM_DOCUMENT_NUMBER = 180;
+const TIMERANGE_KEY = "MONTH";
+const MAXIMUM_DOCUMENT_NUMBER = 24;
 
 class MinuteAccumulatorDA {
   static start$(mongoDbInstance) {
@@ -87,22 +87,20 @@ class MinuteAccumulatorDA {
       TIMERANGE_KEY
     ).mergeMap(initialTime =>
       Rx.Observable.range(0, quantity + 1)
-        .mergeMap(i => {
-          return Rx.Observable.defer(() =>
+        .mergeMap(i => 
+          Rx.Observable.defer(() =>
           AccumulatorDAHelper.changeTimeStampPrecision$(
             new Date(
                 new Date(initialTime).getFullYear(),
-                new Date(initialTime).getMonth(),
+                new Date(initialTime).getMonth() + i,
                 new Date(initialTime).getDate(),
                 new Date(initialTime).getHours(),
-                new Date(initialTime).getMinutes() + i,
-                0)
-                .setMilliseconds(0),
+                1, 0).setMilliseconds(0),
             TIMERANGE_KEY
           )
           .do(r => console.log(new Date(r).toLocaleString()))
-          .mergeMap(idToSearch => collection.findOne({ id: idToSearch })))
-        })
+          .mergeMap( idToSearch => collection.findOne({ id: idToSearch })))
+        )
         .toArray()
     );
   }
@@ -121,10 +119,10 @@ class MinuteAccumulatorDA {
     )
       .map(referenceDate => new Date(
         new Date(referenceDate).getFullYear(),
-        new Date(referenceDate).getMonth(),
+        new Date(referenceDate).getMonth() - timeRadio,
         new Date(referenceDate).getDate(),
         new Date(referenceDate).getHours(),
-        new Date(referenceDate).getMinutes() - timeRadio
+        new Date(referenceDate).getMinutes() 
       ).setMilliseconds(0))
       .mergeMap(initialTime =>
         Rx.Observable.range(0, (timeRadio * 2) + 1).mergeMap(i =>
@@ -132,10 +130,10 @@ class MinuteAccumulatorDA {
             AccumulatorDAHelper.changeTimeStampPrecision$(
               new Date(
                 new Date(initialTime).getFullYear(),
-                new Date(initialTime).getMonth(),
+                new Date(initialTime).getMonth() + i,
                 new Date(initialTime).getDate(),
                 new Date(initialTime).getHours(),
-                new Date(initialTime).getMinutes() + i,
+                new Date(initialTime).getMinutes(),
                 0, 0)
                 .setMilliseconds(0),
               TIMERANGE_KEY)
@@ -147,6 +145,7 @@ class MinuteAccumulatorDA {
       .toArray();
   }
 
+
   /**
    * delete all obsoletes documents 
    */
@@ -157,7 +156,6 @@ class MinuteAccumulatorDA {
       collection.remove({ id: { $lt: obsoleteThreshold } })
     ))
   }
-
 }
 
 module.exports = MinuteAccumulatorDA;

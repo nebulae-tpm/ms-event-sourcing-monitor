@@ -63,7 +63,6 @@ describe('Minute Accumultor Data Access', () => {
                     .toArray())
                 .subscribe(
                     (result) => {
-                        // console.log(result);
                     },
                     (error) => {
                         console.error(`Error comulating events: ${error}`);
@@ -114,7 +113,6 @@ describe('Minute Accumultor Data Access', () => {
             MinuteAccumulatorDA.getAccumulateDataInTimeRange$(timeFalg, 10)
             .subscribe(
                 (result) => {
-                   // console.log(result);
                 },
                 (error) => {
                     console.error(`Error getting Accumulated events in range: ${error}`);
@@ -132,7 +130,6 @@ describe('Minute Accumultor Data Access', () => {
             MinuteAccumulatorDA.getAccumulateDataAroundTimestamp$(timeFalg, 2)
             .subscribe(
                 (result) => {
-                    console.log(result);
                 },
                 (error) => {
                     console.error(`Error getting Accumulated events around the timestamp: ${error}`);

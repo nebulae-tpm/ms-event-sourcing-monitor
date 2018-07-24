@@ -4,7 +4,7 @@ const Rx = require('rxjs');
 const uuid = require('uuid-v4');
 
 //LIBS FOR TESTING
-const HourAccumulatorDA = require('../../bin/data/HourAccumulatorDA');
+const DayAccumulatorDA = require('../../bin/data/DayAccumulatorDA');
 const MongoDB = require('../../bin/data/MongoDB').MongoDB;
 
 //GLOABAL VARS to use between tests
@@ -18,7 +18,7 @@ before run please start docker-compose:
   docker-compose up
 */
 
-describe('Hour Accumultor Data Access', () => {
+describe('DAY Accumulator Data Access', () => {
     describe("Prepare Environment", () => {
       it("Create Mongo instance", done => {
         mongoDB = new MongoDB({
@@ -27,7 +27,7 @@ describe('Hour Accumultor Data Access', () => {
         });
         mongoDB
           .start$()
-          .mergeMap(() => HourAccumulatorDA.start$(mongoDB))
+          .mergeMap(() => DayAccumulatorDA.start$(mongoDB))
           .subscribe(evt => console.log(`MongoDB start: ${evt}`), error => {
               console.error(`MongoDB start: ${error}`);
               return done(error);
@@ -58,7 +58,7 @@ describe('Hour Accumultor Data Access', () => {
                             _id: "1"
                         }
                     })
-                    .mergeMap(evt => HourAccumulatorDA.cumulateEvent$(evt))
+                    .mergeMap(evt => DayAccumulatorDA.cumulateEvent$(evt))
                     .toArray())
                 .subscribe(
                     (result) => {
@@ -76,9 +76,9 @@ describe('Hour Accumultor Data Access', () => {
         it('commulate 1 and check', (done) => {
             const event = { et: "DeviceConnected", etv: "1_4_Beta", at: "Device", data: {}, user: "Felipe Santa", timestamp: 1531943220000, _id: "1" };            
             Rx.Observable.concat(
-                HourAccumulatorDA.getAccumulateData$(event.timestamp),
-                HourAccumulatorDA.cumulateEvent$(event),
-                HourAccumulatorDA.getAccumulateData$(event.timestamp)
+                DayAccumulatorDA.getAccumulateData$(event.timestamp),
+                DayAccumulatorDA.cumulateEvent$(event),
+                DayAccumulatorDA.getAccumulateData$(event.timestamp)
             ).toArray()
             .subscribe(               
                 ([prevAcc, evt, acc]) => {
@@ -110,7 +110,7 @@ describe('Hour Accumultor Data Access', () => {
 
         it('Event Searcher since a timestamp',  (done) => {
             const timeFalg = 1532029894991;
-            HourAccumulatorDA.getAccumulateDataInTimeRange$(timeFalg, 10)
+            DayAccumulatorDA.getAccumulateDataInTimeRange$(timeFalg, 10)
             .subscribe(
                 (result) => {
                 },
@@ -127,7 +127,7 @@ describe('Hour Accumultor Data Access', () => {
         it('Event Searcher around the timestamp',  (done) => {
             const timeFalg = 1532029894991;
             console.log("########",new Date(timeFalg).toLocaleString(), "########");
-            HourAccumulatorDA.getAccumulateDataAroundTimestamp$(timeFalg, 2)
+            DayAccumulatorDA.getAccumulateDataAroundTimestamp$(timeFalg, 2)
             .subscribe(
                 (result) => {
                 },

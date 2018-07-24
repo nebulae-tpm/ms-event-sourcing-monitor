@@ -1,7 +1,7 @@
 "use strict";
 const Rx = require("rxjs");
 const eventSourcing = require("../../tools/EventSourcing")();
-const helloWorld = require("../../domain/HelloWorld")();
+const eventSourcingMonitor = require("../../domain/EventSourcingMonitor")();
 
 /**
  * Singleton instance
@@ -25,6 +25,31 @@ class EventStoreService {
    *    emit value: { aggregateType, eventType, handlerName}
    */
   start$() {
+
+    Rx.Observable.interval(1000).subscribe(() => {
+
+      const users = ["Felipe", "Esteban", "Daniel", "Sebas", "Camilo", "Leon"];
+      const agreggateTypes = ["Device", "Cronjob"];
+      const versions = ["1_Beta", "2_Beta", "1_alfa"];
+      const eventTypes = ["DeviceConnected", "DeviceRamuUsageAlarmActivated"]
+
+      const evt = {
+        et: eventTypes[Math.floor(Math.random() * 2)],
+        etv: versions[Math.floor(Math.random() * 3)],
+        at: agreggateTypes[Math.floor(Math.random() * 2)],
+        user: users[Math.floor(Math.random() * 6)],
+        timestamp: Date.now(),
+        _id: "1"
+      };
+
+      eventSourcingMonitor.handleEvent$(evt)
+      .subscribe(
+        (r) => { console.log(r) },
+        (error) => console.log(error),
+        () => console.log("Finished")
+      );
+    })
+
     //default error handler
     const onErrorHandler = error => {
       console.error("Error handling  EventStore incoming event", error);
@@ -118,10 +143,9 @@ class EventStoreService {
 
       //Sample for handling event-sourcing events, please remove
       HelloWorldEvent: {
-        fn: helloWorld.handleHelloWorld$,
-        obj: helloWorld
-      },
-
+        fn: eventSourcingMonitor.handleHelloWorld$,
+        obj: eventSourcingMonitor
+      }
     };
   }
 
