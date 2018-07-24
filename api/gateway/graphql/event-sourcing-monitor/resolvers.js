@@ -20,6 +20,7 @@ function getReponseFromBackEnd$(response) {
 }
 
 
+
 module.exports = {
 
     //// QUERY ///////

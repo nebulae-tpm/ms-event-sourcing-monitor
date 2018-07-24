@@ -49,6 +49,7 @@ class EventSourcingMonitor {
       YearAccumulatorDA.cumulateEvent$(evt)
     )
   }
+  
 
 
   // initHelloWorldEventGenerator(){
