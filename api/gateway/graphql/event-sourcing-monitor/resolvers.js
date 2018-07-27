@@ -36,6 +36,17 @@ module.exports = {
                 )
                 .mergeMap(response => getReponseFromBackEnd$(response))
                 .toPromise();
+        },
+        getTimeFramesSinceTimestampFromEventSourcingMonitor(root, args, context){
+            return broker
+                .forwardAndGetReply$(
+                    "EventSourcingSummary",
+                    "gateway.graphql.query.getTimeFramesSinceTimestamp",
+                    { root, args, jwt: context.encodedToken },
+                    2000
+                )
+                .mergeMap(response => getReponseFromBackEnd$(response))
+                .toPromise();
         }
     },
 

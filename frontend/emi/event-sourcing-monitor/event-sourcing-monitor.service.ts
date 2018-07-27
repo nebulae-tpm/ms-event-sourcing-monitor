@@ -3,7 +3,8 @@ import { Observable } from 'rxjs/Observable';
 import { GatewayService } from '../../../api/gateway.service';
 import {
   getHelloWorld,
-  EventSourcingMonitorHelloWorldSubscription
+  EventSourcingMonitorHelloWorldSubscription,
+  getTimeFrameInRangeSince
 } from './gql/EventSourcingMonitor';
 
 @Injectable()
@@ -22,6 +23,27 @@ export class EventSourcingMonitorService {
       .valueChanges.map(
         resp => resp.data.getHelloWorldFromEventSourcingMonitor.sn
       );
+  }
+  /**
+   *
+   * @param timeFrameType string MINUTE, HOUR, DAY, MONTH, YEAR
+   * @param initTimestamp Initial timestamp to make the request
+   * @param quantity number  of timeframes to fetch
+   */
+  getTimeFrameInRangeSince$(
+    timeFrameType: string,
+    initTimestamp: number,
+    quantity: number
+  ) {
+    return this.gateway.apollo.watchQuery<any>({
+      query: getTimeFrameInRangeSince,
+      fetchPolicy: 'network-only',
+      variables: {
+        initTimestamp: initTimestamp,
+        quantity: quantity,
+        timeFrameType: timeFrameType
+      }
+    }).valueChanges.map(result => result.data);
   }
 
   /**

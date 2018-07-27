@@ -35,55 +35,57 @@ class AccumulatorDAHelper {
 
   /**
    *
-   * @param {string} precision  MINUTE, HOUR, DAY, MONTH or YAER
-   * @param {*} limit
+   * @param {int} currentTime in millis
+   * @param {string} precision  MINUTE, HOUR, DAY, MONTH or YEAR
+   * @param {int} limit
    */
-  static calculateObsoleteThreshold(precision, limit) {
+  static calculateObsoleteThreshold$(currentTime, precision, limit) {
+    const now = new Date(currentTime);
     switch (precision) {
       case "MINUTE":
         return AccumulatorDAHelper.changeTimeStampPrecision$(
           new Date(
-            new Date().getFullYear(),
-            new Date().getMonth(),
-            new Date().getDate(),
-            new Date().getHours(),
-            new Date().getMinutes() - limit
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            now.getHours(),
+            now.getMinutes() - limit
           ),
           precision
         );
       case "HOUR":
         return AccumulatorDAHelper.changeTimeStampPrecision$(
           new Date(
-            new Date().getFullYear(),
-            new Date().getMonth(),
-            new Date().getDate(),
-            new Date().getHours() - limit,
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            now.getHours() - limit,
             0, 0),
           precision
         );
       case "DAY":
         return AccumulatorDAHelper.changeTimeStampPrecision$(
           new Date(
-            new Date().getFullYear(),
-            new Date().getMonth(),
-            new Date().getDate() - limit,
-            1, 0, 0 
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate() - limit,
+            0, 0, 0 
           ).setMilliseconds(0),
           precision
         );
       case "MONTH":
         return AccumulatorDAHelper.changeTimeStampPrecision$(
           new Date(
-            new Date().getFullYear(),
-            new Date().getMonth() - limit,
-            1, 1, 0, 0
+            now.getFullYear(),
+            now.getMonth() - limit,
+            1, 0, 0, 0
           ).setMilliseconds(0),
           precision
         );
       case "YEAR":
         return AccumulatorDAHelper.changeTimeStampPrecision$(
           new Date(
-            new Date().getFullYear() - limit,
+            now.getFullYear() - limit,
             1, 1, 1, 0, 0 
           ).setMilliseconds(0),
           precision

@@ -1,12 +1,46 @@
+enum EventSourcingMonitorTimeFrameType{
+  MINUTE
+  HOUR
+  DAY
+  MONTH
+  YEAR
+}
+
 "Hello world sample, please remove"
 type HelloWorldEventSourcingMonitor{
   "text"
   sn: String!  
 }
 
+
+type EventSourcingMonitorKeyValue{
+  key: String
+  value: Int
+}
+
+type EventSourcingMonitorInnerKeyValue{
+  key: String
+  value: [EventSourcingMonitorKeyValue]
+}
+
+
+
+type EventSourcingMonitorTimeFrame{
+  id: BigInt
+  globalHits: Int
+  eventTypeHits: [EventSourcingMonitorKeyValue]
+  userHits: [EventSourcingMonitorKeyValue]
+  eventTypes: [EventSourcingMonitorInnerKeyValue]
+  aggregateTypeHits: [EventSourcingMonitorKeyValue]
+}
+
+
+"Queries session"
 type Query {
   "Hello world sample, please remove"
   getHelloWorldFromEventSourcingMonitor: HelloWorldEventSourcingMonitor
+
+  getTimeFramesSinceTimestampFromEventSourcingMonitor( timeFrameType:EventSourcingMonitorTimeFrameType!, initTimestamp: BigInt!, quantity: Int!): [EventSourcingMonitorTimeFrame]
 }
 
 type Subscription {

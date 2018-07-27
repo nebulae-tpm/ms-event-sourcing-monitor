@@ -3,10 +3,9 @@
   <div class="content p-24 w-100-p">
     <div class="widget-group" fxLayout="row" fxFlex="100" fxLayoutWrap fxLayoutAlign="start start" *fuseIfOnDom [@animateStagger]="{value:'50'}">
 
-      <!-- top event types and balances -->
-      <fuse-widget style="background: rgb(68, 98, 165)" class="mb-48" [ngClass.lt-lg]="'mr-32'" class="widget" fxLayout="column"
-        fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="30">
-
+      <!-- OVERVIEW GENERAL -->
+      <fuse-widget style="background: rgb(68, 98, 165)" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column" fxFlex="100"
+        fxFlex.gt-xs="100" fxFlex.gt-md="30">
         <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
 
           <div class="p-10" fxLayout="row" fxLayoutAlign="center center">
@@ -29,15 +28,9 @@
               </tr>
             </tbody>
           </table>
-          <!-- <div class="card-divider full-width"></div> -->
 
         </div>
-
-
-
       </fuse-widget>
-
-      <!-- General events overview -->
       <fuse-widget style="background: red" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column" fxFlex="100"
         fxFlex.gt-xs="100" fxFlex.gt-md="70">
 
@@ -47,46 +40,89 @@
             <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
               <strong> {{ 'ESMONITOR.GENERAL_OVERVIEW' | translate }} </strong>
             </div>
-            <!-- <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="100" fxFlex.gt-sm="25">
-              <mat-select class="simplified" [(ngModel)]="successfulAndFailedTransactionWidget.currentTimeRange"
-              (change)="successfulAndFailedTransactionWidget.onRangeChanged($event.value)"
+            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25" >escala</p>
+            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+              <mat-select class="simplified" [(ngModel)]="generalEventsOverViewChart.currentTimeRange" (change)="generalEventsOverViewChart.onScaleChanged($event.value)"
                 aria-label="Change range">
-                <mat-option *ngFor="let range of successfulAndFailedTransactionWidget.timeRanges | keys" [value]="range.value">
-                  {{ 'DASHBOARD.MINI_WIDGET.TIMERANGES.' + range.key | translate }}
+                <mat-option *ngFor="let range of generalEventsOverViewChart.timeScales | keys" [value]="range.value">
+                  {{ 'GENERAL_OVERVIEW_WIDGET.TIMESCALES.' + range.key | translate }}
                 </mat-option>
               </mat-select>
-            </mat-form-field> -->
+            </mat-form-field>
+            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">rango</p>
+            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+              <mat-select class="simplified" [(ngModel)]="generalEventsOverViewChart.currentQuantity"
+                (change)="generalEventsOverViewChart.onRangeChanged($event.value)"
+                aria-label="Change range">
+                <mat-option *ngFor="let qty of generalEventsOverViewChart.quantities | keys" [value]="qty.value">
+                  {{ 'GENERAL_OVERVIEW_WIDGET.TIMERANGES.' + qty.key | translate }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
           </div>
           <div class="h-400">
-            <canvas baseChart [datasets]="successfulAndFailedTransactionWidget.datasets" [labels]="successfulAndFailedTransactionWidget.labels"
-              [colors]="successfulAndFailedTransactionWidget.colors" [options]="successfulAndFailedTransactionWidget.options"
-              (click)="printEvent($event)" [chartType]="successfulAndFailedTransactionWidget.chartType">
+            <canvas baseChart
+              [datasets]="generalEventsOverViewChart.datasets"
+              [labels]="generalEventsOverViewChart.labels"
+              [colors]="generalEventsOverViewChart.colors"
+              [options]="generalEventsOverViewChart.options"
+              (click)="printEvent($event)"
+              [chartType]="generalEventsOverViewChart.chartType">
             </canvas>
           </div>
         </div>
 
       </fuse-widget>
+      <!-- OVERVIEW GENERAL -->
 
-
-
-
-
-
-
-      <fuse-widget [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column" fxFlex="100" fxFlex.gt-xs="100"
-        fxFlex.gt-md="25" style="background: yellowgreen">
-        <app-monitor-filter-helper></app-monitor-filter-helper>
-      </fuse-widget>
-
-      <fuse-widget fxLayoutWrap style="background: violet" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column"
-        fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="75">
-        <div class="h-400">
-          <canvas baseChart [datasets]="successfulAndFailedTransactionWidget.datasets" [labels]="successfulAndFailedTransactionWidget.labels"
-            [colors]="successfulAndFailedTransactionWidget.colors" [options]="successfulAndFailedTransactionWidget.options"
-            (click)="printEvent($event)" [chartType]="successfulAndFailedTransactionWidget.chartType">
-          </canvas>
+      <!-- OVERVIEW BY EVENT_TYPE -->
+      <fuse-widget style="background: rgb(68, 98, 165)" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column" fxFlex="100"
+        fxFlex.gt-xs="100" fxFlex.gt-md="30">
+        <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
+          <app-monitor-filter-helper></app-monitor-filter-helper>
         </div>
       </fuse-widget>
+      <fuse-widget fxLayoutWrap style="background: violet" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column"
+        fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="70">
+        <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
+          <div class="h-400">
+            <canvas baseChart [datasets]="overViewByEventType.datasets"
+             [labels]="overViewByEventType.labels"
+              [colors]="overViewByEventType.colors"
+              [options]="overViewByEventType.options"
+              (click)="printEvent($event)"
+              [chartType]="overViewByEventType.chartType">
+            </canvas>
+          </div>
+        </div>
+
+      </fuse-widget>
+      <!-- OVERVIEW BY EVENT_TYPE -->
+
+      <!-- OVERVIEW BY AGGREGATE_TYPE -->
+      <fuse-widget style="background: rgb(68, 98, 165)" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column" fxFlex="100"
+        fxFlex.gt-xs="100" fxFlex.gt-md="30">
+        <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
+          <app-monitor-filter-helper></app-monitor-filter-helper>
+        </div>
+      </fuse-widget>
+      <fuse-widget fxLayoutWrap style="background: violet" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column"
+        fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="70">
+        <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
+          <div class="h-400">
+            <canvas baseChart [datasets]="overViewByAggregateType.datasets"
+             [labels]="overViewByAggregateType.labels"
+              [colors]="overViewByAggregateType.colors"
+              [options]="overViewByAggregateType.options"
+              (click)="printEvent($event)"
+              [chartType]="overViewByAggregateType.chartType">
+            </canvas>
+          </div>
+        </div>
+
+      </fuse-widget>
+      <!-- OVERVIEW BY AGGREGATE_TYPE -->
 
     </div>
   </div>

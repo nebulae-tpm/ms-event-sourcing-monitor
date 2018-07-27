@@ -42,11 +42,11 @@ class EventStoreService {
         _id: "1"
       };
 
-      eventSourcingMonitor.handleEvent$(evt)
+      eventSourcingMonitor.handleEventToCumulate$(evt)
       .subscribe(
-        (r) => { console.log(r) },
+        (r) => {  },
         (error) => console.log(error),
-        () => console.log("Finished")
+        () => {}
       );
     })
 

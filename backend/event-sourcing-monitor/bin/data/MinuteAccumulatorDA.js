@@ -1,6 +1,6 @@
 "use strict";
-// const mongoDB = require("./MongoDB").singleton(); // to prod
-let mongoDB = undefined; // to test
+const mongoDB = require("./MongoDB").singleton(); // to prod
+// let mongoDB = undefined; // to test
 const AccumulatorDAHelper = require("./AccumulatorDAHelper");
 const Rx = require("rxjs");
 const CollectionName = "minuteBoxes"; //please change
@@ -23,6 +23,8 @@ class MinuteAccumulatorDA {
   }
 
   static getHelloWorld$(evt) {    
+    const objectToTest = {name: "Felipe", surname: "Santa", age: 22};
+    console.log(Object.entries(objectToTest));
     return Rx.Observable.of( {sn:`Hello World ${Date.now()}`} );
   }
 
@@ -38,7 +40,7 @@ class MinuteAccumulatorDA {
     };
     const update = { $inc: {} };
     update["$inc"][`globalHits`] = 1;
-    update["$inc"][`eventsHits.${event.et}`] = 1;
+    update["$inc"][`eventTypeHits.${event.et}`] = 1;
     update["$inc"][`userHits.${event.user}`] = 1;
     update["$inc"][`eventTypes.${event.et}.userHits.${event.user}`] = 1;
     update["$inc"][`eventTypes.${event.et}.versionHits.${event.etv}`] = 1;
@@ -55,7 +57,6 @@ class MinuteAccumulatorDA {
           )
         //TODO: comprobar que el result o modif count haya cambiado
       )
-      // .do(r => console.log(r.result))
       .mapTo(event);
   }
 
@@ -74,10 +75,11 @@ class MinuteAccumulatorDA {
       Rx.Observable.defer(() => collection.findOne({ id: documentId }))
     );
   }
+
   /**
    *
-   * @param {timestamp reference} startflag
-   * @param {number of documents to search since the startflag} quantity
+   * @param { timestamp reference } startflag
+   * @param {number of documents to search before the current millis} quantity
    * @returns {Array with the data of each time range}
    */
   static getAccumulateDataInTimeRange$(startflag, quantity) {
@@ -89,19 +91,35 @@ class MinuteAccumulatorDA {
       Rx.Observable.range(0, quantity + 1)
         .mergeMap(i => {
           return Rx.Observable.defer(() =>
-          AccumulatorDAHelper.changeTimeStampPrecision$(
-            new Date(
+            AccumulatorDAHelper.changeTimeStampPrecision$(
+              new Date(
                 new Date(initialTime).getFullYear(),
                 new Date(initialTime).getMonth(),
                 new Date(initialTime).getDate(),
                 new Date(initialTime).getHours(),
-                new Date(initialTime).getMinutes() + i,
+                new Date(initialTime).getMinutes() - i,
                 0)
                 .setMilliseconds(0),
-            TIMERANGE_KEY
-          )
-          .do(r => console.log(new Date(r).toLocaleString()))
-          .mergeMap(idToSearch => collection.findOne({ id: idToSearch })))
+              TIMERANGE_KEY
+            )
+              // .do(r => console.log(new Date(r).toLocaleString()))
+              .mergeMap(idToSearch => Rx.Observable.forkJoin(
+                collection.findOne({ id: idToSearch }),
+                Rx.Observable.of(idToSearch)
+              ))
+          ).map(([result, id]) => {
+              if (result == null) {
+                return {
+                  id: id,
+                  aggregateTypeHits: [],
+                  eventTypeHits: [],
+                  eventTypes: [],
+                  globalHits: 0,
+                  userHits: []
+                }
+              }
+              return result;
+            })
         })
         .toArray()
     );
@@ -140,7 +158,7 @@ class MinuteAccumulatorDA {
                 0, 0)
                 .setMilliseconds(0),
               TIMERANGE_KEY)
-            .do(r => console.log(new Date(r).toLocaleString()))
+            // .do(r => console.log(new Date(r).toLocaleString()))
             .mergeMap(idToSearch => collection.findOne({ id: idToSearch }))
           )
         )
@@ -153,7 +171,7 @@ class MinuteAccumulatorDA {
    */
   static clearTrashDocuments() {
     const collection = mongoDB.db.collection(CollectionName);
-    return AccumulatorDAHelper.calculateObsoleteThreshold(TIMERANGE_KEY, MAXIMUM_DOCUMENT_NUMBER)
+    return AccumulatorDAHelper.calculateObsoleteThreshold( Date.now(), TIMERANGE_KEY, MAXIMUM_DOCUMENT_NUMBER)
     .mergeMap(obsoleteThreshold => Rx.Observable.defer(() =>
       collection.remove({ id: { $lt: obsoleteThreshold } })
     ))

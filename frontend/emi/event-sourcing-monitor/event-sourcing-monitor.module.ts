@@ -26,7 +26,6 @@ const routes: Routes = [
     EventSourcingMonitorComponent,
     MonitorFilterHelperComponent
   ],
-  entryComponents: [MonitorFilterHelperComponent],
   providers: [ EventSourcingMonitorService, DatePipe]
 })
 

@@ -1,6 +1,6 @@
 "use strict";
-// const mongoDB = require("./MongoDB").singleton(); // to prod
-let mongoDB = undefined; // to test
+const mongoDB = require("./MongoDB").singleton(); // to prod
+// let mongoDB = undefined; // to test
 const AccumulatorDAHelper = require("./AccumulatorDAHelper");
 const Rx = require("rxjs");
 const CollectionName = "yearBoxes"; //please change
@@ -38,7 +38,7 @@ class MinuteAccumulatorDA {
     };
     const update = { $inc: {} };
     update["$inc"][`globalHits`] = 1;
-    update["$inc"][`eventsHits.${event.et}`] = 1;
+    update["$inc"][`eventTypeHits.${event.et}`] = 1;
     update["$inc"][`userHits.${event.user}`] = 1;
     update["$inc"][`eventTypes.${event.et}.userHits.${event.user}`] = 1;
     update["$inc"][`eventTypes.${event.et}.versionHits.${event.etv}`] = 1;
@@ -93,7 +93,7 @@ class MinuteAccumulatorDA {
           Rx.Observable.defer(() =>
             AccumulatorDAHelper.changeTimeStampPrecision$(
               new Date(
-                new Date(initialTime).getFullYear() + i,
+                new Date(initialTime).getFullYear() - i,
                 new Date(initialTime).getMonth(),
                 new Date(initialTime).getDate(),
                 new Date(initialTime).getHours(),
@@ -101,9 +101,25 @@ class MinuteAccumulatorDA {
                 0
               ).setMilliseconds(0),
               TIMERANGE_KEY
-            ).mergeMap(idToSearch => collection.findOne({ id: idToSearch }))
+            )// .do(r => console.log(new Date(r).toLocaleString()))
+          .mergeMap(idToSearch => Rx.Observable.forkJoin(
+            collection.findOne({ id: idToSearch }),
+            Rx.Observable.of(idToSearch)
           )
         )
+      ).map(([result, id]) => {
+        if (result == null) {
+          return {
+            id: id,
+            aggregateTypeHits: [],
+            eventTypeHits: [],
+            eventTypes: [],
+            globalHits: 0,
+            userHits: []
+          }
+        }
+        return result;
+      }))
         .toArray()
     );
   }
@@ -157,7 +173,7 @@ class MinuteAccumulatorDA {
    */
   static clearTrashDocuments() {
     const collection = mongoDB.db.collection(CollectionName);
-    return AccumulatorDAHelper.calculateObsoleteThreshold(TIMERANGE_KEY, MAXIMUM_DOCUMENT_NUMBER)
+    return AccumulatorDAHelper.calculateObsoleteThreshold( Date.now(), TIMERANGE_KEY, MAXIMUM_DOCUMENT_NUMBER)
     .mergeMap(obsoleteThreshold => Rx.Observable.defer(() =>
       collection.remove({ id: { $lt: obsoleteThreshold } })
     ))

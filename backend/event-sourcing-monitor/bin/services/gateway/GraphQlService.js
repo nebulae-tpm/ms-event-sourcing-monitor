@@ -1,6 +1,6 @@
 "use strict";
 
-const helloWorld = require("../../domain/EventSourcingMonitor")();
+const EventSourcingMonitor = require("../../domain/EventSourcingMonitor")();
 const broker = require("../../tools/broker/BrokerFactory")();
 const Rx = require("rxjs");
 const jsonwebtoken = require("jsonwebtoken");
@@ -125,7 +125,13 @@ class GraphQlService {
         messageType: "gateway.graphql.query.getHelloWorldFromEventSourcingMonitor",
         onErrorHandler,
         onCompleteHandler
-      },      
+      },
+      {
+        aggregateType: "EventSourcingSummary",
+        messageType: "gateway.graphql.query.getTimeFramesSinceTimestamp",
+        onErrorHandler,
+        onCompleteHandler
+      }     
     ];
   }
 
@@ -136,9 +142,13 @@ class GraphQlService {
     return {
       //Sample incoming request, please remove
       "gateway.graphql.query.getHelloWorldFromEventSourcingMonitor": {
-        fn: helloWorld.getHelloWorld$,
-        obj: helloWorld
-      },      
+        fn: EventSourcingMonitor.getHelloWorld$,
+        obj: EventSourcingMonitor
+      },
+      "gateway.graphql.query.getTimeFramesSinceTimestamp":{
+        fn:  EventSourcingMonitor.getTimeFramesSince$,
+        obj: EventSourcingMonitor
+      }      
     };
   }
 

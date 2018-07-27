@@ -103,6 +103,93 @@ describe("prove all result from changeTimeStampPrecision", () => {
         );
       });
 
+      it("-5 minutes precision", (done) => {
+        const expected = 1532026140000;
+        AccumulatorDAHelper.calculateObsoleteThreshold$(currentMillis, "MINUTE", 5)
+        .subscribe(
+          changed => {
+            assert.equal(changed, expected, "-5 minutes precisison");
+          },
+          error => {
+            console.error(`Error minute precision: ${error}`);
+            return done(error);
+          },
+          () => {
+            return done();
+          }
+        );
+      });
+
+      it("-5 Hour precision", (done) => {
+        const expected = 1532005200000;
+        AccumulatorDAHelper.calculateObsoleteThreshold$(currentMillis, "HOUR", 5)
+        .subscribe(
+          changed => {
+            assert.equal(changed, expected, "-5 hours precisison");
+          },
+          error => {
+            console.error(`Error hour precision: ${error}`);
+            return done(error);
+          },
+          () => {
+            return done();
+          }
+        );
+      });
+
+      it("-5 Days precision", (done) => {
+        const expected = 1531544400000;
+        AccumulatorDAHelper.calculateObsoleteThreshold$(currentMillis, "DAY", 5)
+        .subscribe(
+          changed => {
+            assert.equal(changed, expected, "-5 days precisison");
+          },
+          error => {
+            console.error(`Error day precision: ${error}`);
+            return done(error);
+          },
+          () => {
+            return done();
+          }
+        );
+      });
+
+      it("-5 Months precision", (done) => {
+        const expected = 1517461200000;
+        AccumulatorDAHelper.calculateObsoleteThreshold$(currentMillis, "MONTH", 5)
+        .subscribe(
+          changed => {
+            assert.equal(changed, expected, "-5 months precisison");
+          },
+          error => {
+            console.error(`Error month precision: ${error}`);
+            return done(error);
+          },
+          () => {
+            return done();
+          }
+        );
+      });
+
+      it("-5 YEARS precision", (done) => {
+        const expected = 1357016400000;
+        AccumulatorDAHelper.calculateObsoleteThreshold$(currentMillis, "YEAR", 5)
+        .subscribe(
+          changed => {
+            assert.equal(changed, expected, "-5 years precisison");
+          },
+          error => {
+            console.error(`Error year precision: ${error}`);
+            return done(error);
+          },
+          () => {
+            return done();
+          }
+        );
+      });
+
+
+
 
   });
 
