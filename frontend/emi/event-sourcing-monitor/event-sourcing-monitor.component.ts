@@ -105,6 +105,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
                 .toLocaleString('es-CO', this.getLabelFormatter('MINUTE'))
             );
           });
+          this.generalEventsOverViewChart.ready = true;
 
 
           // updateOverViewByAggregateType

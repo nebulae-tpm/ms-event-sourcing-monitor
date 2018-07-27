@@ -27,17 +27,17 @@ module.exports = {
     //// QUERY ///////
 
     Query: {
-        getHelloWorldFromEventSourcingMonitor(root, args, context) {
-            return broker
-                .forwardAndGetReply$(
-                    "HelloWorld",
-                    "gateway.graphql.query.getHelloWorldFromEventSourcingMonitor",
-                    { root, args, jwt: context.encodedToken },
-                    2000
-                )
-                .mergeMap(response => getReponseFromBackEnd$(response))
-                .toPromise();
-        },
+        // getHelloWorldFromEventSourcingMonitor(root, args, context) {
+        //     return broker
+        //         .forwardAndGetReply$(
+        //             "HelloWorld",
+        //             "gateway.graphql.query.getHelloWorldFromEventSourcingMonitor",
+        //             { root, args, jwt: context.encodedToken },
+        //             2000
+        //         )
+        //         .mergeMap(response => getReponseFromBackEnd$(response))
+        //         .toPromise();
+        // },
         getTimeFramesSinceTimestampFromEventSourcingMonitor(root, args, context){
             return broker
                 .forwardAndGetReply$(

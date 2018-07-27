@@ -38,8 +38,7 @@ type EventSourcingMonitorTimeFrame{
 "Queries session"
 type Query {
   "Hello world sample, please remove"
-  getHelloWorldFromEventSourcingMonitor: HelloWorldEventSourcingMonitor
-
+  # getHelloWorldFromEventSourcingMonitor: HelloWorldEventSourcingMonitor
   getTimeFramesSinceTimestampFromEventSourcingMonitor( timeFrameType:EventSourcingMonitorTimeFrameType!, initTimestamp: BigInt!, quantity: Int!): [EventSourcingMonitorTimeFrame]
 }
 

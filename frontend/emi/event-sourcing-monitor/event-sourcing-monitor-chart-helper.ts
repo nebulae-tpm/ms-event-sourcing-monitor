@@ -8,6 +8,7 @@ export enum TimeRanges {
 
 export const genericLineChart = {
   name: 'generalEventsOverView',
+  ready: false,
   showFilterForm: false,
   timeScales: {
     MINUTE: 1,
