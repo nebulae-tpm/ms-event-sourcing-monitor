@@ -4,8 +4,8 @@
     <div class="widget-group" fxLayout="row" fxFlex="100" fxLayoutWrap fxLayoutAlign="start start" *fuseIfOnDom [@animateStagger]="{value:'50'}">
 
       <!-- OVERVIEW GENERAL -->
-      <fuse-widget style="background: rgb(68, 98, 165)" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column" fxFlex="100"
-        fxFlex.gt-xs="100" fxFlex.gt-md="30">
+      <fuse-widget style="background: rgb(68, 98, 165)" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column"
+        fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="30">
         <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
 
           <div class="p-10" fxLayout="row" fxLayoutAlign="center center">
@@ -35,50 +35,52 @@
         fxFlex.gt-xs="100" fxFlex.gt-md="70">
 
         <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
-
+          <!-- HEADERS AND SELECT OPTIONS -->
           <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
+
             <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
-              <strong> {{ 'ESMONITOR.GENERAL_OVERVIEW' | translate }} </strong>
+              <strong> {{ 'WIDGETS.TITLES.GENERAL_OVERVIEW' | translate }} </strong>
             </div>
-            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25" >escala</p>
+            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+              {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
+            </p>
             <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
               <mat-select class="simplified" [(ngModel)]="generalEventsOverViewChart.currentTimeRange" (change)="generalEventsOverViewChart.onScaleChanged($event.value)"
                 aria-label="Change range">
                 <mat-option *ngFor="let range of generalEventsOverViewChart.timeScales | keys" [value]="range.value">
-                  {{ 'GENERAL_OVERVIEW_WIDGET.TIMESCALES.' + range.key | translate }}
+                  {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}
                 </mat-option>
               </mat-select>
             </mat-form-field>
-            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">rango</p>
+            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+              {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
+            </p>
             <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
-              <mat-select class="simplified" [(ngModel)]="generalEventsOverViewChart.currentQuantity"
-                (change)="generalEventsOverViewChart.onRangeChanged($event.value)"
+              <mat-select class="simplified" [(ngModel)]="generalEventsOverViewChart.currentQuantity" (change)="generalEventsOverViewChart.onRangeChanged($event.value)"
                 aria-label="Change range">
                 <mat-option *ngFor="let qty of generalEventsOverViewChart.quantities | keys" [value]="qty.value">
-                  {{ 'GENERAL_OVERVIEW_WIDGET.TIMERANGES.' + qty.key | translate }}
+                  {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
                 </mat-option>
               </mat-select>
             </mat-form-field>
 
           </div>
+          <!-- HEADERS AND SELECT OPTIONS -->
+          <!-- GENERAL OVERVIEW CHART -->
           <div class="h-400">
-            <canvas baseChart
-              [datasets]="generalEventsOverViewChart.datasets"
-              [labels]="generalEventsOverViewChart.labels"
-              [colors]="generalEventsOverViewChart.colors"
-              [options]="generalEventsOverViewChart.options"
-              (click)="printEvent($event)"
-              [chartType]="generalEventsOverViewChart.chartType">
+            <canvas baseChart [datasets]="generalEventsOverViewChart.datasets" [labels]="generalEventsOverViewChart.labels" [colors]="generalEventsOverViewChart.colors"
+              [options]="generalEventsOverViewChart.options"  [chartType]="generalEventsOverViewChart.chartType">
             </canvas>
           </div>
+          <!-- GENERAL OVERVIEW CHART -->
         </div>
 
       </fuse-widget>
       <!-- OVERVIEW GENERAL -->
 
       <!-- OVERVIEW BY EVENT_TYPE -->
-      <fuse-widget style="background: rgb(68, 98, 165)" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column" fxFlex="100"
-        fxFlex.gt-xs="100" fxFlex.gt-md="30">
+      <fuse-widget style="background: rgb(68, 98, 165)" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column"
+        fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="30">
         <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
           <app-monitor-filter-helper></app-monitor-filter-helper>
         </div>
@@ -86,42 +88,118 @@
       <fuse-widget fxLayoutWrap style="background: violet" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column"
         fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="70">
         <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
+
+          <!-- HEADERS AND SELECT OPTIONS -->
+          <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
+
+              <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
+                <strong> {{ 'WIDGETS.TITLES.OVERVIEW_BY_EVENT_TYPE' | translate }} </strong>
+              </div>
+              <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
+              </p>
+              <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                <mat-select class="simplified" [(ngModel)]="overViewByEventType.currentTimeRange" (change)="overViewByEventType.onScaleChanged($event.value)"
+                  aria-label="Change range">
+                  <mat-option *ngFor="let range of overViewByEventType.timeScales | keys" [value]="range.value">
+                    {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
+              </p>
+              <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                <mat-select class="simplified" [(ngModel)]="overViewByEventType.currentQuantity" (change)="overViewByEventType.onRangeChanged($event.value)"
+                  aria-label="Change range">
+                  <mat-option *ngFor="let qty of overViewByEventType.quantities | keys" [value]="qty.value">
+                    {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+          </div>
+          <!-- HEADERS AND SELECT OPTIONS -->
+          <!-- OVERVIEW BY EVENT TYPE CHART -->
           <div class="h-400">
-            <canvas baseChart [datasets]="overViewByEventType.datasets"
-             [labels]="overViewByEventType.labels"
+            <canvas baseChart
+              [datasets]="overViewByEventType.datasets"
+              [labels]="overViewByEventType.labels"
               [colors]="overViewByEventType.colors"
               [options]="overViewByEventType.options"
-              (click)="printEvent($event)"
               [chartType]="overViewByEventType.chartType">
             </canvas>
           </div>
+          <!-- OVERVIEW BY EVENT TYPE CHART -->
         </div>
 
       </fuse-widget>
       <!-- OVERVIEW BY EVENT_TYPE -->
 
       <!-- OVERVIEW BY AGGREGATE_TYPE -->
-      <fuse-widget style="background: rgb(68, 98, 165)" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column" fxFlex="100"
-        fxFlex.gt-xs="100" fxFlex.gt-md="30">
-        <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
-          <app-monitor-filter-helper></app-monitor-filter-helper>
-        </div>
-      </fuse-widget>
-      <fuse-widget fxLayoutWrap style="background: violet" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column"
-        fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="70">
-        <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
-          <div class="h-400">
-            <canvas baseChart [datasets]="overViewByAggregateType.datasets"
-             [labels]="overViewByAggregateType.labels"
-              [colors]="overViewByAggregateType.colors"
-              [options]="overViewByAggregateType.options"
-              (click)="printEvent($event)"
-              [chartType]="overViewByAggregateType.chartType">
-            </canvas>
-          </div>
-        </div>
 
-      </fuse-widget>
+
+
+
+      <!-- <div fxLayout="row" fxLayoutAlign="center none"> -->
+        <fuse-widget *ngIf="overViewByAggregateType.showFilterForm" style="background: rgb(68, 98, 165)" [@animate]="{value:'*',params:{y:'100%'}}"
+          class="widget" fxLayout="column" fxFlex fxFlex.gt-xs="100" fxFlex.gt-md="30">
+          <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
+            <app-monitor-filter-helper [listOptions]="options_test" (filterInserted)="printEvent($event)" (filterRemoved)="printEvent($event)">
+            </app-monitor-filter-helper>
+          </div>
+        </fuse-widget>
+
+        <fuse-widget fxLayoutWrap style="background: violet" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column"
+          fxFlex fxFlex.gt-xs="100" fxFlex.gt-md=70>
+          <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
+            <!-- HEADERS AND SELECT OPTIONS -->
+            <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
+
+              <div class="button-row" fxLayout="column" fxLayoutAlign="center center" fxFlex="5" fxFlex.gt-sm="5">
+                <button mat-icon-button>
+                  <mat-icon aria-label="Example icon-button with a heart icon" (click)="overViewByAggregateType.toggleFilterForm()">filter_list</mat-icon>
+                </button>
+              </div>
+              <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="95" fxFlex.gt-sm="95">
+                <strong> {{ 'WIDGETS.TITLES.OVERVIEW_BY_AGGREGATE_TYPE' | translate }} </strong>
+              </div>
+              <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
+              </p>
+              <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                <mat-select class="simplified" [(ngModel)]="overViewByAggregateType.currentTimeRange" (change)="overViewByAggregateType.onScaleChanged($event.value)"
+                  aria-label="Change range">
+                  <mat-option *ngFor="let range of overViewByAggregateType.timeScales | keys" [value]="range.value">
+                    {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
+              </p>
+              <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                <mat-select class="simplified" [(ngModel)]="overViewByAggregateType.currentQuantity" (change)="overViewByAggregateType.onRangeChanged($event.value)"
+                  aria-label="Change range">
+                  <mat-option *ngFor="let qty of overViewByAggregateType.quantities | keys" [value]="qty.value">
+                    {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+            </div>
+            <!-- HEADERS AND SELECT OPTIONS -->
+            <!-- OVERVIEW BY EVENT TYPE CHART -->
+            <div class="h-400">
+              <canvas baseChart [datasets]="overViewByAggregateType.datasets" [labels]="overViewByAggregateType.labels" [colors]="overViewByAggregateType.colors"
+                [options]="overViewByAggregateType.options" [chartType]="overViewByAggregateType.chartType">
+              </canvas>
+            </div>
+            <!-- OVERVIEW BY EVENT TYPE CHART -->
+          </div>
+
+        </fuse-widget>
+      <!-- </div> -->
       <!-- OVERVIEW BY AGGREGATE_TYPE -->
 
     </div>

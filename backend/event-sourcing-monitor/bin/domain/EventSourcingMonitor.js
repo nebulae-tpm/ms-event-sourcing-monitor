@@ -42,6 +42,7 @@ class EventSourcingMonitor {
  * @param {Event} evt 
  */
   handleEventToCumulate$(evt){
+    console.log(evt);
     return Rx.Observable.forkJoin(
       MinuteAccumulatorDA.cumulateEvent$(evt),
       HourAccumulatorDA.cumulateEvent$(evt),
@@ -59,7 +60,6 @@ class EventSourcingMonitor {
     const timeFrameType = args.timeFrameType;
     const startFlag = args.initTimestamp;
     const quantity = args.quantity;
-    // console.log("##########", timeFrameType, startFlag, quantity, "##########" );
     switch (timeFrameType) {
       case "MINUTE":
         return MinuteAccumulatorDA.getAccumulateDataInTimeRange$(startFlag, quantity)          

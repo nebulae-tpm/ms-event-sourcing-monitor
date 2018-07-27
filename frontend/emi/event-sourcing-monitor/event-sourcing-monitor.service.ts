@@ -35,15 +35,20 @@ export class EventSourcingMonitorService {
     initTimestamp: number,
     quantity: number
   ) {
-    return this.gateway.apollo.watchQuery<any>({
+    return this.gateway.apollo.query<any>({
       query: getTimeFrameInRangeSince,
       fetchPolicy: 'network-only',
       variables: {
         initTimestamp: initTimestamp,
         quantity: quantity,
         timeFrameType: timeFrameType
-      }
-    }).valueChanges.map(result => result.data);
+      },
+      errorPolicy: 'all'
+    })
+    .map(result => {
+      console.log(result);
+      return result.data.getTimeFramesSinceTimestampFromEventSourcingMonitor;
+    });
   }
 
   /**

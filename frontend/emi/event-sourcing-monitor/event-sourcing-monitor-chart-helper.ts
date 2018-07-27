@@ -8,6 +8,7 @@ export enum TimeRanges {
 
 export const genericLineChart = {
   name: 'generalEventsOverView',
+  showFilterForm: false,
   timeScales: {
     MINUTE: 1,
     HOUR: 2,
@@ -41,6 +42,14 @@ export const genericLineChart = {
       backgroundColor: 'rgba(30, 136, 229, 0.3)',
       pointBackgroundColor: 'rgba(30, 136, 229, 0.87)',
       pointHoverBackgroundColor: 'rgba(30, 136, 229, 0.87)',
+      pointBorderColor: '#ffffff',
+      pointHoverBorderColor: '#ffffff'
+    },
+    {
+      borderColor: 'rgba(40, 10, 229, 0.87)',
+      backgroundColor: 'rgba(40, 10, 229, 0.3)',
+      pointBackgroundColor: 'rgba(40, 10, 229, 0.87)',
+      pointHoverBackgroundColor: 'rgba(40, 10, 229, 0.87)',
       pointBorderColor: '#ffffff',
       pointHoverBorderColor: '#ffffff'
     }

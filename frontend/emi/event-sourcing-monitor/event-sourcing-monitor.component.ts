@@ -20,10 +20,20 @@ import { pipe } from 'rxjs/Rx';
 })
 export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
 
-  helloWorld: String = 'Hello World static';
-  allSubscriptions: Subscription[] = [];
-  helloWorldLabelQuery$: Rx.Observable<any>;
-  helloWorldLabelSubscription$: Rx.Observable<any>;
+
+
+  options_test = [{
+    letter: 'A',
+    names: ['Alabama', 'Alaska', 'Arizona', 'Arkansas']
+  },
+  {
+    letter: 'B',
+    names: ['Bogotá']
+  },
+  {
+    letter: 'C',
+    names: ['California', 'Colorado', 'Connecticut']
+  }];
 
 
   topEvents = [];
@@ -57,10 +67,6 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-
-    this.helloWorldLabelQuery$ = this.eventSourcingMonitorervice.getHelloWorld$();
-    this.helloWorldLabelSubscription$ = this.eventSourcingMonitorervice.getEventSourcingMonitorHelloWorldSubscription$();
-
     this.initialQueries();
 
   }
@@ -73,16 +79,80 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     this[overView] = !this[overView];
   }
 
-  printEvent(event: any){
-    console.log('##');
-    console.log(event);
-  }
+
 
   initialQueries(){
-    this.updateGeneralOverViewTimeRange('MINUTE', this.getDefaultLimitByTimeRangeType('MINUTE'));
-    this.updateOverViewByEventType('MINUTE', this.getDefaultLimitByTimeRangeType('MINUTE'));
+    this.eventSourcingMonitorervice.getTimeFrameInRangeSince$('MINUTE', Date.now(), this.getDefaultLimitByTimeRangeType('MINUTE'))
+      .subscribe(
+        result => {
+
+          const responseJSON: any[] =  JSON.parse(JSON.stringify(result));
+          // order summaries
+          const AllSumaries = responseJSON.sort((a, b) =>  a.id - b.id);
+
+          // update generalEventsOverViewChart
+          this.generalEventsOverViewChart.datasets = [{
+            label: 'General overview',
+            data: [],
+            fill: 'start'
+          }];
+          this.generalEventsOverViewChart.labels.length = 0;
+          AllSumaries.forEach((summary, index) => {
+            this.generalEventsOverViewChart.datasets[0].data.push(summary.globalHits);
+            this.generalEventsOverViewChart.labels.push(
+              new Date(summary.id)
+              // TODO set i18n in the next method
+                .toLocaleString('es-CO', this.getLabelFormatter('MINUTE'))
+            );
+          });
+
+
+          // updateOverViewByAggregateType
+          const allDataSets = [];
+
+          AllSumaries.forEach(({ eventTypeHits }) => {
+            eventTypeHits.forEach(({ key, value }) => {
+              if (allDataSets.filter(o => o.label === key).length === 0) {
+                allDataSets.push(
+                  {
+                    label: key,
+                    data: Array.apply(null, Array(responseJSON.length)).map(Number.prototype.valueOf, 0),
+                    fill: 'start'
+                  });
+              }
+            });
+          });
+          this.overViewByEventType.labels.length = 0;
+          responseJSON.forEach(({id, eventTypeHits}, index) => {
+            eventTypeHits.forEach(({key, value}) => {
+              const indexToReplace = allDataSets.findIndex(i => i.label === key);
+              allDataSets[indexToReplace].data[index] = value;
+            });
+
+            this.overViewByEventType.datasets = allDataSets;
+
+            this.overViewByEventType.labels.push(
+              new Date(id)
+              // TODO set i18n in the next method
+                .toLocaleString('es-CO', this.getLabelFormatter('MINUTE'))
+            );
+          });
+
+
+
+
+
+
+        },
+        (e) => console.log(e),
+        () => {}
+      );
   }
 
+  /**
+   * Return the object to format the labels for timeRangeType given
+   * @param timeRangeType MINUTE, HOUR, DAY, MONTH, YEAR
+   */
   getLabelFormatter(timeRangeType: string): Object{
     switch (timeRangeType){
       case 'MINUTE': return { hour: 'numeric', minute: 'numeric',  hour12: false };
@@ -93,6 +163,11 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       default: {}
     }
   }
+
+  /**
+   * Returns de default range time for the timeRangeType
+   * @param timeRangeType MINUTE, HOUR, DAY, MONTH, YEAR
+   */
   getDefaultLimitByTimeRangeType(timeRangeType: string): number{
     switch (timeRangeType){
       case 'MINUTE': return 30;
@@ -104,22 +179,26 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * return the rangeTime options that are posible represent with the scaleTime given
+   * @param scaleTime MINUTE, HOUR, DAY, MONTH, YEAR
+   */
   getDefaultsTimeRangesForscaleTime(scaleTime: string){
     switch (scaleTime){
-      case 'MINUTE': return { HALF_HOUR: 30, ONE_HOUR: 60 };
+      case 'MINUTE': return { HALF_HOUR: 30, ONE_HOUR: 60, TEN_MINUTES: 10 };
       case 'HOUR':   return { SIX_HOURS: 6, TWELVE_HOURS: 12, TWENTYFOUR: 24, FORTYEIGHT: 48  };
-      case 'DAY':    return { ONE_WEEK: 7, ONE_MONTH: 30 };
+      case 'DAY':    return { ONE_WEEK: 7, ONE_MONTH: 30, FIFTEEN_DAYS: 15 };
       case 'MONTH':  return { SIX_MONTH: 6, ONE_YEAR: 12 };
       case 'YEAR':   return { FIVE_YEAR : 5 };
       default: return 0;
     }
   }
 
-  updateGeneralOverViewTimeRange(timeRange: string, range: number){
+  updateGeneralEventsOverViewChart(timeRange: string, range: number){
     this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(timeRange, Date.now(), range)
       .subscribe(
         result => {
-          const responseJSON =  JSON.parse(JSON.stringify(result.getTimeFramesSinceTimestampFromEventSourcingMonitor));
+          const responseJSON =  JSON.parse(JSON.stringify(result));
 
           this.generalEventsOverViewChart.datasets = [{
             label: 'General overview',
@@ -139,7 +218,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
           });
         },
         (e) => console.log(e),
-        () => console.log('####################33')
+        () => {}
       );
   }
 
@@ -148,7 +227,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       .subscribe(
         result => {
           const allDataSets = [];
-          let responseJSON: any[] =  JSON.parse(JSON.stringify(result.getTimeFramesSinceTimestampFromEventSourcingMonitor));
+          let responseJSON: any[] =  JSON.parse(JSON.stringify(result));
           responseJSON = responseJSON.sort((a, b) =>  a.id - b.id);
 
           responseJSON.forEach(({ eventTypeHits }) => {
@@ -182,7 +261,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
           });
         },
         (e) => console.log(e),
-        () => console.log('####################33')
+        () => {}
       );
   }
 
@@ -191,11 +270,11 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       .subscribe(
         result => {
           const allDataSets = [];
-          let responseJSON: any[] =  JSON.parse(JSON.stringify(result.getTimeFramesSinceTimestampFromEventSourcingMonitor));
+          let responseJSON: any[] =  JSON.parse(JSON.stringify(result));
           responseJSON = responseJSON.sort((a, b) =>  a.id - b.id);
 
-          responseJSON.forEach(({ eventTypeHits }) => {
-            eventTypeHits.forEach(({ key, value }) => {
+          responseJSON.forEach(({ aggregateTypeHits }) => {
+            aggregateTypeHits.forEach(({ key, value }) => {
               if (allDataSets.filter(o => o.label === key).length === 0) {
                 allDataSets.push(
                   {
@@ -203,76 +282,82 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
                     data: Array.apply(null, Array(responseJSON.length)).map(Number.prototype.valueOf, 0),
                     fill: 'start'
                   });
+                  console.log('$$$$$$$$$$$$', key);
               }
             });
           });
 
-          this.overViewByEventType.labels.length = 0;
+          this.overViewByAggregateType.labels.length = 0;
 
-          responseJSON.forEach(({id, eventTypeHits}, index) => {
-            eventTypeHits.forEach(({key, value}) => {
+          responseJSON.forEach(({id, aggregateTypeHits}, index) => {
+            aggregateTypeHits.forEach(({key, value}) => {
               const indexToReplace = allDataSets.findIndex(i => i.label === key);
               allDataSets[indexToReplace].data[index] = value;
             });
 
-            this.overViewByEventType.datasets = allDataSets;
+            this.overViewByAggregateType.datasets = allDataSets;
 
-            this.overViewByEventType.labels.push(
+            this.overViewByAggregateType.labels.push(
               new Date(id)
               // TODO set i18n in the next method
                 .toLocaleString('es-CO', this.getLabelFormatter(timeRange))
             );
           });
+
+
+
+
+
+
+
         },
         (e) => console.log(e),
-        () => console.log('####################33')
+        () => {}
       );
   }
 
   initCharts(){
-    this.generalEventsOverViewChart.quantities = this.getDefaultsTimeRangesForscaleTime(TimeRanges[TimeRanges.MINUTE]);
-    this.generalEventsOverViewChart.currentQuantity = this.getDefaultLimitByTimeRangeType(TimeRanges[TimeRanges.MINUTE]);
+    this.setFunctionOnCharts('generalEventsOverViewChart');
+    this.setFunctionOnCharts('overViewByEventType');
+    this.setFunctionOnCharts('overViewByAggregateType');
+  }
+  /**
+   * initilizer function to create the chart and its inner functions
+   * @param chartName Chart name in the component
+   */
+  setFunctionOnCharts(chartName: string): void {
+    // function name to call when an update is required
+    const functionToCall = `update${chartName[0].toUpperCase()}${chartName.slice(1, chartName.length)}`;
+    this[chartName].quantities = this.getDefaultsTimeRangesForscaleTime(TimeRanges[TimeRanges.MINUTE]);
+    this[chartName].currentQuantity = this.getDefaultLimitByTimeRangeType(TimeRanges[TimeRanges.MINUTE]);
 
-    this.generalEventsOverViewChart.onScaleChanged = (scaleTime: number) => {
-      console.log('scaleTime ==>', scaleTime);
-      this.generalEventsOverViewChart.labels = [];
-      this.updateGeneralOverViewTimeRange(
-        TimeRanges[scaleTime].toString(),
-        this.getDefaultLimitByTimeRangeType(TimeRanges[scaleTime].toString())
+    this[chartName].onScaleChanged = (scaleTime: number) => {
+      this[chartName].labels = [];
+      this[functionToCall](
+        TimeRanges[scaleTime],
+        this.getDefaultLimitByTimeRangeType(TimeRanges[scaleTime])
       );
-      this.generalEventsOverViewChart.quantities = this.getDefaultsTimeRangesForscaleTime(TimeRanges[scaleTime].toString());
-      this.generalEventsOverViewChart.currentQuantity = this.getDefaultLimitByTimeRangeType(TimeRanges[scaleTime].toString());
+      this[chartName].quantities = this.getDefaultsTimeRangesForscaleTime(TimeRanges[scaleTime]);
+      this[chartName].currentQuantity = this.getDefaultLimitByTimeRangeType(TimeRanges[scaleTime]);
     };
 
-    this.generalEventsOverViewChart.onRangeChanged = (timeRange: number) => {
-      console.log('timeRange ==>', timeRange);
-      this.generalEventsOverViewChart.labels = [];
-      this.updateGeneralOverViewTimeRange(
-        TimeRanges[this.generalEventsOverViewChart.currentTimeRange].toString(),
+    this[chartName].onRangeChanged = (timeRange: number) => {
+      this[chartName].labels = [];
+      this[functionToCall](
+        TimeRanges[this[chartName].currentTimeRange],
         timeRange
       );
     };
 
-
-
-
-    this.overViewByEventType.onRangeChanged = (timeRange: number) => {
-      this.overViewByEventType.labels = [];
-      this.updateOverViewByEventType(
-        TimeRanges[timeRange].toString(),
-        this.getDefaultLimitByTimeRangeType(TimeRanges[timeRange].toString())
-      );
-    };
-
-    this.overViewByAggregateType.onRangeChanged = (timeRange: number) => {
-      this.overViewByEventType.labels = [];
-      this.updateOverViewByAggregateType(
-        TimeRanges[timeRange].toString(),
-        this.getDefaultLimitByTimeRangeType(TimeRanges[timeRange].toString())
-      );
+    this[chartName].toggleFilterForm = () => {
+      this[chartName].showFilterForm = !this[chartName].showFilterForm;
     };
   }
 
 
+
+  printEvent(obj: any){
+    console.log('========> ', obj);
+  }
 
 }

@@ -19,8 +19,8 @@
                 "id": "event-sourcing-monitor",
                 "icon": "dashboard",
                 "translate": {
-                    "en": "event-sourcing-monitor_en",
-                    "es": "event-sourcing-monitor_es"
+                    "en": "Event sourcing monitor",
+                    "es": "Monitor de eventos"
                 },
                 "navURL": "/event-sourcing-monitor",
                 "path": "event-sourcing-monitor",

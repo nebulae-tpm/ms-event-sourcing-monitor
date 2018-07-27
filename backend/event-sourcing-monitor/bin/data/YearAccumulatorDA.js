@@ -38,11 +38,11 @@ class MinuteAccumulatorDA {
     };
     const update = { $inc: {} };
     update["$inc"][`globalHits`] = 1;
-    update["$inc"][`eventTypeHits.${event.et}`] = 1;
-    update["$inc"][`userHits.${event.user}`] = 1;
-    update["$inc"][`eventTypes.${event.et}.userHits.${event.user}`] = 1;
-    update["$inc"][`eventTypes.${event.et}.versionHits.${event.etv}`] = 1;
-    update["$inc"][`aggregateTypeHits.${event.at}`] = 1;
+    update["$inc"][`eventTypeHits.${event.et.replace(/\./g, '-')}`] = 1;
+    update["$inc"][`userHits.${event.user.replace(/\./g, '-')}`] = 1;
+    update["$inc"][`eventTypes.${event.et.replace(/\./g, '-')}.userHits.${event.user.replace(/\./g, '-')}`] = 1;
+    update["$inc"][`eventTypes.${event.et.replace(/\./g, '-')}.versionHits.${event.etv}`] = 1;
+    update["$inc"][`aggregateTypeHits.${event.at.replace(/\./g, '-')}`] = 1;
 
     return (
       AccumulatorDAHelper.changeTimeStampPrecision$(
