@@ -30,6 +30,7 @@ class EventSourcingMonitor {
       .catch(err => this.errorHandler$(err));
   }
 
+  
   /**
    * Handle HelloWorld Query, please remove
    * This in an Event HAndler for Event-Sourcing events

@@ -28,6 +28,8 @@ spec:
   selector:
     matchLabels:
       app: esm-mongo
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
