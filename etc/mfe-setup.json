@@ -4,18 +4,18 @@
         "src": "frontend/emi/event-sourcing-monitor",
         "groups": [
             {
-              "id": "GROUP_NAME",
+              "id": "SYSTEM",
               "icon": "location_searching",
               "translate": {
-                "en": "Group Name",
-                "es": "Nombre de Grupo"
+                "en": "System",
+                "es": "Sistema"
               },
               "priority": 1000
             }
           ],
         "contents": [
             {
-                "groupId": "GROUP_NAME",
+                "groupId": "SYSTEM",
                 "id": "event-sourcing-monitor",
                 "icon": "dashboard",
                 "translate": {
