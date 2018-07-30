@@ -9,7 +9,10 @@ import { locale as spanish } from './i18n/es';
 // tslint:disable-next-line:import-blacklist
 import * as Rx from 'rxjs/Rx';
 // tslint:disable-next-line:import-blacklist
-import { pipe } from 'rxjs/Rx';
+import { filter, mergeMap, map, tap } from 'rxjs/operators';
+// tslint:disable-next-line:import-blacklist
+import { forkJoin, of } from 'rxjs';
+
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -68,7 +71,6 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.initialQueries();
-
   }
 
 
@@ -82,10 +84,29 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
 
 
   initialQueries(){
+
+    this.eventSourcingMonitorervice.getTimeFrameInRangeSince$('MINUTE', Date.now(), this.getDefaultLimitByTimeRangeType('MINUTE'))
+      .pipe(
+        map(result => JSON.parse(JSON.stringify(result))),
+        map(resultAsArray => resultAsArray.sort((a, b) =>  a.id - b.id)),
+        mergeMap((arrayResult: any) =>
+          forkJoin(
+            this.updateGeneralEventsOverViewChart$(arrayResult),
+            this.updateOverViewByAggregateType$(arrayResult),
+            this.updateOverViewByEventType$(arrayResult)
+          )
+        )
+      ).toArray()
+      .subscribe(
+        (a) => console.log(a),
+        (e) => console.log(e),
+        () => { }
+      );
+
+
     this.eventSourcingMonitorervice.getTimeFrameInRangeSince$('MINUTE', Date.now(), this.getDefaultLimitByTimeRangeType('MINUTE'))
       .subscribe(
         result => {
-
           const responseJSON: any[] =  JSON.parse(JSON.stringify(result));
           // order summaries
           const AllSumaries = responseJSON.sort((a, b) =>  a.id - b.id);
@@ -97,7 +118,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
             fill: 'start'
           }];
           this.generalEventsOverViewChart.labels.length = 0;
-          AllSumaries.forEach((summary, index) => {
+          AllSumaries.forEach((summary) => {
             this.generalEventsOverViewChart.datasets[0].data.push(summary.globalHits);
             this.generalEventsOverViewChart.labels.push(
               new Date(summary.id)
@@ -108,9 +129,8 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
           this.generalEventsOverViewChart.ready = true;
 
 
-          // updateOverViewByAggregateType
-          const allDataSets = [];
-
+          // update OverViewByEventType chart
+          let allDataSets = []; // var used to all datasets for OverViewByEventType chart
           AllSumaries.forEach(({ eventTypeHits }) => {
             eventTypeHits.forEach(({ key, value }) => {
               if (allDataSets.filter(o => o.label === key).length === 0) {
@@ -139,8 +159,36 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
             );
           });
 
+          // update OverViewByAggregateType chart
+          allDataSets = []; // var used to all datasets for OverViewByAggregateType chart
+          AllSumaries.forEach(({ aggregateTypeHits }) => {
+            aggregateTypeHits.forEach(({ key, value }) => {
+              if (allDataSets.filter(o => o.label === key).length === 0) {
+                allDataSets.push(
+                  {
+                    label: key,
+                    data: Array.apply(null, Array(responseJSON.length)).map(Number.prototype.valueOf, 0),
+                    fill: false,
+                    borderWidth: 3
+                  });
+              }
+            });
+          });
+          this.overViewByAggregateType.labels.length = 0;
+          responseJSON.forEach(({id, aggregateTypeHits}, index) => {
+            aggregateTypeHits.forEach(({key, value}) => {
+              const indexToReplace = allDataSets.findIndex(i => i.label === key);
+              allDataSets[indexToReplace].data[index] = value;
+            });
 
+            this.overViewByAggregateType.datasets = allDataSets;
 
+            this.overViewByAggregateType.labels.push(
+              new Date(id)
+              // TODO set i18n in the next method
+                .toLocaleString('es-CO', this.getLabelFormatter('MINUTE'))
+            );
+          });
 
 
 
@@ -222,6 +270,9 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
         () => {}
       );
   }
+  updateGeneralEventsOverViewChart$(array: any[]): Rx.Observable<any>{
+    return Rx.Observable.of(array);
+  }
 
   updateOverViewByEventType(timeRange: string, range: number){
     this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(timeRange, Date.now(), range)
@@ -264,6 +315,9 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
         (e) => console.log(e),
         () => {}
       );
+  }
+  updateOverViewByEventType$(array: any[]): Rx.Observable<any>{
+    return Rx.Observable.of(array);
   }
 
   updateOverViewByAggregateType(timeRange: string, range: number){
@@ -315,6 +369,9 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
         (e) => console.log(e),
         () => {}
       );
+  }
+  updateOverViewByAggregateType$(array: any[]): Rx.Observable<any>{
+    return Rx.Observable.of(array);
   }
 
   initCharts(){

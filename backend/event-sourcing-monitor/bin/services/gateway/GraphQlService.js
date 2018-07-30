@@ -39,8 +39,7 @@ class GraphQlService {
     const subscription = broker
       .getMessageListener$([aggregateType], [messageType])
       //decode and verify the jwt token
-      .mergeMap(message => {
-
+      .mergeMap(message => {        
         return Rx.Observable.of(
           {
             authToken: jsonwebtoken.verify(message.data.jwt, jwtPublicKey),
@@ -48,7 +47,6 @@ class GraphQlService {
           }
         )
         .catch(err => {
-          console.log("###############################", err, message);
           return Rx.Observable.of(
             {
               response,
@@ -78,7 +76,7 @@ class GraphQlService {
       })
       .subscribe(
         msg => {
-           console.log(`GraphQlService: ${messageType} process: ${msg}`);
+          //  console.log(`GraphQlService: ${messageType} process: ${msg}`);
         },
         onErrorHandler,
         onCompleteHandler

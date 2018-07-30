@@ -26,7 +26,6 @@ class EventSourcingMonitor {
  * @param {Event} evt 
  */
   handleEventToCumulate$(evt){
-    console.log(evt);
     return Rx.Observable.forkJoin(
       MinuteAccumulatorDA.cumulateEvent$(evt),
       HourAccumulatorDA.cumulateEvent$(evt),
@@ -170,7 +169,6 @@ class EventSourcingMonitor {
    * @param {Error} err 
    */
   errorHandler$(err) {
-    console.log("errorHandler$ => ", err);
     return Rx.Observable.of(err)
       .map(err => {
         const exception = { data: null, result: {} };

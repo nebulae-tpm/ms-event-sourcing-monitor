@@ -74,24 +74,29 @@
           </div>
           <!-- GENERAL OVERVIEW CHART -->
         </div>
+
       </fuse-widget>
       <!-- OVERVIEW GENERAL -->
 
       <!-- OVERVIEW BY EVENT_TYPE -->
-      <fuse-widget *ngIf="false"  [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column"
+      <fuse-widget *ngIf="overViewByEventType.showFilterForm" [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column"
         fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="30">
         <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
           <app-monitor-filter-helper></app-monitor-filter-helper>
         </div>
       </fuse-widget>
-      <fuse-widget *ngIf="false" fxLayoutWrap [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column"
+      <fuse-widget fxLayoutWrap [@animate]="{value:'*',params:{y:'100%'}}" class="widget" fxLayout="column"
         fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="70">
         <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
 
           <!-- HEADERS AND SELECT OPTIONS -->
           <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
-
-              <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
+              <div class="button-row" fxLayout="column" fxLayoutAlign="center center" fxFlex="5" fxFlex.gt-sm="5">
+                <button mat-icon-button>
+                  <mat-icon aria-label="Example icon-button with a heart icon" (click)="overViewByEventType.toggleFilterForm()">filter_list</mat-icon>
+                </button>
+              </div>
+              <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="95" fxFlex.gt-sm="95">
                 <strong> {{ 'WIDGETS.TITLES.OVERVIEW_BY_EVENT_TYPE' | translate }} </strong>
               </div>
               <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">

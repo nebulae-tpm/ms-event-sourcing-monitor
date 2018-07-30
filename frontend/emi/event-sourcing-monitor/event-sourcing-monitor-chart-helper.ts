@@ -32,7 +32,7 @@ export const genericLineChart = {
   colors: [
     {
       borderColor: '#3949ab',
-      backgroundColor: 'rgba(57,73, 171,0.3)',
+      // backgroundColor: 'rgba(57,73, 171,0.3)',
       pointBackgroundColor: '#3949ab',
       pointHoverBackgroundColor: '#3949ab',
       pointBorderColor: '#ffffff',
@@ -40,7 +40,7 @@ export const genericLineChart = {
     },
     {
       borderColor: 'rgba(30, 136, 229, 0.87)',
-      backgroundColor: 'rgba(30, 136, 229, 0.3)',
+      // backgroundColor: 'rgba(30, 136, 229, 0.3)',
       pointBackgroundColor: 'rgba(30, 136, 229, 0.87)',
       pointHoverBackgroundColor: 'rgba(30, 136, 229, 0.87)',
       pointBorderColor: '#ffffff',
@@ -48,7 +48,7 @@ export const genericLineChart = {
     },
     {
       borderColor: 'rgba(40, 10, 229, 0.87)',
-      backgroundColor: 'rgba(40, 10, 229, 0.3)',
+      // backgroundColor: 'rgba(40, 10, 229, 0.3)',
       pointBackgroundColor: 'rgba(40, 10, 229, 0.87)',
       pointHoverBackgroundColor: 'rgba(40, 10, 229, 0.87)',
       pointBorderColor: '#ffffff',

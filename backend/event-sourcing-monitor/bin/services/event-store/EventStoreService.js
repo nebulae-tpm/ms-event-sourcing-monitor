@@ -42,6 +42,10 @@ class EventStoreService {
     //   };
 
     //   eventSourcingMonitor.handleEventToCumulate$(evt)
+    //   .filter(evt => evt.et == eventTypes[Math.floor(Math.random() * eventTypes.length)] )
+    //   .filter(evt => evt.user == users[Math.floor(Math.random() * users.length)] )
+    //   .filter(evt => evt.etv ==  versions[Math.floor(Math.random() * versions.length)] )
+    //   .filter(evt => evt.at == agreggateTypes[Math.floor(Math.random() * agreggateTypes.length)])
     //   .subscribe(
     //     (r) => {  },
     //     (error) => console.log(error),
