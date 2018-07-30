@@ -180,8 +180,7 @@ class EventStoreService {
         obj: eventSourcingMonitor
       }
     };
-  }
-  
+  }  
 
   /**
   * Generates a map that assocs each AggretateType withs its events
