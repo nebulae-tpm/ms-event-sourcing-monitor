@@ -19,25 +19,8 @@ class EventSourcingMonitor {
   constructor() {
     // this.initHelloWorldEventGenerator();
   }
-
-  /**
-   *  HelloWorld Query, please remove
-   *  this is a queiry form GraphQL
-   */
-  getHelloWorld$(request) {
-    return MinuteAccumulatorDA.getHelloWorld$()
-      .mergeMap(rawResponse => this.buildSuccessResponse$(rawResponse))
-      .catch(err => this.errorHandler$(err));
-  }
-
   
-  /**
-   * Handle HelloWorld Query, please remove
-   * This in an Event HAndler for Event-Sourcing events
-   */
-  handleHelloWorld$(evt) {
-    return Rx.Observable.of('Some process for HelloWorld event');
-  }
+  
 /**
  * this method acumulate by one in the time frames
  * @param {Event} evt 

@@ -22,10 +22,6 @@ class MinuteAccumulatorDA {
     });
   }
 
-  static getHelloWorld$(evt) {    
-    return Rx.Observable.of( {sn:`Hello World ${Date.now()}`} );
-  }
-
   /**
    * Comulate event data
    * @param {Event} event

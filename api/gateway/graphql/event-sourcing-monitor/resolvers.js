@@ -54,19 +54,19 @@ module.exports = {
 
 
     //// SUBSCRIPTIONS ///////
-    Subscription: {
-        EventSourcingMonitorHelloWorldSubscription: {
-            subscribe: withFilter(
-                (payload, variables, context, info) => {
-                    return pubsub.asyncIterator("EventSourcingMonitorHelloWorldSubscription");
-                },
-                (payload, variables, context, info) => {
-                    return true;
-                }
-            )
-        }
+    // Subscription: {
+    //     EventSourcingMonitorHelloWorldSubscription: {
+    //         subscribe: withFilter(
+    //             (payload, variables, context, info) => {
+    //                 return pubsub.asyncIterator("EventSourcingMonitorHelloWorldSubscription");
+    //             },
+    //             (payload, variables, context, info) => {
+    //                 return true;
+    //             }
+    //         )
+    //     }
 
-    }
+    // }
 };
 
 
@@ -74,13 +74,13 @@ module.exports = {
 //// SUBSCRIPTIONS SOURCES ////
 
 const eventDescriptors = [
-    {
-        backendEventName: 'EventSourcingMonitorHelloWorldEvent',
-        gqlSubscriptionName: 'EventSourcingMonitorHelloWorldSubscription',
-        //dataExtractor: (evt) => evt.data,// OPTIONAL, only use if needed
-        //onError: (error, descriptor) => console.log(`Error processing ${descriptor.backendEventName}`),// OPTIONAL, only use if needed
-        //onEvent: (evt, descriptor) => console.log(`Event of type  ${descriptor.backendEventName} arraived: ${JSON.stringify(evt)}`),// OPTIONAL, only use if needed
-    },
+    // {
+    //     backendEventName: 'EventSourcingMonitorHelloWorldEvent',
+    //     gqlSubscriptionName: 'EventSourcingMonitorHelloWorldSubscription',
+    //     //dataExtractor: (evt) => evt.data,// OPTIONAL, only use if needed
+    //     //onError: (error, descriptor) => console.log(`Error processing ${descriptor.backendEventName}`),// OPTIONAL, only use if needed
+    //     //onEvent: (evt, descriptor) => console.log(`Event of type  ${descriptor.backendEventName} arraived: ${JSON.stringify(evt)}`),// OPTIONAL, only use if needed
+    // },
 ];
 
 

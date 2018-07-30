@@ -20,11 +20,7 @@ class MinuteAccumulatorDA {
       }
       observer.complete();
     });
-  }
-
-  static getHelloWorld$(evt) {    
-    return Rx.Observable.of( {sn:`Hello World ${Date.now()}`} );
-  }
+  }  
 
   /**
    * Comulate event data

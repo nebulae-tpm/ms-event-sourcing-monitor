@@ -121,12 +121,6 @@ class GraphQlService {
 
       //Sample incoming request, please remove
       {
-        aggregateType: "HelloWorld",
-        messageType: "gateway.graphql.query.getHelloWorldFromEventSourcingMonitor",
-        onErrorHandler,
-        onCompleteHandler
-      },
-      {
         aggregateType: "EventSourcingSummary",
         messageType: "gateway.graphql.query.getTimeFramesSinceTimestamp",
         onErrorHandler,
@@ -141,11 +135,7 @@ class GraphQlService {
   generateFunctionMap() {    
     return {
       //Sample incoming request, please remove
-      "gateway.graphql.query.getHelloWorldFromEventSourcingMonitor": {
-        fn: EventSourcingMonitor.getHelloWorld$,
-        obj: EventSourcingMonitor
-      },
-      "gateway.graphql.query.getTimeFramesSinceTimestamp":{
+    "gateway.graphql.query.getTimeFramesSinceTimestamp":{
         fn:  EventSourcingMonitor.getTimeFramesSince$,
         obj: EventSourcingMonitor
       }      

@@ -22,12 +22,6 @@ class MinuteAccumulatorDA {
     });
   }
 
-  static getHelloWorld$(evt) {    
-    const objectToTest = {name: "Felipe", surname: "Santa", age: 22};
-    console.log(Object.entries(objectToTest));
-    return Rx.Observable.of( {sn:`Hello World ${Date.now()}`} );
-  }
-
   /**
    * Comulate event data
    * @param {Event} event
