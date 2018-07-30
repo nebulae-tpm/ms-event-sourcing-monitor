@@ -43,7 +43,7 @@ class GraphQlService {
 
         return Rx.Observable.of(
           {
-            authToken: jsonwebtoken.verify(message.data.jwt+ " ", jwtPublicKey),
+            authToken: jsonwebtoken.verify(message.data.jwt, jwtPublicKey),
             message
           }
         )
