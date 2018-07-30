@@ -170,7 +170,7 @@ class EventSourcingMonitor {
    * @param {Error} err 
    */
   errorHandler$(err) {
-    console.log(err);
+    console.log("errorHandler$ => ", err);
     return Rx.Observable.of(err)
       .map(err => {
         const exception = { data: null, result: {} };

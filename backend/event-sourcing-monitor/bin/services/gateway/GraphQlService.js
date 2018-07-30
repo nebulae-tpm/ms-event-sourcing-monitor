@@ -5,6 +5,7 @@ const broker = require("../../tools/broker/BrokerFactory")();
 const Rx = require("rxjs");
 const jsonwebtoken = require("jsonwebtoken");
 const jwtPublicKey = process.env.JWT_PUBLIC_KEY.replace(/\\n/g, "\n");
+const { CustomError, DefaultError } = require("../../tools/customError");
 
 let instance;
 
@@ -38,11 +39,26 @@ class GraphQlService {
     const subscription = broker
       .getMessageListener$([aggregateType], [messageType])
       //decode and verify the jwt token
-      .map(message => {
-        return {
-          authToken: jsonwebtoken.verify(message.data.jwt, jwtPublicKey),
-          message
-        };
+      .mergeMap(message => {
+
+        return Rx.Observable.of(
+          {
+            authToken: jsonwebtoken.verify(message.data.jwt+ " ", jwtPublicKey),
+            message
+          }
+        )
+        .catch(err => {
+          console.log("###############################", err, message);
+          return Rx.Observable.of(
+            {
+              response,
+              correlationId: message.id,
+              replyTo: message.attributes.replyTo 
+            }
+          )
+          .mergeMap(msg => this.sendResponseBack$(msg))
+
+        })
       })
       //ROUTE MESSAGE TO RESOLVER
       .mergeMap(({ authToken, message }) =>
@@ -52,22 +68,13 @@ class GraphQlService {
             return {
               response,
               correlationId: message.id,
-              replyTo: message.attributes.replyTo,              
+              replyTo: message.attributes.replyTo              
             };
           })
       )
-      //send response back if neccesary
-      .mergeMap(({ response, correlationId, replyTo }) => {
-        if (replyTo) {
-          return broker.send$(
-            replyTo,
-            "gateway.graphql.Query.response",
-            response,
-            { correlationId }
-          );
-        } else {
-          return Rx.Observable.of(undefined);
-        }
+      .mergeMap(msg => this.sendResponseBack$(msg))
+      .catch(error => {
+        return Rx.Observable.of(null)
       })
       .subscribe(
         msg => {
@@ -87,6 +94,23 @@ class GraphQlService {
       messageType,
       handlerName: `${handler.obj.name}.${handler.fn.name}`
     };
+  }
+
+  // send response back if neccesary
+  sendResponseBack$(msg) {
+    return Rx.Observable.of(msg)
+      .mergeMap(({ response, correlationId, replyTo }) => {
+        if (replyTo) {
+          return broker.send$(
+            replyTo,
+            "gateway.graphql.Query.response",
+            response,
+            { correlationId }
+          );
+        } else {
+          return Rx.Observable.of(undefined);
+        }
+      })
   }
 
   stop$() {
