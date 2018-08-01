@@ -1,3 +1,4 @@
+import { EventSourcingSpecificChartComponent } from './event-sourcing-specific-chart/event-sourcing-specific-chart.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SharedModule } from '../../../core/modules/shared.module';
@@ -13,6 +14,10 @@ const routes: Routes = [
   {
     path: '',
     component: EventSourcingMonitorComponent,
+  },
+  {
+    path: 'event/:name',
+    component: EventSourcingSpecificChartComponent
   }
 ];
 
@@ -24,7 +29,8 @@ const routes: Routes = [
   ],
   declarations: [
     EventSourcingMonitorComponent,
-    MonitorFilterHelperComponent
+    MonitorFilterHelperComponent,
+    EventSourcingSpecificChartComponent
   ],
   providers: [ EventSourcingMonitorService, DatePipe]
 })

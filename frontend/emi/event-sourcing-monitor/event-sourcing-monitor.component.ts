@@ -1,7 +1,7 @@
 import { genericLineChart, TimeRanges } from './event-sourcing-monitor-chart-helper';
 import { FuseTranslationLoaderService } from './../../../core/services/translation-loader.service';
 import { EventSourcingMonitorService } from './event-sourcing-monitor.service';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { fuseAnimations } from '../../../core/animations';
 import { Subscription } from 'rxjs/Subscription';
 import { locale as english } from './i18n/en';
@@ -12,38 +12,44 @@ import * as Rx from 'rxjs/Rx';
 import { filter, mergeMap, map, tap } from 'rxjs/operators';
 // tslint:disable-next-line:import-blacklist
 import { forkJoin, of } from 'rxjs';
+import { last } from 'rxjs-compat/operator/last';
 
+
+export interface FilterOption{
+  letter: string;
+  names: String[];
+}
 
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'event-sourcing-monitor',
   templateUrl: './event-sourcing-monitor.component.html',
   styleUrls: ['./event-sourcing-monitor.component.scss'],
+  // encapsulation: ViewEncapsulation.Emulated,
   animations: fuseAnimations
 })
 export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
-
-
-
-  options_test = [{
-    letter: 'A',
-    names: ['Alabama', 'Alaska', 'Arizona', 'Arkansas']
-  },
-  {
-    letter: 'B',
-    names: ['Bogotá']
-  },
-  {
-    letter: 'C',
-    names: ['California', 'Colorado', 'Connecticut']
-  }];
-
 
   topEvents = [];
   generalEventsOverViewChart: any = JSON.parse(JSON.stringify(genericLineChart));
   overViewByEventType: any = JSON.parse(JSON.stringify(genericLineChart));
   overViewByAggregateType: any = JSON.parse(JSON.stringify(genericLineChart));
   showFilterForGeneralOverview = true;
+
+  balanceTable = {
+    currentTimeRange: TimeRanges.MINUTE,
+    timeScales: {
+      MINUTE: 1,
+      HOUR: 2,
+      DAY: 3,
+      MONTH: 4,
+      YEAR: 5
+    },
+    onScaleChanged: (timeScale: number) => {
+      const timeScaleAsString = Object.entries(this.balanceTable.timeScales).filter(o => o[1] === timeScale)[0][0];
+      this.updateBalanceTable(timeScaleAsString);
+    }
+  };
 
 
 
@@ -58,12 +64,6 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
 
     this.topEvents = [
       { eventType: 'Event_A', total: 345, balance: '+34%' },
-      { eventType: 'Event_B', total: 2569, balance: '-2.58%' },
-      { eventType: 'Event_C', total: 2569, balance: '-2.58%' },
-      { eventType: 'Event_D', total: 2569, balance: '-2.58%' },
-      { eventType: 'Event_E', total: 2569, balance: '-2.58%' },
-      { eventType: 'Event_F', total: 2569, balance: '-2.58%' },
-      { eventType: 'Event_D', total: 2569, balance: '-2.58%' }
     ];
 
   }
@@ -85,24 +85,25 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
 
   initialQueries(){
 
-    this.eventSourcingMonitorervice.getTimeFrameInRangeSince$('MINUTE', Date.now(), this.getDefaultLimitByTimeRangeType('MINUTE'))
-      .pipe(
-        map(result => JSON.parse(JSON.stringify(result))),
-        map(resultAsArray => resultAsArray.sort((a, b) =>  a.id - b.id)),
-        mergeMap((arrayResult: any) =>
-          forkJoin(
-            this.updateGeneralEventsOverViewChart$(arrayResult),
-            this.updateOverViewByAggregateType$(arrayResult),
-            this.updateOverViewByEventType$(arrayResult)
-          )
-        )
-      ).toArray()
-      .subscribe(
-        (a) => console.log(a),
-        (e) => console.log(e),
-        () => { }
-      );
+    // this.eventSourcingMonitorervice.getTimeFrameInRangeSince$('MINUTE', Date.now(), this.getDefaultLimitByTimeRangeType('MINUTE'))
+    //   .pipe(
+    //     map(result => JSON.parse(JSON.stringify(result))),
+    //     map(resultAsArray => resultAsArray.sort((a, b) =>  a.id - b.id)),
+    //     mergeMap((arrayResult: any) =>
+    //       forkJoin(
+    //         this.updateGeneralEventsOverViewChart$(arrayResult),
+    //         this.updateOverViewByAggregateType$(arrayResult),
+    //         this.updateOverViewByEventType$(arrayResult)
+    //       )
+    //     )
+    //   ).toArray()
+    //   .subscribe(
+    //     (a) => console.log(a),
+    //     (e) => console.log(e),
+    //     () => { }
+    //   );
 
+    this.updateBalanceTable('MINUTE');
 
     this.eventSourcingMonitorervice.getTimeFrameInRangeSince$('MINUTE', Date.now(), this.getDefaultLimitByTimeRangeType('MINUTE'))
       .subscribe(
@@ -138,8 +139,9 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
                   {
                     label: key,
                     data: Array.apply(null, Array(responseJSON.length)).map(Number.prototype.valueOf, 0),
-                    fill: 'start'
+                    fill: false
                   });
+                  this.overViewByEventType.filtersApplied.push(key);
               }
             });
           });
@@ -158,6 +160,22 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
                 .toLocaleString('es-CO', this.getLabelFormatter('MINUTE'))
             );
           });
+        const filterOptions: FilterOption[] = [];
+
+          allDataSets.forEach((e: {label: string, data: number[], fill: string }) => {
+            const filterIndex = filterOptions.findIndex(i => i.letter === e.label[0]);
+            if (filterIndex === -1){
+              filterOptions.push(
+                {
+                  letter: e.label[0].toUpperCase(),
+                  names: [e.label]
+                });
+            } else{
+              filterOptions[filterIndex].names.push(e.label);
+            }
+          });
+          this.overViewByEventType.optionsToFilter = filterOptions;
+
 
           // update OverViewByAggregateType chart
           allDataSets = []; // var used to all datasets for OverViewByAggregateType chart
@@ -289,7 +307,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
                   {
                     label: key,
                     data: Array.apply(null, Array(responseJSON.length)).map(Number.prototype.valueOf, 0),
-                    fill: 'start'
+                    fill: false
                   });
               }
             });
@@ -335,9 +353,8 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
                   {
                     label: key,
                     data: Array.apply(null, Array(responseJSON.length)).map(Number.prototype.valueOf, 0),
-                    fill: 'start'
+                    fill: false
                   });
-                  console.log('$$$$$$$$$$$$', key);
               }
             });
           });
@@ -358,13 +375,6 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
                 .toLocaleString('es-CO', this.getLabelFormatter(timeRange))
             );
           });
-
-
-
-
-
-
-
         },
         (e) => console.log(e),
         () => {}
@@ -372,6 +382,41 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
   }
   updateOverViewByAggregateType$(array: any[]): Rx.Observable<any>{
     return Rx.Observable.of(array);
+  }
+
+  updateBalanceTable(timeScale: string){
+    this.topEvents = [];
+    this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(timeScale, Date.now(), this.getDefaultLimitByTimeRangeType(timeScale))
+    .pipe(
+      map(result => JSON.parse(JSON.stringify(result))),
+      map((resultAsArray: any[]) => resultAsArray.sort((a, b) =>  a.id - b.id).slice(resultAsArray.length - 3, resultAsArray.length - 1)),
+      tap(r => console.log(r)),
+      mergeMap((arrayResult: any) =>
+        Rx.Observable.from(arrayResult)
+        .pipe(
+          map((r: any) => r.eventTypeHits)
+        ).toArray()
+      )
+    )
+    .subscribe(
+      ( result: any[] ) =>  {
+        // const allEvenTypes = [...Object.entries(result[0]), ...Object.entries(result[1]) ];
+        // console.log('ALL EVENT TYPES ==> ', allEvenTypes);
+
+        result[0].forEach(preKeyValue => {
+          const latestKeyValue = result[1].filter(o => o.key === preKeyValue.key)[0];
+          const rowBalance = (((latestKeyValue ? latestKeyValue.value : 0 / preKeyValue.value) - 1) * 100 ).toFixed(0) + '%';
+
+          this.topEvents.push({
+            eventType: preKeyValue.key,
+            total: latestKeyValue.value,
+            balance: rowBalance
+          });
+        });
+      },
+      (e) => console.log(e),
+      () => { }
+    );
   }
 
   initCharts(){
@@ -410,6 +455,22 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     this[chartName].toggleFilterForm = () => {
       this[chartName].showFilterForm = !this[chartName].showFilterForm;
     };
+
+    this[chartName].updateFiltersApplied = (filtersApplied: string[], show: boolean) => {
+      this[chartName].filtersApplied = filtersApplied;
+      this[chartName].datasets.forEach(dataset => {
+        filtersApplied.findIndex(i => i === dataset.label) !== -1
+        ? dataset.hidden = false
+        : dataset.hidden = true;
+      });
+      this.updateChart(chartName);
+    };
+  }
+
+  updateChart(chartName: string): void {
+    const labelsCopy = this[chartName].labels.slice();
+    this[chartName].datasets.labels = 0;
+    this[chartName].labels = labelsCopy;
   }
 
 

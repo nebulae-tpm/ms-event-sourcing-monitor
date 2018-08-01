@@ -1,8 +1,21 @@
-<div fxLayout="column" fxLayoutAlign="space-between stretch"  >
+<div fxLayout="column" fxLayoutAlign="space-between stretch">
   <form [formGroup]="stateForm">
-
-    <mat-form-field>
-      <input type="text" matInput placeholder="States Group" #searchFilter formControlName="stateGroup" [matAutocomplete]="autoGroup" >
+    <mat-form-field class="w-100-p" floatPlaceholder="never">
+        <mat-chip-list matPrefix #filterList>
+          <mat-chip fxLayoutWrap *ngFor="let category of filtersApplied"
+                    removable="true"
+                    (removed)="removeItemFromFilter(category)">
+            {{category}}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+        </mat-chip-list>
+      <input matInput
+          placeholder="Filtro"
+          matChipInputAddOnBlur="true"
+          #searchFilter
+          formControlName="stateGroup"
+          [matChipInputFor]="filterList"
+          [matAutocomplete]="autoGroup">
       <mat-autocomplete #autoGroup="matAutocomplete">
         <mat-optgroup *ngFor="let group of stateGroupOptions | async" [label]="group.letter">
           <mat-option (onSelectionChange)="onNewFilterAdded($event); " *ngFor="let name of group.names" [value]="name">
@@ -11,14 +24,5 @@
         </mat-optgroup>
       </mat-autocomplete>
     </mat-form-field>
-
-    <mat-form-field class="w-100-p" floatPlaceholder="never">
-        <mat-chip-list >
-          <mat-chip  fxLayoutWrap style="border: 10px" *ngFor="let category of filtersApplied" removable="true"  (removed)="removeItemFromFilter(category)">
-            {{category}}
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
-        </mat-chip-list>
-      </mat-form-field>
   </form>
 </div>

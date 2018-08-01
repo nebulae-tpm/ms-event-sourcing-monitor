@@ -6,10 +6,14 @@ export enum TimeRanges {
   YEAR = 5
 }
 
+
+
 export const genericLineChart = {
   name: 'generalEventsOverView',
   ready: false,
   showFilterForm: false,
+  optionsToFilter: [],
+  filtersApplied: [],
   timeScales: {
     MINUTE: 1,
     HOUR: 2,

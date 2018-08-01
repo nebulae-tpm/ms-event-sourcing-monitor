@@ -26,12 +26,11 @@ export const _filter = (opt: string[], value: string): string[] => {
 export class MonitorFilterHelperComponent implements OnInit {
 
   @Input() listOptions: FilterOptions[];
-  @Output() filterInserted: EventEmitter<any> = new EventEmitter();
-  @Output() filterRemoved: EventEmitter<any> = new EventEmitter();
+  @Input() filtersApplied: string[];
+  @Output() filtersUpdated: EventEmitter<any> = new EventEmitter();
 
   constructor(private fb: FormBuilder) { }
 
-  filtersApplied = [];
   searchFilter: string;
 
   stateForm: FormGroup = this.fb.group({
@@ -64,7 +63,8 @@ export class MonitorFilterHelperComponent implements OnInit {
 
   removeItemFromFilter(filter: any) {
     this.filtersApplied = this.filtersApplied.filter(e => e !== filter);
-    this.filterRemoved.emit(filter);
+    console.log('removeItemFromFilter', this.filtersApplied);
+    this.filtersUpdated.emit(this.filtersApplied);
   }
 
   onNewFilterAdded(filter: any){
@@ -72,7 +72,7 @@ export class MonitorFilterHelperComponent implements OnInit {
     this.searchFilter = '';
     if (!this.filtersApplied.includes(filterToApply)){
       this.filtersApplied.push(filter.source.value);
-      this.filterInserted.emit(filter.source.value);
+      this.filtersUpdated.emit(this.filtersApplied);
     }
   }
 }
