@@ -29,10 +29,22 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let row of topEvents" [routerLink]="['event/test']">
+                  <tr *ngFor="let row of topEvents" [routerLink]="['event', row.eventType]">
                     <td>{{row.eventType}}</td>
                     <td class="text-right">{{row.total}}</td>
-                    <td class="text-right">{{row.balance}}</td>
+                    <td class="text-right" fxLayout="row" fxLayoutAlign="end center"  >
+                      <mat-icon class="s-18 pr-4 red-fg" *ngIf="row.balance < 0">
+                        arrow_downward
+                      </mat-icon>
+
+                      <mat-icon class="s-18 pr-4 green-fg" *ngIf="row.balance > 0">
+                        arrow_upward
+                      </mat-icon>
+                      <div [ngClass]="{'red-fg': row.balance < 0, 'green-fg': row.balance > 0}">
+                          {{row.balance}}%
+                      </div>
+
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -87,7 +99,7 @@
         <!-- OVERVIEW GENERAL -->
 
         <!-- OVERVIEW BY EVENT_TYPE -->
-        <fuse-widget fxLayoutWrap class="widget" fxLayout="column" fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="100">
+        <fuse-widget *ngIf="overViewByEventType.ready" fxLayoutWrap class="widget" fxLayout="column" fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="100">
           <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
 
             <!-- HEADERS AND SELECT OPTIONS -->
@@ -148,7 +160,7 @@
         <!-- OVERVIEW BY EVENT_TYPE -->
 
         <!-- OVERVIEW BY AGGREGATE_TYPE -->
-        <fuse-widget fxLayoutWrap class="widget" fxLayout="column" fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="100">
+        <fuse-widget *ngIf="overViewByAggregateType.ready" fxLayoutWrap class="widget" fxLayout="column" fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="100">
           <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
 
             <!-- HEADERS AND SELECT OPTIONS -->

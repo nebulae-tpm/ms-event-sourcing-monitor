@@ -25,30 +25,6 @@ class EventStoreService {
    *    emit value: { aggregateType, eventType, handlerName}
    */
   start$() {
-
-    // Rx.Observable.interval(5000).subscribe(() => {
-    //   const users = ["Felipe", "Esteban", "Daniel", "Sebas", "Camilo", "Leon"];
-    //   const agreggateTypes = ["Device", "Cronjob", "Business", "Clearing"];
-    //   const versions = ["1_Beta", "2_Beta", "1_alfa"];
-    //   const eventTypes = ["DeviceConnected", "DeviceRamuUsageAlarmActivated", "DeviceCpuAlarmActivated"]
-
-    //   const evt = {
-    //     et: eventTypes[Math.floor(Math.random() * eventTypes.length)],
-    //     etv: versions[Math.floor(Math.random() * versions.length)],
-    //     at: agreggateTypes[Math.floor(Math.random() * agreggateTypes.length)],
-    //     user: users[Math.floor(Math.random() * users.length)],
-    //     timestamp: Date.now(),
-    //     _id: "1"
-    //   };
-
-    //   eventSourcingMonitor.handleEventToCumulate$(evt)
-    //   .subscribe(
-    //     (r) => {  },
-    //     (error) => console.log(error),
-    //     () => {}
-    //   );
-    // });
-
     //default error handler
     const onErrorHandler = error => {
       console.error("Error handling  EventStore incoming event", error);
@@ -86,8 +62,8 @@ class EventStoreService {
     const subscription =
       //MANDATORY:  AVOIDS ACK REGISTRY DUPLICATIONS
       eventSourcing.eventStore.ensureAcknowledgeRegistry$(aggregateType)
-        .mergeMap(() => eventSourcing.eventStore.getEventListener$(aggregateType, mbeKey))
-        .filter(evt => evt.et === eventType)
+        .mergeMap(() => eventSourcing.eventStore.getEventListener$(aggregateType, mbeKey, false))
+        // .filter(evt => evt.et === eventType)
         .mergeMap(evt => Rx.Observable.concat(
           handler.fn.call(handler.obj, evt),
           //MANDATORY:  ACKWOWLEDGE THIS EVENT WAS PROCESSED
@@ -125,7 +101,7 @@ class EventStoreService {
     //MANDATORY:  AVOIDS ACK REGISTRY DUPLICATIONS
     return eventSourcing.eventStore.ensureAcknowledgeRegistry$(aggregateType)
       .switchMap(() => eventSourcing.eventStore.retrieveUnacknowledgedEvents$(aggregateType, mbeKey))
-      .filter(evt => evt.et === eventType)
+      // .filter(evt => evt.et === eventType)
       .concatMap(evt => Rx.Observable.concat(
         handler.fn.call(handler.obj, evt),
         //MANDATORY:  ACKWOWLEDGE THIS EVENT WAS PROCESSED
@@ -139,43 +115,7 @@ class EventStoreService {
 
   generateFunctionMap() {
     return {
-      DeviceConnected: {
-        fn: eventSourcingMonitor.handleEventToCumulate$,
-        obj: eventSourcingMonitor
-      },
-      DeviceCpuUsageAlarmActivated: {
-        fn: eventSourcingMonitor.handleEventToCumulate$,
-        obj: eventSourcingMonitor
-      },
-      DeviceRamuUsageAlarmActivated: {
-        fn: eventSourcingMonitor.handleEventToCumulate$,
-        obj: eventSourcingMonitor
-      },
-      DeviceTemperatureAlarmActivated: {
-        fn: eventSourcingMonitor.handleEventToCumulate$,
-        obj: eventSourcingMonitor
-      },
-      DeviceLowVoltageAlarmReported: {
-        fn: eventSourcingMonitor.handleEventToCumulate$,
-        obj: eventSourcingMonitor
-      },
-      DeviceHighVoltageAlarmReported: {
-        fn: eventSourcingMonitor.handleEventToCumulate$,
-        obj: eventSourcingMonitor
-      },
-      DeviceDeviceStateReported: {
-        fn: eventSourcingMonitor.handleEventToCumulate$,
-        obj: eventSourcingMonitor
-      },
-      DeviceMainAppUsosTranspCountReported: {
-        fn: eventSourcingMonitor.handleEventToCumulate$,
-        obj: eventSourcingMonitor
-      },
-      DeviceMainAppErrsTranspCountReported: {
-        fn: eventSourcingMonitor.handleEventToCumulate$,
-        obj: eventSourcingMonitor
-      },
-      CleanDashBoardDevicesHistoryJobTriggered: {
+      "*": {
         fn: eventSourcingMonitor.handleEventToCumulate$,
         obj: eventSourcingMonitor
       }
@@ -188,44 +128,8 @@ class EventStoreService {
   generateAggregateEventsArray() {
     return [
       {
-        aggregateType: "Device",
-        eventType: "DeviceConnected"
-      },
-      {
-        aggregateType: "Device",
-        eventType: "DeviceDeviceStateReported"
-      },
-      {
-        aggregateType: "Device",
-        eventType: "DeviceCpuUsageAlarmActivated"
-      },
-      {
-        aggregateType: "Device",
-        eventType: "DeviceRamuUsageAlarmActivated"
-      },
-      {
-        aggregateType: "Device",
-        eventType: "DeviceTemperatureAlarmActivated"
-      },
-      {
-        aggregateType: "Device",
-        eventType: "DeviceLowVoltageAlarmReported"
-      },
-      {
-        aggregateType: "Device",
-        eventType: "DeviceHighVoltageAlarmReported"
-      },
-      {
-        aggregateType: "Device",
-        eventType: "DeviceMainAppUsosTranspCountReported"
-      },
-      {
-        aggregateType: "Device",
-        eventType: "DeviceMainAppErrsTranspCountReported"
-      },
-      {
-        aggregateType: "Cronjob",
-        eventType: "CleanDashBoardDevicesHistoryJobTriggered"
+        aggregateType: "*",
+        eventType: "*"
       }
     ]
   }

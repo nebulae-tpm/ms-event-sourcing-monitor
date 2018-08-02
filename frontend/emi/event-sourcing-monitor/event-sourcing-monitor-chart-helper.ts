@@ -5,8 +5,21 @@ export enum TimeRanges {
   MONTH = 4,
   YEAR = 5
 }
-
-
+export interface GenericLineChartInterfaz {
+  name: string;
+  ready: boolean;
+  showFilterForm: boolean;
+  filtersApplied: string[];
+  timeScales: Object;
+  quantities: Object;
+  currentTimeRange: number;
+  currentQuantity: number;
+  datasets: {label: string, data: number[], fill: string|boolean, hidden: boolean }[];
+  labels: string[];
+  colors: Object[];
+  options: Object;
+  chartType: string;
+}
 
 export const genericLineChart = {
   name: 'generalEventsOverView',
