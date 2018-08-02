@@ -177,7 +177,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
 
     // update OverViewByEventType chart
     let allDataSets = []; // var used to all datasets for OverViewByEventType chart
-
+    // const filtersApplied = this.overViewByEventType.filtersApplied.slice();
     allSummaries.forEach(({ eventTypeHits }) => {
       eventTypeHits.forEach(({ key, value }) => {
         if (allDataSets.filter(o => o.label === key).length === 0) {
@@ -187,7 +187,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
               data: Array.apply(null, Array(allSummaries.length)).map(Number.prototype.valueOf, 0),
               fill: false
             });
-          this.overViewByEventType.filtersApplied.push(key);
+          // this.overViewByEventType.filtersApplied.push(key);
         }
       });
     });
@@ -230,6 +230,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     }
 
     this.overViewByEventType.datasets = allDataSets;
+    console.log('FILTERS ===> ', this.overViewByEventType.filter);
     this.overViewByEventType.ready = true;
 
     // return Rx.Observable.from(allSummaries).pipe(
@@ -445,7 +446,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       this[chartName].datasets.forEach(dataset => {
         filtersApplied.findIndex(i => i === dataset.label) !== -1
         ? dataset.hidden = false
-        : dataset.hidden = true;
+        : dataset.hidden = filtersApplied.length === 0 ? false : true;
       });
       this.updateChart(chartName);
     };
