@@ -41,7 +41,7 @@
                         arrow_upward
                       </mat-icon>
                       <div [ngClass]="{'red-fg': row.balance < 0, 'green-fg': row.balance > 0}">
-                          {{row.balance}}%
+                          {{ (row.balance + '').replace('-', '')}}%
                       </div>
 
                     </td>

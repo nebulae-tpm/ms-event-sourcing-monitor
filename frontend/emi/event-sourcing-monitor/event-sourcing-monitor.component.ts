@@ -8,7 +8,7 @@ import { locale as spanish } from './i18n/es';
 // tslint:disable-next-line:import-blacklist
 import * as Rx from 'rxjs/Rx';
 // tslint:disable-next-line:import-blacklist
-import { filter, mergeMap, map, tap } from 'rxjs/operators';
+import { mergeMap, map, tap } from 'rxjs/operators';
 // tslint:disable-next-line:import-blacklist
 import { forkJoin, of } from 'rxjs';
 
@@ -75,145 +75,25 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
 
   initialQueries(){
 
-    // this.eventSourcingMonitorervice.getTimeFrameInRangeSince$('MINUTE', Date.now(), this.getDefaultLimitByTimeRangeType('MINUTE'))
-    //   .pipe(
-    //     map(result => JSON.parse(JSON.stringify(result))),
-    //     map(resultAsArray => resultAsArray.sort((a, b) =>  a.id - b.id)),
-    //     mergeMap((arrayResult: any) =>
-    //       forkJoin(
-    //         this.updateGeneralEventsOverViewChart$(arrayResult),
-    //         this.updateOverViewByAggregateType$(arrayResult),
-    //         this.updateOverViewByEventType$(arrayResult)
-    //       )
-    //     )
-    //   ).toArray()
-    //   .subscribe(
-    //     (a) => console.log(a),
-    //     (e) => console.log(e),
-    //     () => { }
-    //   );
+    this.eventSourcingMonitorervice.getTimeFrameInRangeSince$('MINUTE', Date.now(), this.getDefaultLimitByTimeRangeType('MINUTE'))
+      .pipe(
+        map(result => JSON.parse(JSON.stringify(result))),
+        map(resultAsArray => resultAsArray.sort((a, b) =>  a.id - b.id)),
+        mergeMap((arrayResult: any) =>
+          forkJoin(
+            this.updateGeneralEventsOverViewChart$(arrayResult, TimeRanges[1]),
+            this.updateOverViewByEventType$(arrayResult, TimeRanges[1]),
+            this.updateOverViewByAggregateType$(arrayResult, TimeRanges[1])
+          )
+        )
+      ).toArray()
+      .subscribe(
+        (a) => console.log(a),
+        (e) => console.log(e),
+        () => { }
+      );
 
     this.updateBalanceTable('MINUTE');
-
-    this.eventSourcingMonitorervice.getTimeFrameInRangeSince$('MINUTE', Date.now(), this.getDefaultLimitByTimeRangeType('MINUTE'))
-      .subscribe(
-        result => {
-          const responseJSON: any[] =  JSON.parse(JSON.stringify(result));
-          // order summaries
-          const AllSumaries = responseJSON.sort((a, b) =>  a.id - b.id);
-
-          // update generalEventsOverViewChart
-          this.generalEventsOverViewChart.datasets = [{
-            label: 'General overview',
-            data: [],
-            fill: 'start'
-          }];
-          this.generalEventsOverViewChart.labels.length = 0;
-          AllSumaries.forEach((summary) => {
-            this.generalEventsOverViewChart.datasets[0].data.push(summary.globalHits);
-            this.generalEventsOverViewChart.labels.push(
-              new Date(summary.id)
-              // TODO set i18n in the next method
-                .toLocaleString('es-CO', this.getLabelFormatter('MINUTE'))
-            );
-          });
-          this.generalEventsOverViewChart.ready = true;
-
-
-          // update OverViewByEventType chart
-          let allDataSets = []; // var used to all datasets for OverViewByEventType chart
-          AllSumaries.forEach(({ eventTypeHits }) => {
-            eventTypeHits.forEach(({ key, value }) => {
-              if (allDataSets.filter(o => o.label === key).length === 0) {
-                allDataSets.push(
-                  {
-                    label: key,
-                    data: Array.apply(null, Array(responseJSON.length)).map(Number.prototype.valueOf, 0),
-                    fill: false
-                  });
-                  this.overViewByEventType.filtersApplied.push(key);
-              }
-            });
-          });
-          this.overViewByEventType.labels.length = 0;
-          responseJSON.forEach(({id, eventTypeHits}, index) => {
-            eventTypeHits.forEach(({key, value}) => {
-              const indexToReplace = allDataSets.findIndex(i => i.label === key);
-              allDataSets[indexToReplace].data[index] = value;
-            });
-
-
-            this.overViewByEventType.labels.push(
-              new Date(id)
-              // TODO set i18n in the next method
-                .toLocaleString('es-CO', this.getLabelFormatter('MINUTE'))
-            );
-          });
-        const filterOptions: FilterOption[] = [];
-
-          allDataSets.forEach((e: {label: string, data: number[], fill: string }) => {
-            const filterIndex = filterOptions.findIndex(i => i.letter === e.label[0]);
-            if (filterIndex === -1){
-              filterOptions.push(
-                {
-                  letter: e.label[0].toUpperCase(),
-                  names: [e.label]
-                });
-            } else{
-              filterOptions[filterIndex].names.push(e.label);
-            }
-          });
-          this.overViewByEventType.optionsToFilter = filterOptions;
-
-          if (allDataSets.length === 0){
-            console.log('EL DATASETS ESTABA VACIO', allDataSets);
-            allDataSets = [{
-              label: 'Event_A',
-              data: Array.apply(null, Array(responseJSON.length)).map(Number.prototype.valueOf, 0),
-              fill: 'start'
-            }];
-          }
-
-          this.overViewByEventType.datasets = allDataSets;
-          this.overViewByEventType.ready = true;
-
-
-          // update OverViewByAggregateType chart
-          allDataSets = []; // var used to all datasets for OverViewByAggregateType chart
-          AllSumaries.forEach(({ aggregateTypeHits }) => {
-            aggregateTypeHits.forEach(({ key, value }) => {
-              if (allDataSets.filter(o => o.label === key).length === 0) {
-                allDataSets.push(
-                  {
-                    label: key,
-                    data: Array.apply(null, Array(responseJSON.length)).map(Number.prototype.valueOf, 0),
-                    fill: false,
-                    borderWidth: 3
-                  });
-              }
-            });
-          });
-          this.overViewByAggregateType.labels.length = 0;
-          responseJSON.forEach(({id, aggregateTypeHits}, index) => {
-            aggregateTypeHits.forEach(({key, value}) => {
-              const indexToReplace = allDataSets.findIndex(i => i.label === key);
-              allDataSets[indexToReplace].data[index] = value;
-            });
-
-            this.overViewByAggregateType.datasets = allDataSets;
-
-            this.overViewByAggregateType.labels.push(
-              new Date(id)
-              // TODO set i18n in the next method
-                .toLocaleString('es-CO', this.getLabelFormatter('MINUTE'))
-            );
-          });
-          // this.overViewByAggregateType.ready = true;
-
-        },
-        (e) => console.log(e),
-        () => {}
-      );
   }
 
   /**
@@ -260,154 +140,210 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       default: return 0;
     }
   }
+/**
+ * Update the general overview chart
+ * @param allSummaries allSummaries that the query give us
+ * @param timeScale  MINUTE, HOUR, DAY, MONTH, YEAR
+ */
+  updateGeneralEventsOverViewChart$(allSummaries: any[], timeScale: string) {
+    this.generalEventsOverViewChart.datasets = [{
+      label: 'General overview',
+      data: [],
+      fill: 'start'
+    }];
 
-  updateGeneralEventsOverViewChart(timeRange: string, range: number){
-    this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(timeRange, Date.now(), range)
-      .subscribe(
-        result => {
-          const responseJSON =  JSON.parse(JSON.stringify(result));
-
-          this.generalEventsOverViewChart.datasets = [{
-            label: 'General overview',
-            data: [],
-            fill: 'start'
-          }];
-
-          const AllSumaries: [any] = responseJSON.sort((a, b) =>  a.id - b.id);
-          this.generalEventsOverViewChart.labels.length = 0;
-          AllSumaries.forEach((summary, index) => {
-            this.generalEventsOverViewChart.datasets[0].data.push(summary.globalHits);
-            this.generalEventsOverViewChart.labels.push(
-              new Date(summary.id)
-              // TODO set i18n in the next method
-                .toLocaleString('es-CO', this.getLabelFormatter(timeRange))
-            );
-          });
-        },
-        (e) => console.log(e),
-        () => {}
+    this.generalEventsOverViewChart.labels.length = 0;
+    allSummaries.forEach((summary, index) => {
+      this.generalEventsOverViewChart.datasets[0].data.push(summary.globalHits);
+      this.generalEventsOverViewChart.labels.push(
+        new Date(summary.id)
+          // TODO set i18n in the next method
+          .toLocaleString('es-CO', this.getLabelFormatter(timeScale))
       );
+    });
+    this.generalEventsOverViewChart.ready = true;
+    // return Rx.Observable.from(allSummaries).pipe(
+    //   map((summary: any) => new Date(summary.id).toLocaleTimeString())
+    // );
+    return Rx.Observable.of(timeScale);
   }
 
+  /**
+   * Update the overview by eventType chart
+   * @param allSummaries allSummaries that the query give us
+   * @param timeScale MINUTE, HOUR, DAY, MONTH, YEAR
+   */
+  updateOverViewByEventType$(allSummaries: any, timeScale: string) {
 
-  updateOverViewByEventType(timeRange: string, range: number){
-    console.log('timeRange: ', timeRange, 'range: ', range );
-    this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(timeRange, Date.now(), range)
-      .subscribe(
-        result => {
-          const responseJSON: any[] =  JSON.parse(JSON.stringify(result));
-          // order summaries
-          const AllSumaries = responseJSON.sort((a, b) =>  a.id - b.id);
-           // update OverViewByEventType chart
-           let allDataSets = []; // var used to all datasets for OverViewByEventType chart
-           console.log('');
-           AllSumaries.forEach(({ eventTypeHits }) => {
-             eventTypeHits.forEach(({ key, value }) => {
-               if (allDataSets.filter(o => o.label === key).length === 0) {
-                 allDataSets.push(
-                   {
-                     label: key,
-                     data: Array.apply(null, Array(responseJSON.length)).map(Number.prototype.valueOf, 0),
-                     fill: false
-                   });
-                   this.overViewByEventType.filtersApplied.push(key);
-               }
-             });
-           });
-           this.overViewByEventType.labels.length = 0;
-           responseJSON.forEach(({id, eventTypeHits}, index) => {
-             eventTypeHits.forEach(({key, value}) => {
-               const indexToReplace = allDataSets.findIndex(i => i.label === key);
-               allDataSets[indexToReplace].data[index] = value;
-             });
+    // update OverViewByEventType chart
+    let allDataSets = []; // var used to all datasets for OverViewByEventType chart
 
-
-
-             this.overViewByEventType.labels.push(
-               new Date(id)
-               // TODO set i18n in the next method
-                 .toLocaleString('es-CO', this.getLabelFormatter(timeRange))
-             );
-           });
-         const filterOptions: FilterOption[] = [];
-
-           allDataSets.forEach((e: {label: string, data: number[], fill: string }) => {
-             const filterIndex = filterOptions.findIndex(i => i.letter === e.label[0]);
-             if (filterIndex === -1){
-               filterOptions.push(
-                 {
-                   letter: e.label[0].toUpperCase(),
-                   names: [e.label]
-                 });
-             } else{
-               filterOptions[filterIndex].names.push(e.label);
-             }
-           });
-           this.overViewByEventType.optionsToFilter = filterOptions;
-
-           if (allDataSets.length === 0){
-             console.log('EL DATASETS ESTABA VACIO', allDataSets);
-             allDataSets = [{
-               label: 'Event_A',
-               data: Array.apply(null, Array(responseJSON.length)).map(Number.prototype.valueOf, 0),
-               fill: 'start'
-             }];
-           }
-
-           this.overViewByEventType.datasets = allDataSets;
-           this.overViewByEventType.ready = true;
-           this.updateChart('overViewByEventType');
-
-        },
-        (e) => console.log(e),
-        () => {}
-      );
-  }
-
-
-  updateOverViewByAggregateType(timeRange: string, range: number){
-    this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(timeRange, Date.now(), range)
-      .subscribe(
-        result => {
-          const allDataSets = [];
-          let responseJSON: any[] =  JSON.parse(JSON.stringify(result));
-          responseJSON = responseJSON.sort((a, b) =>  a.id - b.id);
-
-          responseJSON.forEach(({ aggregateTypeHits }) => {
-            aggregateTypeHits.forEach(({ key, value }) => {
-              if (allDataSets.filter(o => o.label === key).length === 0) {
-                allDataSets.push(
-                  {
-                    label: key,
-                    data: Array.apply(null, Array(responseJSON.length)).map(Number.prototype.valueOf, 0),
-                    fill: false
-                  });
-              }
+    allSummaries.forEach(({ eventTypeHits }) => {
+      eventTypeHits.forEach(({ key, value }) => {
+        if (allDataSets.filter(o => o.label === key).length === 0) {
+          allDataSets.push(
+            {
+              label: key,
+              data: Array.apply(null, Array(allSummaries.length)).map(Number.prototype.valueOf, 0),
+              fill: false
             });
+          this.overViewByEventType.filtersApplied.push(key);
+        }
+      });
+    });
+    this.overViewByEventType.labels.length = 0;
+
+    allSummaries.forEach(({ id, eventTypeHits }, index) => {
+
+      eventTypeHits.forEach(({ key, value }) => {
+        const indexToReplace = allDataSets.findIndex(i => i.label === key);
+        allDataSets[indexToReplace].data[index] = value;
+      });
+
+      // TODO apply with i18n
+      this.overViewByEventType.labels.push(new Date(id).toLocaleString('es-CO', this.getLabelFormatter(timeScale)));
+    });
+
+    const filterOptions: FilterOption[] = [];
+
+    allDataSets.forEach((e: { label: string, data: number[], fill: string }) => {
+      const filterIndex = filterOptions.findIndex(i => i.letter === e.label[0]);
+      if (filterIndex === -1) {
+        filterOptions.push(
+          {
+            letter: e.label[0].toUpperCase(),
+            names: [e.label]
           });
+      } else {
+        filterOptions[filterIndex].names.push(e.label);
+      }
+    });
+    this.overViewByEventType.optionsToFilter = filterOptions;
 
-          this.overViewByAggregateType.labels.length = 0;
+    if (allDataSets.length === 0) {
+      console.log('EL DATASETS ESTABA VACIO', allDataSets);
+      allDataSets = [{
+        label: 'Event_A',
+        data: Array.apply(null, Array(allSummaries.length)).map(Number.prototype.valueOf, 0),
+        fill: 'start'
+      }];
+    }
 
-          responseJSON.forEach(({id, aggregateTypeHits}, index) => {
-            aggregateTypeHits.forEach(({key, value}) => {
-              const indexToReplace = allDataSets.findIndex(i => i.label === key);
-              allDataSets[indexToReplace].data[index] = value;
-            });
+    this.overViewByEventType.datasets = allDataSets;
+    this.overViewByEventType.ready = true;
 
-            this.overViewByAggregateType.datasets = allDataSets;
-
-            this.overViewByAggregateType.labels.push(
-              new Date(id)
-              // TODO set i18n in the next method
-                .toLocaleString('es-CO', this.getLabelFormatter(timeRange))
-            );
-          });
-        },
-        (e) => console.log(e),
-        () => {}
-      );
+    // return Rx.Observable.from(allSummaries).pipe(
+    //   map((summary: any) => new Date(summary.id).toLocaleTimeString())
+    // );
+    return Rx.Observable.of(timeScale);
   }
 
+  // updateOverViewByAggregateType(timeRange: string, range: number){
+  //   this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(timeRange, Date.now(), range)
+  //     .subscribe(
+  //       result => {
+  //         const allDataSets = [];
+  //         let responseJSON: any[] =  JSON.parse(JSON.stringify(result));
+  //         responseJSON = responseJSON.sort((a, b) =>  a.id - b.id);
+
+  //         responseJSON.forEach(({ aggregateTypeHits }) => {
+  //           aggregateTypeHits.forEach(({ key, value }) => {
+  //             if (allDataSets.filter(o => o.label === key).length === 0) {
+  //               allDataSets.push(
+  //                 {
+  //                   label: key,
+  //                   data: Array.apply(null, Array(responseJSON.length)).map(Number.prototype.valueOf, 0),
+  //                   fill: false
+  //                 });
+  //             }
+  //           });
+  //         });
+
+  //         this.overViewByAggregateType.labels.length = 0;
+
+  //         responseJSON.forEach(({id, aggregateTypeHits}, index) => {
+  //           aggregateTypeHits.forEach(({key, value}) => {
+  //             const indexToReplace = allDataSets.findIndex(i => i.label === key);
+  //             allDataSets[indexToReplace].data[index] = value;
+  //           });
+
+  //           this.overViewByAggregateType.datasets = allDataSets;
+
+  //           this.overViewByAggregateType.labels.push(
+  //             new Date(id)
+  //             // TODO set i18n in the next method
+  //               .toLocaleString('es-CO', this.getLabelFormatter(timeRange))
+  //           );
+  //         });
+  //       },
+  //       (e) => console.log(e),
+  //       () => {}
+  //     );
+  // }
+  updateOverViewByAggregateType$(allSummaries: any, timeScale: string){
+     // update OverViewByEventType chart
+     let allDataSets = []; // var used to all datasets for OverViewByEventType chart
+     allSummaries.forEach(({ aggregateTypeHits }) => {
+       aggregateTypeHits.forEach(({ key, value }) => {
+         if (allDataSets.filter(o => o.label === key).length === 0) {
+           allDataSets.push(
+             {
+               label: key,
+               data: Array.apply(null, Array(allSummaries.length)).map(Number.prototype.valueOf, 0),
+               fill: false
+             });
+           this.overViewByAggregateType.filtersApplied.push(key);
+         }
+       });
+     });
+     this.overViewByAggregateType.labels.length = 0;
+     allSummaries.forEach(({ id, aggregateTypeHits }, index) => {
+      aggregateTypeHits.forEach(({ key, value }) => {
+         const indexToReplace = allDataSets.findIndex(i => i.label === key);
+         allDataSets[indexToReplace].data[index] = value;
+       });
+
+
+
+       this.overViewByAggregateType.labels.push(
+         new Date(id)
+           // TODO set i18n in the next method
+           .toLocaleString('es-CO', this.getLabelFormatter(timeScale))
+       );
+     });
+     const filterOptions: FilterOption[] = [];
+
+     allDataSets.forEach((e: { label: string, data: number[], fill: string }) => {
+       const filterIndex = filterOptions.findIndex(i => i.letter === e.label[0]);
+       if (filterIndex === -1) {
+         filterOptions.push(
+           {
+             letter: e.label[0].toUpperCase(),
+             names: [e.label]
+           });
+       } else {
+         filterOptions[filterIndex].names.push(e.label);
+       }
+     });
+     this.overViewByAggregateType.optionsToFilter = filterOptions;
+
+     if (allDataSets.length === 0) {
+       console.log('EL DATASETS ESTABA VACIO', allDataSets);
+       allDataSets = [{
+         label: 'Event_A',
+         data: Array.apply(null, Array(allSummaries.length)).map(Number.prototype.valueOf, 0),
+         fill: 'start'
+       }];
+     }
+
+     this.overViewByAggregateType.datasets = allDataSets;
+     this.overViewByAggregateType.ready = true;
+
+     // return Rx.Observable.from(allSummaries).pipe(
+     //   map((summary: any) => new Date(summary.id).toLocaleTimeString())
+     // );
+     return Rx.Observable.of(timeScale);
+  }
 
   updateBalanceTable(timeScale: string){
     this.topEvents = [];
@@ -457,33 +393,53 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
    */
   setFunctionOnCharts(chartName: string): void {
     // function name to call when an update is required
-    const functionToCall = `update${chartName[0].toUpperCase()}${chartName.slice(1, chartName.length)}`;
+    const functionToSubscribe = `update${chartName[0].toUpperCase()}${chartName.slice(1, chartName.length)}$`;
     this[chartName].quantities = this.getDefaultsTimeRangesForscaleTime(TimeRanges[TimeRanges.MINUTE]);
     this[chartName].currentQuantity = this.getDefaultLimitByTimeRangeType(TimeRanges[TimeRanges.MINUTE]);
 
+    // when Change the Scale of time like MINUTES, HOURS ....
     this[chartName].onScaleChanged = (scaleTime: number) => {
-      this[chartName].labels = [];
-      this[functionToCall](
-        TimeRanges[scaleTime],
-        this.getDefaultLimitByTimeRangeType(TimeRanges[scaleTime])
-      );
+
       this[chartName].quantities = this.getDefaultsTimeRangesForscaleTime(TimeRanges[scaleTime]);
       this[chartName].currentQuantity = this.getDefaultLimitByTimeRangeType(TimeRanges[scaleTime]);
-    };
-
-    this[chartName].onRangeChanged = (timeRange: number) => {
-      console.log('onRangeChanged => ', timeRange );
-      this[chartName].labels = [];
-      this[functionToCall](
-        TimeRanges[this[chartName].currentTimeRange],
-        timeRange
+      this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(TimeRanges[scaleTime], Date.now(), this[chartName].currentQuantity)
+      .pipe(
+        map(result => JSON.parse(JSON.stringify(result))),
+        map(resultAsArray => resultAsArray.sort((a, b) =>  a.id - b.id)),
+        mergeMap((arrayResult: any[]) => this[functionToSubscribe](arrayResult, TimeRanges[scaleTime])
+        )
+      )
+      .subscribe(
+        (result) => { console.log('Result => ', result); },
+        (error) => { console.log(error); },
+        () => console.log('FINISHED')
       );
     };
+    // When change the range of time
+    this[chartName].onRangeChanged = (timeRange: number) => {
+      console.log('currentQuantity => ', this[chartName].currentQuantity);
+      console.log('currentTimeRange => ', this[chartName].currentTimeRange);
 
+      console.log('onRangeChanged => ', timeRange );
+      // this[chartName].labels = [];
+      this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(TimeRanges[this[chartName].currentTimeRange], Date.now(), timeRange)
+      .pipe(
+        map(result => JSON.parse(JSON.stringify(result))),
+        map(resultAsArray => resultAsArray.sort((a, b) =>  a.id - b.id)),
+        mergeMap((arrayResult: any[]) => this[functionToSubscribe](arrayResult, TimeRanges[this[chartName].currentTimeRange])
+        )
+      )
+      .subscribe(
+        (result) => { console.log('Result => ', result); },
+        (error) => { console.log(error); },
+        () => console.log('FINISHED')
+      );
+    };
+    // To hide or show the filter helper component
     this[chartName].toggleFilterForm = () => {
       this[chartName].showFilterForm = !this[chartName].showFilterForm;
     };
-
+    // to update the filters for each chart
     this[chartName].updateFiltersApplied = (filtersApplied: string[], show: boolean) => {
       this[chartName].filtersApplied = filtersApplied;
       this[chartName].datasets.forEach(dataset => {
@@ -493,6 +449,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       });
       this.updateChart(chartName);
     };
+
   }
 
   updateChart(chartName: string): void {
