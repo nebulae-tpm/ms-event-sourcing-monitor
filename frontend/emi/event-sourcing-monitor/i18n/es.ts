@@ -1,6 +1,11 @@
 export const locale = {
   lang: 'es',
   data: {
+    ESPECIFIC_CHART: {
+      SIDEBAR: {
+        TITLE: 'Lista de eventos'
+      }
+    },
     WIDGETS: {
       TITLES: {
         GENERAL_OVERVIEW: 'Vista general de eventos',

@@ -4,14 +4,19 @@
     <div class="content"> <!--  class="content p-24 w-100-p" -->
       <div class="widget-group" fxLayout="row" fxFlex="100" fxLayoutWrap fxLayoutAlign="start start" *fuseIfOnDom [@animateStagger]="{value:'50'}">
         <!-- OVERVIEW GENERAL -->
-        <fuse-widget  class="widget" fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="40">
+        <fuse-widget  class="widget h-500" fxFlex="100" fxLayout="column" fxLayoutAlign="space-between start" fxFlex.gt-xs="100" fxFlex.gt-md="40">
           <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
-
             <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
-              <div fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="75">
+
+              <button *ngIf="topEvents && topEvents.length > 0" mat-icon-button fxFlex="20" fxFlex.gt-sm="20"
+                  [routerLink]="['event/', topEvents[0].eventType]" >
+                <mat-icon aria-label="Example icon-button with a heart icon">featured_play_list</mat-icon>
+              </button>
+
+              <div fxLayout="column" fxLayoutAlign="center center" fxFlex="60" fxFlex.gt-sm="60">
                 <div class="h2 pr-16">Top event Types</div>
               </div>
-              <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+              <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="20">
                 <mat-select class="simplified" [(ngModel)]="balanceTable.currentTimeRange" (change)="balanceTable.onScaleChanged($event.value)"
                   aria-label="Change range">
                   <mat-option *ngFor="let range of balanceTable.timeScales | keys" [value]="range.value">
@@ -49,7 +54,6 @@
                 </tbody>
               </table>
             </div>
-
           </div>
         </fuse-widget>
         <fuse-widget *ngIf="generalEventsOverViewChart.ready" class="widget" fxFlex="100"  fxFlex.gt-xs="100" fxFlex.gt-md="60">

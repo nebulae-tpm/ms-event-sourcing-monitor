@@ -5,6 +5,7 @@ export enum TimeRanges {
   MONTH = 4,
   YEAR = 5
 }
+
 export interface GenericLineChartInterfaz {
   name: string;
   ready: boolean;

@@ -28,7 +28,7 @@ export interface FilterOption{
 })
 export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
 
-  topEvents = [];
+  topEvents: {eventType: string, total: number, balance: number}[] = [];
   generalEventsOverViewChart: any = JSON.parse(JSON.stringify(genericLineChart));
   overViewByEventType: any = JSON.parse(JSON.stringify(genericLineChart));
   overViewByAggregateType: any = JSON.parse(JSON.stringify(genericLineChart));
@@ -372,7 +372,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
           if (this.topEvents.length <= 8){
           this.topEvents.push({
             eventType: preKeyValue.key,
-              total: latestKeyValue ? latestKeyValue.value : 0,
+            total: latestKeyValue ? latestKeyValue.value : 0,
             balance: rowBalance
           });
           }

@@ -1,3 +1,78 @@
-<p>
-  event-sourcing-specific-chart works!
-</p>
+<div id="mail" class="page-layout carded left-sidenav" fusePerfectScrollbar>
+
+
+
+        <mat-sidenav-container>
+
+            <!-- SIDENAV -->
+            <mat-sidenav #sidenav class="sidenav" align="end" mode="side" opened="true" fuseMatSidenavHelper="carded-left-sidenav" mat-is-locked-open="gt-md">
+              <div class="content" fusePerfectScrollbar *fuseIfOnDom>
+
+
+
+                      <div class="search mat-white-bg" flex fxLayout="row" fxLayoutAlign="start center">
+                        <mat-icon>search</mat-icon>
+                        <input [placeholder]="'EVENTO'" fxFlex>
+                      </div>
+
+
+                <div class="nav">
+
+                  <div class="nav-subheader">{{ 'ESPECIFIC_CHART.SIDEBAR.TITLE' | translate }}</div>
+
+                  <div class="nav-item" *ngFor="let event of eventList">
+                    <a class="nav-link" matRipple routerLinkActive="active" (click)="updateCharts()" >
+                      <mat-icon class="nav-link-icon">linear_scale</mat-icon>
+                      <span>{{event}}</span>
+                    </a>
+                  </div>
+
+                </div>
+
+              </div>
+            </mat-sidenav>
+            <!-- / SIDENAV -->
+
+            <!-- CENTER -->
+            <div class="center">
+
+                <!-- CONTENT CARD -->
+                <div class="content-card mat-white-bg" [ngClass]="{'current-mail-selected':currentMail}">
+
+                    <!-- CONTENT TOOLBAR -->
+                    <div class="toolbar px-24 py-8">
+
+                        <div class="mail-selection" fxFlex="row" fxLayoutAlign="end center">
+
+                          <div fxFlex="100" id="details_title">
+                            <h2 style="text-align: center">
+                              Detalles del evento especifico
+                            </h2>
+                          </div>
+
+                              <button mat-button class="mat-icon-button sidenav-toggle" fuseMatSidenavToggler="carded-left-sidenav" fxHide.gt-md aria-label="Toggle Sidenav">
+                                  <mat-icon>menu</mat-icon>
+                              </button>
+                            <div class="toolbar-separator" *ngIf="hasSelectedMails"></div>
+
+                        </div>
+                    </div>
+                    <!-- / CONTENT TOOLBAR -->
+
+                    <!-- CONTENT -->
+                    <div class="content" fxLayoutAlign="row">
+                      <div fxFlex="100"  >
+
+                      </div>
+                    </div>
+                    <!-- / CONTENT -->
+
+                </div>
+                <!-- / CONTENT CARD -->
+
+            </div>
+            <!-- / CENTER -->
+
+        </mat-sidenav-container>
+
+      </div>
