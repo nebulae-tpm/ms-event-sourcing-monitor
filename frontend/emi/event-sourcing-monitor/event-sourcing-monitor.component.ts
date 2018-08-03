@@ -101,14 +101,15 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
    * @param timeRangeType MINUTE, HOUR, DAY, MONTH, YEAR
    */
   getLabelFormatter(timeRangeType: string): Object{
-    switch (timeRangeType){
-      case 'MINUTE': return { hour: 'numeric', minute: 'numeric',  hour12: false };
-      case 'HOUR':   return { hour: 'numeric', minute: 'numeric',  hour12: false };
-      case 'DAY':    return { month: 'short', day: 'numeric',  hour12: false };
-      case 'MONTH':  return { year: 'numeric', month: 'short',  hour12: false };
-      case 'YEAR':   return { year: 'numeric',  hour12: false };
-      default: {}
-    }
+    return { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric',  hour12: false };
+    // switch (timeRangeType){
+    //   case 'MINUTE': return { hour: 'numeric', minute: 'numeric',  hour12: false };
+    //   case 'HOUR':   return { hour: 'numeric', minute: 'numeric',  hour12: false };
+    //   case 'DAY':    return { month: 'short', day: 'numeric',  hour12: false };
+    //   case 'MONTH':  return { year: 'numeric', month: 'short',  hour12: false };
+    //   case 'YEAR':   return { year: 'numeric',  hour12: false };
+    //   default: {}
+    // }
   }
 
   /**
@@ -165,7 +166,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     // return Rx.Observable.from(allSummaries).pipe(
     //   map((summary: any) => new Date(summary.id).toLocaleTimeString())
     // );
-    return Rx.Observable.of(timeScale);
+    return Rx.Observable.of(allSummaries);
   }
 
   /**
@@ -239,48 +240,6 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     return Rx.Observable.of(timeScale);
   }
 
-  // updateOverViewByAggregateType(timeRange: string, range: number){
-  //   this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(timeRange, Date.now(), range)
-  //     .subscribe(
-  //       result => {
-  //         const allDataSets = [];
-  //         let responseJSON: any[] =  JSON.parse(JSON.stringify(result));
-  //         responseJSON = responseJSON.sort((a, b) =>  a.id - b.id);
-
-  //         responseJSON.forEach(({ aggregateTypeHits }) => {
-  //           aggregateTypeHits.forEach(({ key, value }) => {
-  //             if (allDataSets.filter(o => o.label === key).length === 0) {
-  //               allDataSets.push(
-  //                 {
-  //                   label: key,
-  //                   data: Array.apply(null, Array(responseJSON.length)).map(Number.prototype.valueOf, 0),
-  //                   fill: false
-  //                 });
-  //             }
-  //           });
-  //         });
-
-  //         this.overViewByAggregateType.labels.length = 0;
-
-  //         responseJSON.forEach(({id, aggregateTypeHits}, index) => {
-  //           aggregateTypeHits.forEach(({key, value}) => {
-  //             const indexToReplace = allDataSets.findIndex(i => i.label === key);
-  //             allDataSets[indexToReplace].data[index] = value;
-  //           });
-
-  //           this.overViewByAggregateType.datasets = allDataSets;
-
-  //           this.overViewByAggregateType.labels.push(
-  //             new Date(id)
-  //             // TODO set i18n in the next method
-  //               .toLocaleString('es-CO', this.getLabelFormatter(timeRange))
-  //           );
-  //         });
-  //       },
-  //       (e) => console.log(e),
-  //       () => {}
-  //     );
-  // }
   updateOverViewByAggregateType$(allSummaries: any, timeScale: string){
      // update OverViewByEventType chart
      let allDataSets = []; // var used to all datasets for OverViewByEventType chart
@@ -293,7 +252,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
                data: Array.apply(null, Array(allSummaries.length)).map(Number.prototype.valueOf, 0),
                fill: false
              });
-           this.overViewByAggregateType.filtersApplied.push(key);
+          //  this.overViewByAggregateType.filtersApplied.push(key);
          }
        });
      });
