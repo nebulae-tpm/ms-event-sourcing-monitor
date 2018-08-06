@@ -3,6 +3,7 @@
 const Rx = require("rxjs");
 const CollectionName = "CollectionName"; // please change
 const { CustomError } = require("../tools/customError");
+const GMT_OFFSET = ((parseInt(process.env.GMT_TO_SERVE.replace('GMT', '')) * 60) - new Date().getTimezoneOffset()) * 60000;
 
 class AccumulatorDAHelper {
   /**
@@ -12,21 +13,21 @@ class AccumulatorDAHelper {
    * @returns <Rx.Observable>
    */
   static changeTimeStampPrecision$(timestamp, precision) {
-    return Rx.Observable.of(timestamp).map(ts => {
-      const date = new Date(ts);
+    return Rx.Observable.of(timestamp).map(ts => {      
+      const date = new Date(ts + GMT_OFFSET);
       switch (precision) {
         case "MINUTE":
-          return date.setSeconds(0, 0);
+          return date.setSeconds(0, 0) - GMT_OFFSET;
         case "HOUR":
-          return date.setMinutes(0, 0, 0);
+          return date.setMinutes(0, 0, 0) - GMT_OFFSET;
         case "DAY":
-          return date.setHours(0, 0, 0, 0);
+          return date.setHours(0, 0, 0, 0) - GMT_OFFSET;
         case "MONTH":
           return new Date(date.getFullYear(), date.getMonth()).setMilliseconds(
             0
-          );
+          ) - GMT_OFFSET;
         case "YEAR":
-          return new Date(date.getFullYear(), 0).setMilliseconds(0);
+          return new Date(date.getFullYear(), 0).setMilliseconds(0) - GMT_OFFSET;
         default:
           throw new Error("precision time given is not supported");
       }

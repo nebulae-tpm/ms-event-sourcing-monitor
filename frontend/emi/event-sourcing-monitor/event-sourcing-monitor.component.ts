@@ -101,15 +101,15 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
    * @param timeRangeType MINUTE, HOUR, DAY, MONTH, YEAR
    */
   getLabelFormatter(timeRangeType: string): Object{
-    return { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric',  hour12: false };
-    // switch (timeRangeType){
-    //   case 'MINUTE': return { hour: 'numeric', minute: 'numeric',  hour12: false };
-    //   case 'HOUR':   return { hour: 'numeric', minute: 'numeric',  hour12: false };
-    //   case 'DAY':    return { month: 'short', day: 'numeric',  hour12: false };
-    //   case 'MONTH':  return { year: 'numeric', month: 'short',  hour12: false };
-    //   case 'YEAR':   return { year: 'numeric',  hour12: false };
-    //   default: {}
-    // }
+    // return { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric',  hour12: false };
+    switch (timeRangeType){
+      case 'MINUTE': return { hour: 'numeric', minute: 'numeric',  hour12: false };
+      case 'HOUR':   return { hour: 'numeric', minute: 'numeric',  hour12: false };
+      case 'DAY':    return { month: 'short', day: 'numeric',  hour12: false };
+      case 'MONTH':  return { year: 'numeric', month: 'short',  hour12: false };
+      case 'YEAR':   return { year: 'numeric',  hour12: false };
+      default: {}
+    }
   }
 
   /**
