@@ -2,77 +2,124 @@
 
 
 
-        <mat-sidenav-container>
+  <mat-sidenav-container>
 
-            <!-- SIDENAV -->
-            <mat-sidenav #sidenav class="sidenav" align="end" mode="side" opened="true" fuseMatSidenavHelper="carded-left-sidenav" mat-is-locked-open="gt-md">
-              <div class="content" fusePerfectScrollbar *fuseIfOnDom>
-
-
-
-                      <div class="search mat-white-bg" flex fxLayout="row" fxLayoutAlign="start center">
-                        <mat-icon>search</mat-icon>
-                        <input [placeholder]="'EVENTO'" fxFlex>
-                      </div>
+    <!-- SIDENAV -->
+    <mat-sidenav #sidenav class="sidenav" align="end" mode="side" opened="true" fuseMatSidenavHelper="carded-left-sidenav" mat-is-locked-open="gt-md">
+      <div class="content" fusePerfectScrollbar *fuseIfOnDom>
 
 
-                <div class="nav">
 
-                  <div class="nav-subheader">{{ 'ESPECIFIC_CHART.SIDEBAR.TITLE' | translate }}</div>
+        <div class="search mat-white-bg" flex fxLayout="row" fxLayoutAlign="start center">
+          <mat-icon>search</mat-icon>
+          <input [placeholder]="'EVENTO'" fxFlex>
+        </div>
 
-                  <div class="nav-item" *ngFor="let event of eventList">
-                    <a class="nav-link" matRipple routerLinkActive="active" (click)="updateCharts()" >
-                      <mat-icon class="nav-link-icon">linear_scale</mat-icon>
-                      <span>{{event}}</span>
-                    </a>
-                  </div>
 
-                </div>
+        <div class="nav">
 
-              </div>
-            </mat-sidenav>
-            <!-- / SIDENAV -->
+          <div class="nav-subheader">{{ 'ESPECIFIC_CHART.SIDEBAR.TITLE' | translate }} </div>
 
-            <!-- CENTER -->
-            <div class="center">
+          <div class="nav-item" *ngFor="let event of eventList">
+            <a class="nav-link" matRipple routerLinkActive="active" (click)="updateCharts()">
+              <mat-icon class="nav-link-icon">linear_scale</mat-icon>
+              <span>{{event}}</span>
+            </a>
+          </div>
 
-                <!-- CONTENT CARD -->
-                <div class="content-card mat-white-bg">
-
-                    <!-- CONTENT TOOLBAR -->
-                    <div class="toolbar px-24 py-8">
-
-                        <div class="mail-selection" fxFlex="row" fxLayoutAlign="end center">
-
-                          <div fxFlex="100" id="details_title">
-                            <h2 style="text-align: center">
-                              Detalles del evento especifico
-                            </h2>
-                          </div>
-
-                              <button mat-button class="mat-icon-button sidenav-toggle" fuseMatSidenavToggler="carded-left-sidenav" fxHide.gt-md aria-label="Toggle Sidenav">
-                                  <mat-icon>menu</mat-icon>
-                              </button>
-                            <!-- <div class="toolbar-separator" *ngIf="hasSelectedMails"></div> -->
-
-                        </div>
-                    </div>
-                    <!-- / CONTENT TOOLBAR -->
-
-                    <!-- CONTENT -->
-                    <div class="content" fxLayoutAlign="row">
-                      <div fxFlex="100"  >
-
-                      </div>
-                    </div>
-                    <!-- / CONTENT -->
-
-                </div>
-                <!-- / CONTENT CARD -->
-
-            </div>
-            <!-- / CENTER -->
-
-        </mat-sidenav-container>
+        </div>
 
       </div>
+    </mat-sidenav>
+    <!-- / SIDENAV -->
+
+    <!-- CENTER -->
+    <div class="center">
+
+      <!-- CONTENT CARD -->
+      <div class="content-card mat-white-bg">
+
+        <!-- CONTENT TOOLBAR -->
+        <div class="toolbar px-24 py-8">
+
+          <div class="mail-selection" fxFlex="row" fxLayoutAlign="end center">
+
+            <div fxFlex="100" id="details_title">
+              <h2 style="text-align: center">
+               {{ 'ESPECIFIC_CHART.TITLE_TEMPLATE' | translate   }} {{ selectedEvent }}
+              </h2>
+            </div>
+
+            <button mat-button class="mat-icon-button sidenav-toggle" fuseMatSidenavToggler="carded-left-sidenav" fxHide.gt-md aria-label="Toggle Sidenav">
+              <mat-icon>menu</mat-icon>
+            </button>
+            <!-- <div class="toolbar-separator" *ngIf="hasSelectedMails"></div> -->
+
+          </div>
+        </div>
+        <!-- / CONTENT TOOLBAR -->
+
+        <!-- CONTENT -->
+        <div class="content page-layout simple fullwidth">
+          <div class="widget-group" fxLayout="row" fxFlex="100" fxLayoutWrap fxLayoutAlign="start start" *fuseIfOnDom>
+            <!-- OVERVIEW -->
+            <fuse-widget *ngIf="eventTypeChart.ready" class="widget" fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="100">
+
+              <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
+                <!-- HEADERS AND SELECT OPTIONS -->
+                <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
+
+                  <!-- <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
+                    <strong> {{ 'WIDGETS.TITLES.GENERAL_OVERVIEW' | translate }} </strong>
+                  </div> -->
+                  <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                    {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
+                  </p>
+                  <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                    <mat-select class="simplified" [(ngModel)]="eventTypeChart.currentTimeRange" (change)="eventTypeChart.onScaleChanged($event.value)"
+                      aria-label="Change range">
+                      <mat-option *ngFor="let range of eventTypeChart.timeScales | keys" [value]="range.value">
+                        {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                    {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
+                  </p>
+                  <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                    <mat-select class="simplified" [(ngModel)]="eventTypeChart.currentQuantity" (change)="eventTypeChart.onRangeChanged($event.value)"
+                      aria-label="Change range">
+                      <mat-option *ngFor="let qty of eventTypeChart.quantities | keys" [value]="qty.value">
+                        {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+                <!-- HEADERS AND SELECT OPTIONS -->
+                <!-- GENERAL OVERVIEW CHART -->
+                <div class="h-400">
+                  <canvas baseChart [datasets]="eventTypeChart.datasets" [labels]="eventTypeChart.labels" [colors]="eventTypeChart.colors"
+                    [options]="eventTypeChart.options" [chartType]="eventTypeChart.chartType">
+                  </canvas>
+                </div>
+                <!-- GENERAL OVERVIEW CHART -->
+              </div>
+
+            </fuse-widget>
+            <!-- OVERVIEW -->
+
+
+          </div>
+        </div>
+        <!-- / CONTENT -->
+
+      </div>
+      <!-- / CONTENT CARD -->
+
+    </div>
+    <!-- / CENTER -->
+
+  </mat-sidenav-container>
+
+</div>

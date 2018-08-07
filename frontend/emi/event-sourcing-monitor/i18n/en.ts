@@ -4,7 +4,8 @@ export const locale = {
     ESPECIFIC_CHART: {
       SIDEBAR: {
         TITLE: 'Lista de eventos'
-      }
+      },
+      TITLE_TEMPLATE: 'Details about '
     },
     WIDGETS: {
       TITLES: {
