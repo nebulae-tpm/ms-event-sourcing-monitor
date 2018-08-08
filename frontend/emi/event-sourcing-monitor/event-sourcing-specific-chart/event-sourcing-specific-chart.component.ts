@@ -34,7 +34,7 @@ export class EventSourcingSpecificChartComponent implements OnInit {
     this.translationLoader.loadTranslations(english, spanish);
   }
 
-  eventList: string[] = Array.apply(null, Array(10)).map(Number.prototype.valueOf, 1);
+  eventList: string[] = ['Juan', 'Felipe', 'Santa', 'Ospina'];
 
   ngOnInit() {
     // console.log('sideNAv ==> ', this.sideNav);
@@ -56,13 +56,9 @@ export class EventSourcingSpecificChartComponent implements OnInit {
 
   }
 
-  updateCharts(){
-    console.log(this.sideNav._isFocusTrapEnabled);
-    if (this.sideNav.opened){
-      console.log('#########', this.sideNav );
-      // this.sideNav.close();
-    }
-
+  updateCharts(evtType: string){
+    console.log(this.sideNav);
+    console.log("Changing to  ==> ", evtType);
   }
 
   initCharts(){
