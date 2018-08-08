@@ -37,6 +37,7 @@ export class EventSourcingSpecificChartComponent implements OnInit {
     this.translationLoader.loadTranslations(english, spanish);
   }
 
+  
   eventList: string[] = [];
 
   ngOnInit() {

@@ -153,7 +153,7 @@ jobs:
             mkdir ~/nebulae/backend
             cp ~/nebulae/go/mbinit ~/nebulae/repo/backend/event-sourcing-monitor/
             export DOCKERHUB_IMAGE=event-sourcing-monitor.backend.event-sourcing-monitor
-            export DOCKERHUB_TAG=0.0.16
+            export DOCKERHUB_TAG=0.0.17
             gitChanged backend/event-sourcing-monitor || docker build  -t $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE:$DOCKERHUB_TAG -t $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE:latest ~/nebulae/repo/backend/event-sourcing-monitor/
             gitChanged backend/event-sourcing-monitor || docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
             gitChanged backend/event-sourcing-monitor || docker push $DOCKERHUB_NAMESPACE/$DOCKERHUB_IMAGE:$DOCKERHUB_TAG

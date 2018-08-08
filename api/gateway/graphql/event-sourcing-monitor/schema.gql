@@ -5,14 +5,7 @@ enum EventSourcingMonitorTimeFrameType{
   MONTH
   YEAR
 }
-
-"Hello world sample, please remove"
-# type HelloWorldEventSourcingMonitor{
-#   "text"
-#   sn: String!  
-# }
-
-
+"Basic key-value type"
 type EventSourcingMonitorKeyValue{
   key: String
   value: Int
@@ -22,6 +15,7 @@ type EventSourcingMonitorInnerKeyValue{
   key: String
   value: [EventSourcingMonitorKeyValue]
 }
+
 type EventSourcingMonitorEventTypes{
   key: String
   value: [EventSourcingMonitorInnerKeyValue]
