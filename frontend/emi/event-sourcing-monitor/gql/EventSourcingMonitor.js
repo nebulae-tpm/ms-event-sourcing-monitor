@@ -31,10 +31,13 @@ export const getTimeFrameInRangeSince = gql`
         key
         value {
           key
+          value {
+            key
           value
         }
       }
     }
+  }
   }
 `;
 

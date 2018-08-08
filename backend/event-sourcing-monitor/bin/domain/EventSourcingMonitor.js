@@ -92,25 +92,6 @@ class EventSourcingMonitor {
         .catch(err => this.errorHandler$(err));
     }
   }
-  
-
-
-  // initHelloWorldEventGenerator(){
-  //   Rx.Observable.interval(1000)
-  //   .take(120)
-  //   .mergeMap(id =>  MinuteAccumulatorDA.getHelloWorld$())    
-  //   .mergeMap(evt => {
-  //     return broker.send$(MATERIALIZED_VIEW_TOPIC, 'EventSourcingMonitorHelloWorldEvent',evt);
-  //   }).subscribe(
-  //     (evt) => console.log('Gateway GraphQL sample event sent, please remove'),
-  //     (err) => console.error('Gateway GraphQL sample event sent ERROR, please remove'),
-  //     () => console.log('Gateway GraphQL sample event sending STOPPED, please remove'),
-  //   );
-  // }
-
-  
-  
-
   //#region  mappers for API responses
 
   objectKeyToArrayFormat$(object) {
@@ -133,24 +114,16 @@ class EventSourcingMonitor {
           Object.entries(timeFrameObj.userHits).forEach(e => {
             userHits.push({key: e[0], value: e[1]})
           });
-          // Object.entries(timeFrameObj.eventTypes).forEach(innerEvent => {
-          //   console.log("## INNER_EVENT_TYPE ###", innerEvent[0], "###############");
-          //   const key = innerEvent[0];
-          //   const innerKeyValues = [];
-          //   Object.entries(innerEvent[1]).forEach(innerHit => {
-          //     const innerHitKey = innerHit[0];
-          //     const InnerHitValue = [];
-          //     Object.entries(innerHit[1]).forEach(InnerKeyValueInInnerHitValue => {
-          //       InnerHitValue.push({
-          //         key: InnerKeyValueInInnerHitValue[0],
-          //         value: InnerKeyValueInInnerHitValue[1]})
-          //     })
-          //     innerKeyValues.push({key: innerHitKey, value: InnerHitValue});
-          //   })
 
-          //   eventTypes.push({key: key, value: innerKeyValues });
-          // });
-          // console.log(JSON.stringify(eventTypes));
+          Object.entries(timeFrameObj.eventTypes).forEach(innerEvent => {
+            const key = innerEvent[0];
+            const values = innerEvent[1];
+            eventTypes.push({key: key, value: Object.entries(values).map(([key, value]) => {
+              return {key, value: Object.entries(value).map(([key, value]) => {
+                return {key, value}
+              }) }
+            })})
+          });
 
           return {
             id: timeFrameObj.id,

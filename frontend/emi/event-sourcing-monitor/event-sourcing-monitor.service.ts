@@ -63,7 +63,8 @@ export class EventSourcingMonitorService {
                 return {
                   id: summary.id,
                   eventHits: eventHitsResult,
-                  eventTypeVersionsByUser: summary.eventTypes.filter(evt => evt.key === eventName)
+                  eventTypeVersionsByUser: summary.eventTypes.filter(evt => evt.key === eventName),
+                  eventTypes: summary.eventTypes.filter(evt => evt.key === eventName)
                 };
               })
             ).toArray(),
@@ -79,7 +80,7 @@ export class EventSourcingMonitorService {
               });
               return options.sort();
             })
-          )
+          );
         })
       );
   }

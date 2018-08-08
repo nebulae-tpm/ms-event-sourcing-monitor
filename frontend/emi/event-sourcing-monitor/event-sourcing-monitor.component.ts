@@ -152,6 +152,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       data: [],
       fill: 'start'
     }];
+    console.log('allSummaries ==>', allSummaries);
 
     this.generalEventsOverViewChart.labels.length = 0;
     allSummaries.forEach((summary, index) => {
@@ -222,7 +223,6 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     this.overViewByEventType.optionsToFilter = filterOptions;
 
     if (allDataSets.length === 0) {
-      console.log('EL DATASETS ESTABA VACIO', allDataSets);
       allDataSets = [{
         label: 'Event_A',
         data: Array.apply(null, Array(allSummaries.length)).map(Number.prototype.valueOf, 0),
@@ -231,7 +231,6 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     }
 
     this.overViewByEventType.datasets = allDataSets;
-    console.log('FILTERS ===> ', this.overViewByEventType.filter);
     this.overViewByEventType.ready = true;
 
     // return Rx.Observable.from(allSummaries).pipe(
@@ -288,7 +287,6 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
      this.overViewByAggregateType.optionsToFilter = filterOptions;
 
      if (allDataSets.length === 0) {
-       console.log('EL DATASETS ESTABA VACIO', allDataSets);
        allDataSets = [{
          label: 'Event_A',
          data: Array.apply(null, Array(allSummaries.length)).map(Number.prototype.valueOf, 0),
@@ -320,9 +318,6 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     )
     .subscribe(
       ( result: any[] ) =>  {
-        // const allEvenTypes = [...Object.entries(result[0]), ...Object.entries(result[1]) ];
-        // console.log('ALL EVENT TYPES ==> ', allEvenTypes);
-
         result[0].forEach(preKeyValue => {
           const latestKeyValue = result[1].filter(o => o.key === preKeyValue.key)[0];
           const latestValue = latestKeyValue ? latestKeyValue.value : 0;
@@ -372,16 +367,11 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       .subscribe(
         (result) => { console.log('Result => ', result); },
         (error) => { console.log(error); },
-        () => console.log('FINISHED')
+        () => { }
       );
     };
     // When change the range of time
     this[chartName].onRangeChanged = (timeRange: number) => {
-      console.log('currentQuantity => ', this[chartName].currentQuantity);
-      console.log('currentTimeRange => ', this[chartName].currentTimeRange);
-
-      console.log('onRangeChanged => ', timeRange );
-      // this[chartName].labels = [];
       this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(TimeRanges[this[chartName].currentTimeRange], Date.now(), timeRange)
       .pipe(
         map(result => JSON.parse(JSON.stringify(result))),
@@ -392,7 +382,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       .subscribe(
         (result) => { console.log('Result => ', result); },
         (error) => { console.log(error); },
-        () => console.log('FINISHED')
+        () => { }
       );
     };
     // To hide or show the filter helper component

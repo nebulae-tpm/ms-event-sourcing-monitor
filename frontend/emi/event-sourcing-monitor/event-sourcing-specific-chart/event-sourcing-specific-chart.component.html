@@ -4,45 +4,45 @@
 
     <!-- CENTER -->
     <div class="center" fusePerfectScrollbar>
-    
+
       <!-- CONTENT TOOLBAR -->
       <div class="toolbar px-24 py-8">
-    
+
         <div class="mail-selection" fxFlex="row" fxLayoutAlign="end center">
-    
+
           <div fxFlex="100" id="details_title">
             <h2 style="text-align: center">
               {{ 'ESPECIFIC_CHART.TITLE_TEMPLATE' | translate }} {{ selectedEvent }}
             </h2>
           </div>
-    
+
           <button mat-button class="mat-icon-button sidenav-toggle" fuseMatSidenavToggler="dashboards-right-sidenav" fxHide.gt-md aria-label="Toggle Sidenav">
             <mat-icon>menu</mat-icon>
           </button>
           <!-- <div class="toolbar-separator" *ngIf="hasSelectedMails"></div> -->
-    
+
         </div>
       </div>
       <!-- / CONTENT TOOLBAR -->
-    
-    
-    
+
+
+
       <!-- CONTENT -->
       <div class="content">
-    
+
         <!-- WIDGET GROUP -->
         <div  class="widget-group grey-100-bg" fxLayout="row" fxFlex="100" fxLayoutWrap *fuseIfOnDom>
 
 
-    
+
           <!-- OVERVIEW -->
           <fuse-widget *ngIf="eventTypeChart.ready" class="widget" fxLayout="column" fxFlex="100" fxFlex.gt-sm="100">
-    
+
             <!-- Front -->
             <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
               <!-- HEADERS AND SELECT OPTIONS -->
               <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
-              
+
                 <!-- <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
                                   <strong> {{ 'WIDGETS.TITLES.GENERAL_OVERVIEW' | translate }} </strong>
                                 </div> -->
@@ -71,7 +71,7 @@
                 <!-- <div class="toolbar-separator" *ngIf="hasSelectedMails"></div> -->
               </div>
               <!-- HEADERS AND SELECT OPTIONS -->
-    
+
               <mat-divider></mat-divider>
 
               <div class="h-400">
@@ -79,144 +79,122 @@
                   [options]="eventTypeChart.options" [chartType]="eventTypeChart.chartType">
                 </canvas>
               </div>
-    
+
             </div>
             <!-- / Front -->
-    
+
           </fuse-widget>
           <!-- OVERVIEW -->
           <!-- VERSION VS -->
-          <fuse-widget *ngIf="eventTypeChart.ready" class="widget" fxLayout="column" fxFlex="100" fxFlex.gt-sm="50">
-    
-              <!-- Front -->
-              <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
-                <!-- HEADERS AND SELECT OPTIONS -->
-                <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
-                
-                  <!-- <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
-                                    <strong> {{ 'WIDGETS.TITLES.GENERAL_OVERVIEW' | translate }} </strong>
-                                  </div> -->
-                  <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
-                    {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
-                  </p>
-                  <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
-                    <mat-select class="simplified" [(ngModel)]="eventTypeChart.currentTimeRange" (change)="eventTypeChart.onScaleChanged($event.value)"
-                      aria-label="Change range">
-                      <mat-option *ngFor="let range of eventTypeChart.timeScales | keys" [value]="range.value">
-                        {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                  <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
-                    {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
-                  </p>
-                  <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
-                    <mat-select class="simplified" [(ngModel)]="eventTypeChart.currentQuantity" (change)="eventTypeChart.onRangeChanged($event.value)"
-                      aria-label="Change range">
-                      <mat-option *ngFor="let qty of eventTypeChart.quantities | keys" [value]="qty.value">
-                        {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                  <!-- <div class="toolbar-separator" *ngIf="hasSelectedMails"></div> -->
-                </div>
-                <!-- HEADERS AND SELECT OPTIONS -->
-      
-                <mat-divider></mat-divider>
-  
-                <div class="h-400">
-                  <canvas baseChart [datasets]="eventTypeChart.datasets" [labels]="eventTypeChart.labels" [colors]="eventTypeChart.colors"
-                    [options]="eventTypeChart.options" [chartType]="eventTypeChart.chartType">
-                  </canvas>
-                </div>
-      
+          <fuse-widget class="widget" fxLayout="column" fxFlex="100" fxFlex.gt-sm="50">
+
+            <!-- Front -->
+            <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
+
+              <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="space-between center">
+                <div class="h3"> {{ 'ESPECIFIC_CHART.VERSION_VS_CHART_TITLE' | translate }} </div>
               </div>
-              <!-- / Front -->
-      
+
+              <div class="h-400">
+                <ngx-charts-pie-chart *fuseIfOnDom
+                  [scheme]="eventTypeVsByVersionChart.scheme"
+                  [results]="eventTypeVsByVersionChart.results"
+                  [legend]="eventTypeVsByVersionChart.legend"
+                  [explodeSlices]="eventTypeVsByVersionChart.explodeSlices"
+                  [labels]="eventTypeVsByVersionChart.labels"
+                  [doughnut]="eventTypeVsByVersionChart.doughnut"
+                  [gradient]="eventTypeVsByVersionChart.gradient">
+                </ngx-charts-pie-chart>
+              </div>
+
+              <!-- <div class="py-8 mh-16 border-top" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
+                <div class="py-8 border-right" fxLayout="column" fxLayoutAlign="center center" fxFlex="100" fxFlex.gt-sm="50">
+                  <span class="mat-display-1 mb-0">{{widgets.widget6.footerLeft.count[widget6.currentRange]}}</span>
+                  <span class="h4">{{widgets.widget6.footerLeft.title}}</span>
+                </div>
+
+                <div class="py-8" fxLayout="column" fxLayoutAlign="center center" fxFlex="100" fxFlex.gt-sm="50">
+                  <span class="mat-display-1 mb-0">{{widgets.widget6.footerRight.count[widget6.currentRange]}}</span>
+                  <span class="h4">{{widgets.widget6.footerRight.title}}</span>
+                </div>
+              </div> -->
+
+            </div>
+            <!-- / Front -->
+
           </fuse-widget>
           <!-- VERSION VS -->
           <!-- USERS VS -->
-          <fuse-widget *ngIf="eventTypeChart.ready" class="widget" fxLayout="column" fxFlex="100" fxFlex.gt-sm="50">
-    
-              <!-- Front -->
-              <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
-                <!-- HEADERS AND SELECT OPTIONS -->
-                <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
-                
-                  <!-- <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
-                                    <strong> {{ 'WIDGETS.TITLES.GENERAL_OVERVIEW' | translate }} </strong>
-                                  </div> -->
-                  <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
-                    {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
-                  </p>
-                  <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
-                    <mat-select class="simplified" [(ngModel)]="eventTypeChart.currentTimeRange" (change)="eventTypeChart.onScaleChanged($event.value)"
-                      aria-label="Change range">
-                      <mat-option *ngFor="let range of eventTypeChart.timeScales | keys" [value]="range.value">
-                        {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                  <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
-                    {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
-                  </p>
-                  <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
-                    <mat-select class="simplified" [(ngModel)]="eventTypeChart.currentQuantity" (change)="eventTypeChart.onRangeChanged($event.value)"
-                      aria-label="Change range">
-                      <mat-option *ngFor="let qty of eventTypeChart.quantities | keys" [value]="qty.value">
-                        {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                  <!-- <div class="toolbar-separator" *ngIf="hasSelectedMails"></div> -->
-                </div>
-                <!-- HEADERS AND SELECT OPTIONS -->
-      
-                <mat-divider></mat-divider>
-  
-                <div class="h-400">
-                  <canvas baseChart [datasets]="eventTypeChart.datasets" [labels]="eventTypeChart.labels" [colors]="eventTypeChart.colors"
-                    [options]="eventTypeChart.options" [chartType]="eventTypeChart.chartType">
-                  </canvas>
-                </div>
-      
+          <fuse-widget class="widget" fxLayout="column" fxFlex="100" fxFlex.gt-sm="50">
+
+            <!-- Front -->
+            <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
+
+              <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="space-between center">
+                <div class="h3">{{ 'ESPECIFIC_CHART.USER_VS_CHART_TITLE' | translate }}</div>
               </div>
-              <!-- / Front -->
-      
+
+              <div class="h-400">
+                <ngx-charts-pie-chart *fuseIfOnDom
+                  [scheme]="eventTypeVsByUsersChart.scheme"
+                  [results]="eventTypeVsByUsersChart.results"
+                  [legend]="eventTypeVsByUsersChart.legend"
+                  [explodeSlices]="eventTypeVsByUsersChart.explodeSlices"
+                  [labels]="eventTypeVsByUsersChart.labels"
+                  [doughnut]="eventTypeVsByUsersChart.doughnut"
+                  [gradient]="eventTypeVsByUsersChart.gradient">
+                </ngx-charts-pie-chart>
+              </div>
+
+              <!-- <div class="py-8 mh-16 border-top" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
+                <div class="py-8 border-right" fxLayout="column" fxLayoutAlign="center center" fxFlex="100" fxFlex.gt-sm="50">
+                  <span class="mat-display-1 mb-0">{{widgets.widget6.footerLeft.count[widget6.currentRange]}}</span>
+                  <span class="h4">{{widgets.widget6.footerLeft.title}}</span>
+                </div>
+
+                <div class="py-8" fxLayout="column" fxLayoutAlign="center center" fxFlex="100" fxFlex.gt-sm="50">
+                  <span class="mat-display-1 mb-0">{{widgets.widget6.footerRight.count[widget6.currentRange]}}</span>
+                  <span class="h4">{{widgets.widget6.footerRight.title}}</span>
+                </div>
+              </div> -->
+
+            </div>
+            <!-- / Front -->
+
           </fuse-widget>
           <!-- USERS VS -->
-    
+
         </div>
         <!-- / WIDGET GROUP -->
-    
+
       </div>
       <!-- / CONTENT -->
-    
+
     </div>
     <!-- / CENTER -->
 
     <!-- SIDENAV -->
     <mat-sidenav #sidenav class="sidenav" align="end" mode="side" opened="true" fuseMatSidenavHelper="dashboards-right-sidenav" mat-is-locked-open="gt-md">
 
-      <div class="sidenav-content" fusePerfectScrollbar *fuseIfOnDom>  
+      <div class="sidenav-content" fusePerfectScrollbar *fuseIfOnDom>
 
           <div class="search mat-white-bg" flex fxLayout="row" fxLayoutAlign="start center">
               <mat-icon>search</mat-icon>
               <input [placeholder]="'EVENTO'" fxFlex>
             </div>
-    
-    
+
+
             <div class="nav">
-    
+
               <div class="nav-subheader">{{ 'ESPECIFIC_CHART.SIDEBAR.TITLE' | translate }} </div>
-    
+
               <div class="nav-item" *ngFor="let eventType of eventList">
                 <a class="nav-link" matRipple routerLinkActive="active" (click)="updateCharts(eventType)" >
                   <mat-icon class="nav-link-icon">linear_scale</mat-icon>
                   <span>{{eventType}}</span>
                 </a>
               </div>
-    
+
             </div>
       </div>
 

@@ -1,4 +1,4 @@
-import { genericLineChart, TimeRanges } from './../event-sourcing-monitor-chart-helper';
+import { genericLineChart, TimeRanges, NgxChartsPieChart} from './../event-sourcing-monitor-chart-helper';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FuseTranslationLoaderService } from './../../../../core/services/translation-loader.service';
 import { locale as english } from '../i18n/en';
@@ -9,9 +9,10 @@ import { ActivatedRoute } from '@angular/router';
 // tslint:disable-next-line:import-blacklist
 import * as Rx from 'rxjs/Rx';
 // tslint:disable-next-line:import-blacklist
-import { mergeMap, map, tap } from 'rxjs/operators';
+import { mergeMap, map, tap, filter } from 'rxjs/operators';
 // tslint:disable-next-line:import-blacklist
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, of, pipe } from 'rxjs';
+import { rxSubscriber } from 'rxjs/internal-compatibility';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -24,6 +25,8 @@ export class EventSourcingSpecificChartComponent implements OnInit {
 
   @ViewChild('sidenav') public sideNav: MatSidenav;
   eventTypeChart:  any = JSON.parse(JSON.stringify(genericLineChart));
+  eventTypeVsByUsersChart: NgxChartsPieChart = new NgxChartsPieChart();
+  eventTypeVsByVersionChart: NgxChartsPieChart = new NgxChartsPieChart();
   selectedEvent: string = null;
 
   constructor(
@@ -37,7 +40,15 @@ export class EventSourcingSpecificChartComponent implements OnInit {
   eventList: string[] = [];
 
   ngOnInit() {
-    // console.log('sideNAv ==> ', this.sideNav);
+    this.eventTypeVsByUsersChart.clearResultData = () => {
+      this.eventTypeVsByUsersChart.results.length = 0;
+      this.eventTypeVsByUsersChart.results = [];
+    };
+
+    this.eventTypeVsByVersionChart.clearResultData = () => {
+      this.eventTypeVsByVersionChart.results.length = 0;
+      this.eventTypeVsByVersionChart.results = [];
+    };
 
     this.route.params
       .pipe(
@@ -62,10 +73,10 @@ export class EventSourcingSpecificChartComponent implements OnInit {
       Rx.Observable.forkJoin(
         this.updateEventTypeChart$(evtType, TimeRanges[this.eventTypeChart.currentTimeRange], this.eventTypeChart.currentQuantity)
       ).subscribe(
-        (ok) => { console.log(ok) },
-        (error) => { console.log(error) },
-        () => { console.log('updateCharts FINISHED') }
-      )
+        (ok) => { console.log(ok); },
+        (error) => { console.log(error); },
+        () => { }
+      );
 
     }
   }
@@ -75,34 +86,103 @@ export class EventSourcingSpecificChartComponent implements OnInit {
   }
 
   updateEventTypeChart$(eventName: string, timeScale: string, timeRange: number) {
+    this.eventTypeVsByUsersChart.clearResultData();
+    this.eventTypeVsByVersionChart.clearResultData();
     return this.eventSourcingMonitorervice.getTimeFrameswithFilter$(eventName, timeScale, timeRange)
       .pipe(
-        tap(r => {
-          this.eventList = r[1];
+        mergeMap((array) => {
+          return Rx.Observable.forkJoin(
+            this.processVsData$(array[0]),
+            Rx.Observable.of(array).pipe(
+              tap(r => {
+                this.eventList = r[1];
+              }),
+              map(resultAsArray => resultAsArray[0].sort((a: any, b: any) => a.id - b.id)),
+              tap(allSummaries => {
+                this.eventTypeChart.datasets = [{
+                  label: eventName,
+                  data: [],
+                  fill: 'start'
+                }];
+
+                this.eventTypeChart.labels.length = 0;
+                allSummaries.forEach((summary: any, index: number) => {
+                  this.eventTypeChart.datasets[0].data.push(summary.eventHits[0].value);
+                  this.eventTypeChart.labels.push(
+                    new Date(summary.id)
+                      // TODO set i18n in the next method
+                      .toLocaleString('es-CO', this.getLabelFormatter(timeScale))
+                  );
+                });
+
+                this.eventTypeChart.ready = true;
+
+              })
+            )
+          );
         }),
-        map(resultAsArray => resultAsArray[0].sort((a: any, b: any) => a.id - b.id)),
-        tap(allSummaries => {
-          this.eventTypeChart.datasets = [{
-            label: eventName,
-            data: [],
-            fill: 'start'
-          }];
-
-           this.eventTypeChart.labels.length = 0;
-           allSummaries.forEach((summary: any, index: number) => {
-            this.eventTypeChart.datasets[0].data.push(summary.eventHits[0].value);
-            this.eventTypeChart.labels.push(
-              new Date(summary.id)
-                // TODO set i18n in the next method
-                .toLocaleString('es-CO', this.getLabelFormatter(timeScale))
-            );
-          });
-
-          this.eventTypeChart.ready = true;
-
-
+        tap(() => {
+          this.eventTypeVsByUsersChart.results = this.eventTypeVsByUsersChart.results.slice();
+          this.eventTypeVsByVersionChart.results =  this.eventTypeVsByVersionChart.results.slice();
         })
       );
+
+  }
+  /**
+   *
+   * @param array UPDATE THE CHART THAT REPRESENT THE VS BETTEWN USERS AND VERSIONS BY EVENT TYPE
+   */
+  processVsData$(array: any[]){
+    console.log('PROCESANDO DATA DEL LOS VS');
+    return Rx.Observable.from(array)
+    .pipe(
+      map(summary => summary.eventTypes[0]),
+      mergeMap(eventBalance => {
+        return Rx.Observable.of(eventBalance)
+        .pipe(
+          mergeMap((eventtByVs: any) => Rx.Observable.forkJoin(
+            Rx.Observable.of(eventtByVs).pipe(
+              filter(item => item),
+              map((r: any) => r.value),
+              map((arrayWithVs: any[]) => arrayWithVs.filter(vs => vs.key === 'userHits')),
+              filter((userHits: any[]) => userHits.length > 0),
+              map((r: any) => r[0].value),
+              mergeMap((cumulators: {key: string, value: number}[]) => this.cumulateDataInChart$('eventTypeVsByUsersChart', cumulators))
+            ),
+            Rx.Observable.of(eventtByVs).pipe(
+              filter(item => item),
+              map((r: any) => r.value),
+              map((arrayWithVs: any[]) => arrayWithVs.filter(vs => vs.key === 'versionHits')),
+              filter((userHits: any[]) => userHits.length > 0),
+              map((r: any) => r[0].value),
+              mergeMap((cumulators: {key: string, value: number}[]) => this.cumulateDataInChart$('eventTypeVsByVersionChart', cumulators))
+            ),
+          ))
+
+        );
+      }),
+      map(() => {} )
+    );
+  }
+
+  cumulateDataInChart$(chartName: string, dataToCummulate: any[]){
+    return Rx.Observable.from(dataToCummulate)
+    .pipe(
+      mergeMap(({key, value}) => {
+        return Rx.Observable.of({key, value})
+        .pipe(
+          map(item => {
+            const indexOf = this[chartName].results.findIndex(o => o.name === item.key);
+            if (indexOf === -1){
+              this[chartName].results.push({name: item.key, value: item.value });
+            }else{
+              this[chartName].results[indexOf].value = this[chartName].results[indexOf].value + item.value;
+            }
+            return Rx.Observable.of(item);
+          })
+        );
+      })
+    );
   }
 
   /**
@@ -170,7 +250,7 @@ export class EventSourcingSpecificChartComponent implements OnInit {
       .subscribe(
         (result) => { console.log('Result => ', result); },
         (error) => { console.log(error); },
-        () => console.log('FINISHED')
+        () => { }
       );
     };
 
@@ -180,7 +260,7 @@ export class EventSourcingSpecificChartComponent implements OnInit {
       .subscribe(
         (result) => { console.log('Result => ', result); },
         (error) => { console.log(error); },
-        () => console.log('FINISHED')
+        () => { }
       );
     };
 

@@ -1,5 +1,6 @@
 import { EventSourcingSpecificChartComponent } from './event-sourcing-specific-chart/event-sourcing-specific-chart.component';
 import { NgModule } from '@angular/core';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { RouterModule, Routes } from '@angular/router';
 import { SharedModule } from '../../../core/modules/shared.module';
 import { DatePipe } from '@angular/common';
@@ -16,7 +17,7 @@ const routes: Routes = [
     component: EventSourcingMonitorComponent,
   },
   {
-    path: 'event/:name',
+    path: ':name',
     component: EventSourcingSpecificChartComponent
   }
 ];
@@ -25,6 +26,7 @@ const routes: Routes = [
   imports: [
     SharedModule,
     RouterModule.forChild(routes),
+    NgxChartsModule,
     FuseWidgetModule
   ],
   declarations: [

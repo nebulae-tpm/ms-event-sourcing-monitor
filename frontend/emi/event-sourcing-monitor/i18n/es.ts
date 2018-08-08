@@ -5,7 +5,9 @@ export const locale = {
       SIDEBAR: {
         TITLE: 'Lista de eventos'
       },
-      TITLE_TEMPLATE: 'Detalles acerca de '
+      TITLE_TEMPLATE: 'Detalles acerca de ',
+      USER_VS_CHART_TITLE: 'Comparación entre Usuarios',
+      VERSION_VS_CHART_TITLE: 'Comparacion entre Versiones',
     },
     WIDGETS: {
       TITLES: {

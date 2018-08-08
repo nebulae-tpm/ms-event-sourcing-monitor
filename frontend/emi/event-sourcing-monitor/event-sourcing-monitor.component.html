@@ -9,7 +9,7 @@
             <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
 
               <button *ngIf="topEvents && topEvents.length > 0" mat-icon-button fxFlex="20" fxFlex.gt-sm="20"
-                  [routerLink]="['event/', topEvents[0].eventType]" >
+                  [routerLink]="[topEvents[0].eventType]" >
                 <mat-icon aria-label="Example icon-button with a heart icon">featured_play_list</mat-icon>
               </button>
 
@@ -34,7 +34,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let row of topEvents" [routerLink]="['event', row.eventType]">
+                  <tr *ngFor="let row of topEvents" [routerLink]="[row.eventType]">
                     <td>{{row.eventType}}</td>
                     <td class="text-right">{{row.total}}</td>
                     <td class="text-right" fxLayout="row" fxLayoutAlign="end center"  >
