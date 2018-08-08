@@ -77,7 +77,7 @@ export class EventSourcingMonitorService {
                   }
                 });
               });
-              return options;
+              return options.sort();
             })
           )
         })

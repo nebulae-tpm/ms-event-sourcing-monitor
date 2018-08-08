@@ -56,15 +56,18 @@ export class EventSourcingSpecificChartComponent implements OnInit {
 
   }
 
-  updateCharts(evtType: string){
-    this.selectedEvent = evtType;
-    Rx.Observable.forkJoin(
-      this.updateEventTypeChart$(evtType, TimeRanges[this.eventTypeChart.currentTimeRange], this.eventTypeChart.currentQuantity)
-    ).subscribe(
-      (ok) => { console.log(ok) },
-      (error) => { console.log(error) },
-      () => {console.log('updateCharts FINISHED')}
-    )
+  updateCharts(evtType: string) {
+    if (this.selectedEvent !== evtType) {
+      this.selectedEvent = evtType;
+      Rx.Observable.forkJoin(
+        this.updateEventTypeChart$(evtType, TimeRanges[this.eventTypeChart.currentTimeRange], this.eventTypeChart.currentQuantity)
+      ).subscribe(
+        (ok) => { console.log(ok) },
+        (error) => { console.log(error) },
+        () => { console.log('updateCharts FINISHED') }
+      )
+
+    }
   }
 
   initCharts(){
