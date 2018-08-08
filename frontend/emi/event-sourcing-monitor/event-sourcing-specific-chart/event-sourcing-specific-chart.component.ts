@@ -34,7 +34,7 @@ export class EventSourcingSpecificChartComponent implements OnInit {
     this.translationLoader.loadTranslations(english, spanish);
   }
 
-  eventList: string[] = ['Juan', 'Felipe', 'Santa', 'Ospina'];
+  eventList: string[] = [];
 
   ngOnInit() {
     // console.log('sideNAv ==> ', this.sideNav);
@@ -57,8 +57,14 @@ export class EventSourcingSpecificChartComponent implements OnInit {
   }
 
   updateCharts(evtType: string){
-    console.log(this.sideNav);
-    console.log("Changing to  ==> ", evtType);
+    this.selectedEvent = evtType;
+    Rx.Observable.forkJoin(
+      this.updateEventTypeChart$(evtType, TimeRanges[this.eventTypeChart.currentTimeRange], this.eventTypeChart.currentQuantity)
+    ).subscribe(
+      (ok) => { console.log(ok) },
+      (error) => { console.log(error) },
+      () => {console.log('updateCharts FINISHED')}
+    )
   }
 
   initCharts(){
@@ -68,7 +74,9 @@ export class EventSourcingSpecificChartComponent implements OnInit {
   updateEventTypeChart$(eventName: string, timeScale: string, timeRange: number) {
     return this.eventSourcingMonitorervice.getTimeFrameswithFilter$(eventName, timeScale, timeRange)
       .pipe(
-        tap(r => console.log(r)),
+        tap(r => {
+          this.eventList = r[1];
+        }),
         map(resultAsArray => resultAsArray[0].sort((a: any, b: any) => a.id - b.id)),
         tap(allSummaries => {
           this.eventTypeChart.datasets = [{

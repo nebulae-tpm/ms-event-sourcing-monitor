@@ -67,17 +67,19 @@ export class EventSourcingMonitorService {
                 };
               })
             ).toArray(),
-            // map((data: any[]) => {
-            //   const options = [];
-            //   data.forEach((summary: any ) => {
-            //     summary.eventTypeHits.forEach(e => {
-            //       if (options.findIndex((element: any) => element.key) === -1) {
-            //         options.push(e.key);
-            //       }
-            //     });
-            //   });
-            // })
-          );
+            Rx.Observable.of(newData)
+            .map((data: any[]) => {
+              const options = [];
+              data.forEach((summary: any ) => {
+                summary.eventTypeHits.forEach(e => {
+                  if (options.findIndex((element: any) => element === e.key ) === -1) {
+                    options.push(e.key);
+                  }
+                });
+              });
+              return options;
+            })
+          )
         })
       );
   }
