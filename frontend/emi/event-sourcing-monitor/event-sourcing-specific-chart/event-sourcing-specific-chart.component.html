@@ -31,25 +31,49 @@
       <div class="content">
     
         <!-- WIDGET GROUP -->
-        <div class="widget-group grey-100-bg" fxLayout="row" fxFlex="100" fxLayoutWrap *fuseIfOnDom>
+        <div  class="widget-group grey-100-bg" fxLayout="row" fxFlex="100" fxLayoutWrap *fuseIfOnDom>
+
+
     
           <!-- WIDGET 8 -->
           <fuse-widget class="widget" fxLayout="column" fxFlex="100" fxFlex.gt-sm="100">
     
             <!-- Front -->
             <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
-              <div class="h3 px-16 py-24">
-                titulo
+              <!-- HEADERS AND SELECT OPTIONS -->
+              <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
+              
+                <!-- <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
+                                  <strong> {{ 'WIDGETS.TITLES.GENERAL_OVERVIEW' | translate }} </strong>
+                                </div> -->
+                <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                  {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
+                </p>
+                <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                  <mat-select class="simplified" [(ngModel)]="eventTypeChart.currentTimeRange" (change)="eventTypeChart.onScaleChanged($event.value)"
+                    aria-label="Change range">
+                    <mat-option *ngFor="let range of eventTypeChart.timeScales | keys" [value]="range.value">
+                      {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                  {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
+                </p>
+                <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
+                  <mat-select class="simplified" [(ngModel)]="eventTypeChart.currentQuantity" (change)="eventTypeChart.onRangeChanged($event.value)"
+                    aria-label="Change range">
+                    <mat-option *ngFor="let qty of eventTypeChart.quantities | keys" [value]="qty.value">
+                      {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <!-- <div class="toolbar-separator" *ngIf="hasSelectedMails"></div> -->
               </div>
+              <!-- HEADERS AND SELECT OPTIONS -->
     
               <mat-divider></mat-divider>
-    
-              <!-- <div class="h-400">
-                      <ngx-charts-pie-chart *fuseIfOnDom [scheme]="widget8.scheme" [results]="widgets.widget8.mainChart" [legend]="widget8.legend"
-                        [explodeSlices]="widget8.explodeSlices" [labels]="widget8.labels" [doughnut]="widget8.doughnut" [gradient]="widget8.gradient"
-                        (select)="widget8.onSelect($event)">
-                      </ngx-charts-pie-chart>
-                    </div> -->
+
               <div class="h-400">
                 <canvas baseChart [datasets]="eventTypeChart.datasets" [labels]="eventTypeChart.labels" [colors]="eventTypeChart.colors"
                   [options]="eventTypeChart.options" [chartType]="eventTypeChart.chartType">
