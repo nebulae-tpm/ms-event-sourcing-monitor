@@ -1,4 +1,4 @@
-import { genericLineChart, TimeRanges } from './event-sourcing-monitor-chart-helper';
+import { TimeRanges, GenericBaseChart } from './event-sourcing-monitor-chart-helper';
 import { FuseTranslationLoaderService } from './../../../core/services/translation-loader.service';
 import { EventSourcingMonitorService } from './event-sourcing-monitor.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
@@ -8,9 +8,9 @@ import { locale as spanish } from './i18n/es';
 // tslint:disable-next-line:import-blacklist
 import * as Rx from 'rxjs/Rx';
 // tslint:disable-next-line:import-blacklist
-import { mergeMap, map, tap } from 'rxjs/operators';
+import { mergeMap, map } from 'rxjs/operators';
 // tslint:disable-next-line:import-blacklist
-import { forkJoin, of } from 'rxjs';
+import { forkJoin } from 'rxjs';
 
 
 export interface FilterOption{
@@ -29,10 +29,9 @@ export interface FilterOption{
 export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
 
   topEvents: {eventType: string, total: number, balance: number}[] = [];
-  generalEventsOverViewChart: any = JSON.parse(JSON.stringify(genericLineChart));
-  overViewByEventType: any = JSON.parse(JSON.stringify(genericLineChart));
-  overViewByAggregateType: any = JSON.parse(JSON.stringify(genericLineChart));
-  showFilterForGeneralOverview = true;
+  generalEventsOverViewChart: GenericBaseChart = new GenericBaseChart();
+  overViewByEventType: GenericBaseChart = new GenericBaseChart();
+  overViewByAggregateType: GenericBaseChart = new GenericBaseChart();
 
   balanceTable = {
     currentTimeRange: TimeRanges.MINUTE,
@@ -55,11 +54,11 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     private eventSourcingMonitorervice: EventSourcingMonitorService,
     private translationLoader: FuseTranslationLoaderService) {
     this.translationLoader.loadTranslations(english, spanish);
-    this.initCharts();
   }
 
 
   ngOnInit() {
+    this.initCharts();
     this.initialQueries();
   }
 
@@ -67,9 +66,6 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
   }
 
-  toggleFilterList(overView: string) {
-    this[overView] = !this[overView];
-  }
 
 
 

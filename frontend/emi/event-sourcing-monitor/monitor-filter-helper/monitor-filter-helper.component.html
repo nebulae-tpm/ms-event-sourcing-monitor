@@ -1,28 +1,31 @@
-<div fxLayout="column" fxLayoutAlign="space-between stretch">
-  <form [formGroup]="stateForm">
-    <mat-form-field class="w-100-p" floatPlaceholder="never">
-        <mat-chip-list matPrefix #filterList>
-          <mat-chip fxLayoutWrap *ngFor="let category of filtersApplied"
-                    removable="true"
-                    (removed)="removeItemFromFilter(category)">
-            {{category}}
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
-        </mat-chip-list>
-      <input matInput
-          placeholder="Filtro"
-          matChipInputAddOnBlur="true"
-          #searchFilter
-          formControlName="stateGroup"
-          [matChipInputFor]="filterList"
-          [matAutocomplete]="autoGroup">
-      <mat-autocomplete #autoGroup="matAutocomplete">
-        <mat-optgroup *ngFor="let group of stateGroupOptions | async" [label]="group.letter">
-          <mat-option (onSelectionChange)="onNewFilterAdded($event); " *ngFor="let name of group.names" [value]="name">
-            {{name}}
-          </mat-option>
-        </mat-optgroup>
-      </mat-autocomplete>
+<div id="filterComponent">
+  <form [formGroup]="filterForm" fxFill >
+    <mat-form-field style="width: 100%;" >
+          <mat-chip-list #filterList>
+            <mat-chip *ngFor="let filterKey of filtersApplied"
+              removable="true"
+              (removed)="removeItemFromFilter(filterKey)">
+              {{filterKey}}
+              <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+          </mat-chip-list>
+
+          <input style="background: antiquewhite; width: 100%" #searchFilter
+            placeholder="'FILTRO'"
+            matChipInputAddOnBlur="true"
+            formControlName="filterGroup"
+            [matChipInputFor]="filterList"
+            [matAutocomplete]="autoGroup">
+
+        <mat-autocomplete #autoGroup="matAutocomplete">
+          <mat-optgroup *ngFor="let group of eventGroupOptions | async" [ngStyle]="{'display': allOptionInGroupAreApplied(group.names) ? 'none' : 'block' }" [label]="group.letter">
+            <mat-option *ngFor="let name of group.names" [ngStyle]="{'display': filtersApplied.includes(name) ? 'none' : 'block' }" [value]="name"
+              style="background: aquamarine !important" (onSelectionChange)="onNewFilterAdded($event); ">
+              {{name}}
+            </mat-option>
+          </mat-optgroup>
+        </mat-autocomplete>
+
     </mat-form-field>
   </form>
 </div>

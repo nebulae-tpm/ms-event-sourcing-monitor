@@ -180,15 +180,14 @@
 
           <div class="search mat-white-bg" flex fxLayout="row" fxLayoutAlign="start center">
               <mat-icon>search</mat-icon>
-              <input [placeholder]="'EVENTO'" fxFlex>
+              <input #inputFilter [placeholder]="'ESPECIFIC_CHART.SIDEBAR.SEARCH_PLACE_HOLDER' | translate" fxFlex>
             </div>
-
 
             <div class="nav">
 
               <div class="nav-subheader">{{ 'ESPECIFIC_CHART.SIDEBAR.TITLE' | translate }} </div>
 
-              <div class="nav-item" *ngFor="let eventType of eventList">
+              <div class="nav-item" *ngFor="let eventType of eventOptionList">
                 <a class="nav-link" matRipple routerLinkActive="active" (click)="updateCharts(eventType)" >
                   <mat-icon class="nav-link-icon">linear_scale</mat-icon>
                   <span>{{eventType}}</span>

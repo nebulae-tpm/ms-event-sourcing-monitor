@@ -118,8 +118,8 @@
               </div>
 
               <!-- FILTER -->
-              <div  *ngIf="overViewByEventType.showFilterForm"  fxLayoutAlign="center center" fxFlex="90" fxFlex.gt-sm="90">
-                  <app-monitor-filter-helper
+              <div  *ngIf="overViewByEventType.showFilterForm"  fxLayoutAlign="center center" fxFlex="100" fxFlex.gt-sm="100">
+                  <app-monitor-filter-helper fxFill
                     [(listOptions)]="overViewByEventType.optionsToFilter"
                     [filtersApplied] = "overViewByEventType.filtersApplied"
                     (filtersUpdated)="overViewByEventType.updateFiltersApplied($event)">
@@ -180,7 +180,9 @@
 
               <!-- FILTER -->
               <div *ngIf="overViewByAggregateType.showFilterForm" fxLayoutAlign="center center" fxFlex="90" fxFlex.gt-sm="90">
-                <app-monitor-filter-helper [(listOptions)]="overViewByAggregateType.optionsToFilter" [filtersApplied]="overViewByAggregateType.filtersApplied"
+                <app-monitor-filter-helper fxFill
+                  [(listOptions)]="overViewByAggregateType.optionsToFilter"
+                  [filtersApplied]="overViewByAggregateType.filtersApplied"
                   (filtersUpdated)="overViewByAggregateType.updateFiltersApplied($event)">
                 </app-monitor-filter-helper>
               </div>

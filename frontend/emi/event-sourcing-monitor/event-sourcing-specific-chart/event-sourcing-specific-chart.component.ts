@@ -1,5 +1,6 @@
-import { genericLineChart, TimeRanges, NgxChartsPieChart} from './../event-sourcing-monitor-chart-helper';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { GenericBaseChart } from './../../../../../../../../frontend/emi/event-sourcing-monitor/event-sourcing-monitor-chart-helper';
+import { TimeRanges, NgxChartsPieChart} from './../event-sourcing-monitor-chart-helper';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FuseTranslationLoaderService } from './../../../../core/services/translation-loader.service';
 import { locale as english } from '../i18n/en';
 import { locale as spanish } from '../i18n/es';
@@ -24,7 +25,7 @@ import { rxSubscriber } from 'rxjs/internal-compatibility';
 export class EventSourcingSpecificChartComponent implements OnInit {
 
   @ViewChild('sidenav') public sideNav: MatSidenav;
-  eventTypeChart:  any = JSON.parse(JSON.stringify(genericLineChart));
+  eventTypeChart:  GenericBaseChart = new GenericBaseChart();
   eventTypeVsByUsersChart: NgxChartsPieChart = new NgxChartsPieChart();
   eventTypeVsByVersionChart: NgxChartsPieChart = new NgxChartsPieChart();
   selectedEvent: string = null;
@@ -37,8 +38,8 @@ export class EventSourcingSpecificChartComponent implements OnInit {
     this.translationLoader.loadTranslations(english, spanish);
   }
 
-  
-  eventList: string[] = [];
+
+  eventOptionList: string[] = [];
 
   ngOnInit() {
     this.eventTypeVsByUsersChart.clearResultData = () => {
@@ -96,7 +97,7 @@ export class EventSourcingSpecificChartComponent implements OnInit {
             this.processVsData$(array[0]),
             Rx.Observable.of(array).pipe(
               tap(r => {
-                this.eventList = r[1];
+                this.eventOptionList = r[1];
               }),
               map(resultAsArray => resultAsArray[0].sort((a: any, b: any) => a.id - b.id)),
               tap(allSummaries => {

@@ -3,7 +3,8 @@ export const locale = {
   data: {
     ESPECIFIC_CHART: {
       SIDEBAR: {
-        TITLE: 'Lista de eventos'
+        TITLE: 'Lista de eventos',
+        SEARCH_PLACE_HOLDER: 'Event'
       },
       TITLE_TEMPLATE: 'Details about ',
       USER_VS_CHART_TITLE: 'Comparison between Users',
