@@ -10,7 +10,7 @@
             </mat-chip>
           </mat-chip-list>
 
-          <input style="background: antiquewhite; width: 100%" #searchFilter
+          <input style="width: 100%" #searchFilter
             placeholder="'FILTRO'"
             matChipInputAddOnBlur="true"
             formControlName="filterGroup"
@@ -20,7 +20,7 @@
         <mat-autocomplete #autoGroup="matAutocomplete">
           <mat-optgroup *ngFor="let group of eventGroupOptions | async" [ngStyle]="{'display': allOptionInGroupAreApplied(group.names) ? 'none' : 'block' }" [label]="group.letter">
             <mat-option *ngFor="let name of group.names" [ngStyle]="{'display': filtersApplied.includes(name) ? 'none' : 'block' }" [value]="name"
-              style="background: aquamarine !important" (onSelectionChange)="onNewFilterAdded($event); ">
+              (onSelectionChange)="onNewFilterAdded($event); ">
               {{name}}
             </mat-option>
           </mat-optgroup>

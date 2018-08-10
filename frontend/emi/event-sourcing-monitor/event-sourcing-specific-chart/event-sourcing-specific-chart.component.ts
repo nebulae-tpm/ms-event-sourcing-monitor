@@ -1,5 +1,4 @@
-import { GenericBaseChart } from './../../../../../../../../frontend/emi/event-sourcing-monitor/event-sourcing-monitor-chart-helper';
-import { TimeRanges, NgxChartsPieChart} from './../event-sourcing-monitor-chart-helper';
+import { TimeRanges, NgxChartsPieChart, GenericBaseChart } from './../event-sourcing-monitor-chart-helper';
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FuseTranslationLoaderService } from './../../../../core/services/translation-loader.service';
 import { locale as english } from '../i18n/en';
