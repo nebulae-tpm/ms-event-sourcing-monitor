@@ -1,5 +1,5 @@
-import { TimeRanges, NgxChartsPieChart, GenericBaseChart } from './../event-sourcing-monitor-chart-helper';
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { TimeRanges } from '../chart-helpers/ChartTools';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FuseTranslationLoaderService } from './../../../../core/services/translation-loader.service';
 import { locale as english } from '../i18n/en';
 import { locale as spanish } from '../i18n/es';
@@ -13,6 +13,8 @@ import { mergeMap, map, tap, filter } from 'rxjs/operators';
 // tslint:disable-next-line:import-blacklist
 import { forkJoin, of, pipe } from 'rxjs';
 import { rxSubscriber } from 'rxjs/internal-compatibility';
+import { GenericBaseChart } from '../chart-helpers/GenericBaseChart';
+import { NgxChartsPieChart } from '../chart-helpers/NgxChartsPieChart';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -112,7 +114,7 @@ export class EventSourcingSpecificChartComponent implements OnInit {
                   this.eventTypeChart.labels.push(
                     new Date(summary.id)
                       // TODO set i18n in the next method
-                      .toLocaleString('es-CO', this.getLabelFormatter(timeScale))
+                      .toLocaleString('es-CO', this.eventTypeChart.getLabelFormatter(timeScale))
                   );
                 });
 
@@ -187,65 +189,19 @@ export class EventSourcingSpecificChartComponent implements OnInit {
   }
 
   /**
-   * Return the object to format the labels for timeRangeType given
-   * @param timeRangeType MINUTE, HOUR, DAY, MONTH, YEAR
-   */
-  getLabelFormatter(timeRangeType: string): Object{
-    // return { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric',  hour12: false };
-    switch (timeRangeType){
-      case 'MINUTE': return { hour: 'numeric', minute: 'numeric',  hour12: false };
-      case 'HOUR':   return { hour: 'numeric', minute: 'numeric',  hour12: false };
-      case 'DAY':    return { month: 'short', day: 'numeric',  hour12: false };
-      case 'MONTH':  return { year: 'numeric', month: 'short',  hour12: false };
-      case 'YEAR':   return { year: 'numeric',  hour12: false };
-      default: {}
-    }
-  }
-
-    /**
-   * return the rangeTime options that are posible represent with the scaleTime given
-   * @param scaleTime MINUTE, HOUR, DAY, MONTH, YEAR
-   */
-  getDefaultsTimeRangesForscaleTime(scaleTime: string){
-    switch (scaleTime){
-      case 'MINUTE': return { HALF_HOUR: 30, ONE_HOUR: 60, TEN_MINUTES: 10 };
-      case 'HOUR':   return { SIX_HOURS: 6, TWELVE_HOURS: 12, TWENTYFOUR: 24, FORTYEIGHT: 48  };
-      case 'DAY':    return { ONE_WEEK: 7, ONE_MONTH: 30, FIFTEEN_DAYS: 15 };
-      case 'MONTH':  return { SIX_MONTH: 6, ONE_YEAR: 12 };
-      case 'YEAR':   return { FIVE_YEAR : 5 };
-      default: return 0;
-    }
-  }
-
-   /**
-   * Returns de default range time for the timeRangeType
-   * @param timeRangeType MINUTE, HOUR, DAY, MONTH, YEAR
-   */
-  getDefaultLimitByTimeRangeType(timeRangeType: string): number{
-    switch (timeRangeType){
-      case 'MINUTE': return 30;
-      case 'HOUR':   return 12;
-      case 'DAY':    return 7;
-      case 'MONTH':  return 12;
-      case 'YEAR':   return 5;
-      default: return 0;
-    }
-  }
-
-  /**
    * initilizer function to create the chart and its inner functions
    * @param chartName Chart name in the component
    */
   setFunctionOnCharts(chartName: string): void {
     // function name to call when an update is required
     const functionToSubscribe = `update${chartName[0].toUpperCase()}${chartName.slice(1, chartName.length)}$`;
-    this[chartName].quantities = this.getDefaultsTimeRangesForscaleTime(TimeRanges[TimeRanges.MINUTE]);
-    this[chartName].currentQuantity = this.getDefaultLimitByTimeRangeType(TimeRanges[TimeRanges.MINUTE]);
+    this[chartName].quantities = GenericBaseChart.getDefaultsTimeRangesForscaleTime(TimeRanges[TimeRanges.MINUTE]);
+    this[chartName].currentQuantity = GenericBaseChart.getDefaultLimitByTimeRangeType(TimeRanges[TimeRanges.MINUTE]);
 
     // when Change the Scale of time like MINUTES, HOURS ....
     this[chartName].onScaleChanged = (scaleTime: number) => {
-      this[chartName].quantities = this.getDefaultsTimeRangesForscaleTime(TimeRanges[scaleTime]);
-      this[chartName].currentQuantity = this.getDefaultLimitByTimeRangeType(TimeRanges[scaleTime]);
+      this[chartName].quantities = GenericBaseChart.getDefaultsTimeRangesForscaleTime(TimeRanges[scaleTime]);
+      this[chartName].currentQuantity = GenericBaseChart.getDefaultLimitByTimeRangeType(TimeRanges[scaleTime]);
 
       this[functionToSubscribe](this.selectedEvent, TimeRanges[scaleTime], this[chartName].currentQuantity)
       .subscribe(
@@ -267,11 +223,4 @@ export class EventSourcingSpecificChartComponent implements OnInit {
 
 
   }
-
-  updateChart(chartName: string): void {
-    const labelsCopy = this[chartName].labels.slice();
-    this[chartName].datasets.labels = 0;
-    this[chartName].labels = labelsCopy;
-  }
-
 }

@@ -1,4 +1,4 @@
-import { TimeRanges, GenericBaseChart } from './event-sourcing-monitor-chart-helper';
+import { TimeRanges } from './chart-helpers/ChartTools';
 import { FuseTranslationLoaderService } from './../../../core/services/translation-loader.service';
 import { EventSourcingMonitorService } from './event-sourcing-monitor.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
@@ -8,9 +8,10 @@ import { locale as spanish } from './i18n/es';
 // tslint:disable-next-line:import-blacklist
 import * as Rx from 'rxjs/Rx';
 // tslint:disable-next-line:import-blacklist
-import { mergeMap, map } from 'rxjs/operators';
+import { mergeMap, map, tap } from 'rxjs/operators';
 // tslint:disable-next-line:import-blacklist
 import { forkJoin } from 'rxjs';
+import { GenericBaseChart } from './chart-helpers/GenericBaseChart';
 
 
 export interface FilterOption{
@@ -27,28 +28,9 @@ export interface FilterOption{
   animations: fuseAnimations
 })
 export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
-
-  topEvents: {eventType: string, total: number, balance: number}[] = [];
   generalEventsOverViewChart: GenericBaseChart = new GenericBaseChart();
   overViewByEventType: GenericBaseChart = new GenericBaseChart();
   overViewByAggregateType: GenericBaseChart = new GenericBaseChart();
-
-  balanceTable = {
-    currentTimeRange: TimeRanges.MINUTE,
-    timeScales: {
-      MINUTE: 1,
-      HOUR: 2,
-      DAY: 3,
-      MONTH: 4,
-      YEAR: 5
-    },
-    onScaleChanged: (timeScale: number) => {
-      const timeScaleAsString = Object.entries(this.balanceTable.timeScales).filter(o => o[1] === timeScale)[0][0];
-      this.updateBalanceTable(timeScaleAsString);
-    }
-  };
-
-
 
   constructor(
     private eventSourcingMonitorervice: EventSourcingMonitorService,
@@ -62,16 +44,12 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     this.initialQueries();
   }
 
-
   ngOnDestroy() {
   }
 
-
-
-
   initialQueries(){
 
-    this.eventSourcingMonitorervice.getTimeFrameInRangeSince$('MINUTE', Date.now(), this.getDefaultLimitByTimeRangeType('MINUTE'))
+    this.eventSourcingMonitorervice.getTimeFrameInRangeSince$('MINUTE', Date.now(),  GenericBaseChart.getDefaultLimitByTimeRangeType('MINUTE'))
       .pipe(
         map(result => JSON.parse(JSON.stringify(result))),
         map(resultAsArray => resultAsArray.sort((a, b) =>  a.id - b.id)),
@@ -88,55 +66,8 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
         (e) => console.log(e),
         () => { }
       );
-
-    this.updateBalanceTable('MINUTE');
   }
 
-  /**
-   * Return the object to format the labels for timeRangeType given
-   * @param timeRangeType MINUTE, HOUR, DAY, MONTH, YEAR
-   */
-  getLabelFormatter(timeRangeType: string): Object{
-    // return { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric',  hour12: false };
-    switch (timeRangeType){
-      case 'MINUTE': return { hour: 'numeric', minute: 'numeric',  hour12: false };
-      case 'HOUR':   return { hour: 'numeric', minute: 'numeric',  hour12: false };
-      case 'DAY':    return { month: 'short', day: 'numeric',  hour12: false };
-      case 'MONTH':  return { year: 'numeric', month: 'short',  hour12: false };
-      case 'YEAR':   return { year: 'numeric',  hour12: false };
-      default: {}
-    }
-  }
-
-  /**
-   * Returns de default range time for the timeRangeType
-   * @param timeRangeType MINUTE, HOUR, DAY, MONTH, YEAR
-   */
-  getDefaultLimitByTimeRangeType(timeRangeType: string): number{
-    switch (timeRangeType){
-      case 'MINUTE': return 30;
-      case 'HOUR':   return 12;
-      case 'DAY':    return 7;
-      case 'MONTH':  return 12;
-      case 'YEAR':   return 5;
-      default: return 0;
-    }
-  }
-
-  /**
-   * return the rangeTime options that are posible represent with the scaleTime given
-   * @param scaleTime MINUTE, HOUR, DAY, MONTH, YEAR
-   */
-  getDefaultsTimeRangesForscaleTime(scaleTime: string){
-    switch (scaleTime){
-      case 'MINUTE': return { HALF_HOUR: 30, ONE_HOUR: 60, TEN_MINUTES: 10 };
-      case 'HOUR':   return { SIX_HOURS: 6, TWELVE_HOURS: 12, TWENTYFOUR: 24, FORTYEIGHT: 48  };
-      case 'DAY':    return { ONE_WEEK: 7, ONE_MONTH: 30, FIFTEEN_DAYS: 15 };
-      case 'MONTH':  return { SIX_MONTH: 6, ONE_YEAR: 12 };
-      case 'YEAR':   return { FIVE_YEAR : 5 };
-      default: return 0;
-    }
-  }
 /**
  * Update the general overview chart
  * @param allSummaries allSummaries that the query give us
@@ -148,7 +79,6 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       data: [],
       fill: 'start'
     }];
-    console.log('allSummaries ==>', allSummaries);
 
     this.generalEventsOverViewChart.labels.length = 0;
     allSummaries.forEach((summary, index) => {
@@ -156,7 +86,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       this.generalEventsOverViewChart.labels.push(
         new Date(summary.id)
           // TODO set i18n in the next method
-          .toLocaleString('es-CO', this.getLabelFormatter(timeScale))
+          .toLocaleString('es-CO', this.generalEventsOverViewChart.getLabelFormatter(timeScale))
       );
     });
     this.generalEventsOverViewChart.ready = true;
@@ -199,7 +129,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       });
 
       // TODO apply with i18n
-      this.overViewByEventType.labels.push(new Date(id).toLocaleString('es-CO', this.getLabelFormatter(timeScale)));
+      this.overViewByEventType.labels.push(new Date(id).toLocaleString('es-CO', this.overViewByEventType.getLabelFormatter(timeScale)));
     });
 
     const filterOptions: FilterOption[] = [];
@@ -263,7 +193,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
        this.overViewByAggregateType.labels.push(
          new Date(id)
            // TODO set i18n in the next method
-           .toLocaleString('es-CO', this.getLabelFormatter(timeScale))
+           .toLocaleString('es-CO', this.overViewByAggregateType.getLabelFormatter(timeScale))
        );
      });
      const filterOptions: FilterOption[] = [];
@@ -299,39 +229,6 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
      return Rx.Observable.of(timeScale);
   }
 
-  updateBalanceTable(timeScale: string){
-    this.topEvents = [];
-    this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(timeScale, Date.now(), this.getDefaultLimitByTimeRangeType(timeScale))
-    .pipe(
-      map(result => JSON.parse(JSON.stringify(result))),
-      map((resultAsArray: any[]) => resultAsArray.sort((a, b) =>  a.id - b.id).slice(resultAsArray.length - 3, resultAsArray.length - 1)),
-      mergeMap((arrayResult: any) =>
-        Rx.Observable.from(arrayResult)
-        .pipe(
-          map((r: any) => r.eventTypeHits)
-        ).toArray()
-      )
-    )
-    .subscribe(
-      ( result: any[] ) =>  {
-        result[0].forEach(preKeyValue => {
-          const latestKeyValue = result[1].filter(o => o.key === preKeyValue.key)[0];
-          const latestValue = latestKeyValue ? latestKeyValue.value : 0;
-          const rowBalance = +(((latestValue / preKeyValue.value) - 1) * 100).toFixed(0);
-
-          if (this.topEvents.length <= 8){
-          this.topEvents.push({
-            eventType: preKeyValue.key,
-            total: latestKeyValue ? latestKeyValue.value : 0,
-            balance: rowBalance
-          });
-          }
-        });
-      },
-      (e) => console.log(e),
-      () => { }
-    );
-  }
 
   initCharts(){
     this.setFunctionOnCharts('generalEventsOverViewChart');
@@ -345,14 +242,14 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
   setFunctionOnCharts(chartName: string): void {
     // function name to call when an update is required
     const functionToSubscribe = `update${chartName[0].toUpperCase()}${chartName.slice(1, chartName.length)}$`;
-    this[chartName].quantities = this.getDefaultsTimeRangesForscaleTime(TimeRanges[TimeRanges.MINUTE]);
-    this[chartName].currentQuantity = this.getDefaultLimitByTimeRangeType(TimeRanges[TimeRanges.MINUTE]);
+    this[chartName].quantities = GenericBaseChart.getDefaultsTimeRangesForscaleTime(TimeRanges[TimeRanges.MINUTE]);
+    this[chartName].currentQuantity = GenericBaseChart.getDefaultLimitByTimeRangeType(TimeRanges[TimeRanges.MINUTE]);
 
     // when Change the Scale of time like MINUTES, HOURS ....
     this[chartName].onScaleChanged = (scaleTime: number) => {
 
-      this[chartName].quantities = this.getDefaultsTimeRangesForscaleTime(TimeRanges[scaleTime]);
-      this[chartName].currentQuantity = this.getDefaultLimitByTimeRangeType(TimeRanges[scaleTime]);
+      this[chartName].quantities = GenericBaseChart.getDefaultsTimeRangesForscaleTime(TimeRanges[scaleTime]);
+      this[chartName].currentQuantity = GenericBaseChart.getDefaultLimitByTimeRangeType(TimeRanges[scaleTime]);
       this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(TimeRanges[scaleTime], Date.now(), this[chartName].currentQuantity)
       .pipe(
         map(result => JSON.parse(JSON.stringify(result))),
@@ -393,16 +290,8 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
         ? dataset.hidden = false
         : dataset.hidden = filtersApplied.length === 0 ? false : true;
       });
-      this.updateChart(chartName);
+      this[chartName].updateChart();
     };
 
   }
-
-  updateChart(chartName: string): void {
-    const labelsCopy = this[chartName].labels.slice();
-    this[chartName].datasets.labels = 0;
-    this[chartName].labels = labelsCopy;
-  }
-
-
 }

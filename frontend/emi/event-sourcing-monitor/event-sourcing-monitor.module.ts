@@ -9,6 +9,7 @@ import { FuseWidgetModule } from '../../../core/components/widget/widget.module'
 import { EventSourcingMonitorService } from './event-sourcing-monitor.service';
 import { EventSourcingMonitorComponent } from './event-sourcing-monitor.component';
 import { MonitorFilterHelperComponent } from './monitor-filter-helper/monitor-filter-helper.component';
+import { MonitorIndicatorsComponent } from './monitor-indicators/monitor-indicators.component';
 
 
 const routes: Routes = [
@@ -32,7 +33,8 @@ const routes: Routes = [
   declarations: [
     EventSourcingMonitorComponent,
     MonitorFilterHelperComponent,
-    EventSourcingSpecificChartComponent
+    EventSourcingSpecificChartComponent,
+    MonitorIndicatorsComponent
   ],
   providers: [ EventSourcingMonitorService, DatePipe]
 })

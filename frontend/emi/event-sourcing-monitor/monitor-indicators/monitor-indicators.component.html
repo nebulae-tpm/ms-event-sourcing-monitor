@@ -1,0 +1,111 @@
+<fuse-widget class="widget h-500" fxFlex="100" fxLayout="column" fxLayoutAlign="space-between start">
+  <!-- <fuse-widget> -->
+  <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
+    <!-- FILTER OPTIONS -->
+    <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
+
+      <button *ngIf="topEvents && topEvents.length > 0" mat-icon-button fxFlex="20" fxFlex.gt-sm="20" [routerLink]="[topEvents[0].eventType]">
+        <mat-icon aria-label="Example icon-button with a heart icon">featured_play_list</mat-icon>
+      </button>
+
+      <div fxLayout="column" fxLayoutAlign="center center" fxFlex="60" fxFlex.gt-sm="60">
+        <div class="h2 pr-16">Top event Types</div>
+      </div>
+
+      <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="20">
+        <mat-select class="simplified" [(ngModel)]="balanceTable.currentTimeRange" (change)="balanceTable.onScaleChanged($event.value)"
+          aria-label="Change range">
+          <mat-option *ngFor="let range of balanceTable.timeScales | keys" [value]="range.value">
+            {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <!-- FILTER OPTIONS -->
+    <!-- OPTION LIST -->
+    <div id="allEventOptions" fxLayout="column" fxLayoutAlign="space-evenly stretch" fxFill style="margin-top: 10px">
+      <div *ngFor="let row of topEvents.slice(0,5)" fxLayout="row" fxLayout.gt-md="column" fxLayout.gt-xs="row" fxLayoutAlign="center center">
+        <div id="event_type" fxFlex.gt-xs="100" fxFlex.gt-md="100" fxLayoutAlign="center center">
+          {{row.eventType}}
+        </div>
+        <div id="balances" fxFlex.gt-xs="40" fxFlex.gt-md="100" fxLayout="row" fxLayoutAlign="space-evenly center">
+          <div fxFlex.gt-xs="33" fxFlex.gt-md="100" style="margin-left: 10px; margin-right: 10px; margin-bottom: 10px">
+            <div id="balance_title" fxLayoutAlign="center center">
+              {{row.date[0]}}
+            </div>
+            <div id="balance_content">
+              <td fxLayout="row" fxLayoutAlign="center center">
+                <p>{{row.total[0] + '( ' }}</p>
+                <mat-icon class="s-18 pr-4 red-fg" *ngIf="row.balance[0] < 0">
+                  arrow_downward
+                </mat-icon>
+
+                <mat-icon class="s-18 pr-4 green-fg" *ngIf="row.balance[0] > 0">
+                  arrow_upward
+                </mat-icon>
+                <div *ngIf="row.balance[0] !== -999" [ngClass]="{'red-fg': row.balance[0] < 0, 'green-fg': row.balance[0] > 0}">
+                  {{ (row.balance[0] + '').replace('-', '')}}%
+                </div>
+                <p>{{')'}}</p>
+                <div *ngIf="row.balance[0] === -999 || row.date[0] === ''" [ngClass]="{'red-fg': row.balance[0] < 0, 'green-fg': row.balance[0] > 0}">
+                  ---
+                </div>
+
+              </td>
+            </div>
+          </div>
+          <div fxFlex.gt-xs="33" fxFlex.gt-md="100" style="margin-left: 10px; margin-right: 10px; margin-bottom: 10px">
+            <div id="balance_title" fxLayoutAlign="center center">
+                {{row.date[1]}}
+            </div>
+            <div id="balance_content" fxLayoutAlign="center center">
+                <td fxLayout="row" fxLayoutAlign="center center">
+                  <p>{{row.total[1] + '( ' }}</p>
+                  <mat-icon class="s-18 pr-4 red-fg" *ngIf="row.balance[1] < 0">
+                    arrow_downward
+                  </mat-icon>
+
+                  <mat-icon class="s-18 pr-4 green-fg" *ngIf="row.balance[1] > 0">
+                    arrow_upward
+                  </mat-icon>
+                  <div *ngIf="row.balance[1] !== -999" [ngClass]="{'red-fg': row.balance[1] < 0, 'green-fg': row.balance[1] > 0}">
+                    {{ (row.balance[1] + '').replace('-', '')}}%
+                  </div>
+                  <p>{{')'}}</p>
+                  <div *ngIf="row.balance[1] === -999 || row.date[1] === ''" [ngClass]="{'red-fg': row.balance[1] < 0, 'green-fg': row.balance[1] > 0}">
+                    ---
+                  </div>
+                </td>
+            </div>
+          </div>
+          <div fxFlex.gt-xs="33" fxFlex.gt-md="100" style="margin-left: 10px; margin-right: 10px; margin-bottom: 10px">
+            <div id="balance_title" fxLayoutAlign="center center">
+                {{row.date[2]}}
+            </div>
+            <div id="balance_content" fxLayoutAlign="center center">
+                <td fxLayout="row" fxLayoutAlign="center center">
+                    <p>{{row.total[2] + '( ' }}</p>
+                    <mat-icon class="s-18 pr-4 red-fg" *ngIf="row.balance[2] < 0">
+                      arrow_downward
+                    </mat-icon>
+
+                    <mat-icon class="s-18 pr-4 green-fg" *ngIf="row.balance[2] > 0">
+                      arrow_upward
+                    </mat-icon>
+                    <div *ngIf="row.balance[2] !== -999">
+                      {{ (row.balance[2] + '').replace('-', '')}}%
+                    </div>
+                    <p>{{')'}}</p>
+                    <div *ngIf="row.balance[2] === -999 || row.date[2] === ''" [ngClass]="{'red-fg': row.balance[2] < 0, 'green-fg': row.balance[2] > 0}">
+                      ---
+                    </div>
+
+                  </td>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- OPTION LIST -->
+  </div>
+</fuse-widget>

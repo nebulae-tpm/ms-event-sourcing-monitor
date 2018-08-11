@@ -25,17 +25,17 @@ export const locale = {
       },
       TIMERANGES: {
         TEN_MINUTES: '10 Min',
-        HALF_HOUR: '1/2 H',
-        ONE_HOUR: '1 H',
+        HALF_HOUR: '30 Min',
+        ONE_HOUR: '60 Min',
         SIX_HOURS: '6 H',
         TWELVE_HOURS: '12 H',
         TWENTYFOUR: '24 H',
         FORTYEIGHT: '48 H',
-        ONE_WEEK: '1 Week',
+        ONE_WEEK: '7 Days',
         FIFTEEN_DAYS: '15 Days',
         ONE_MONTH: '1 Month',
         SIX_MONTH: '6 Months',
-        ONE_YEAR: '1 year',
+        ONE_YEAR: '12 Months',
         FIVE_YEAR: '5 years'
       }
     },
