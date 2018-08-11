@@ -17,8 +17,15 @@
           </div>
 
           <button mat-button class="mat-icon-button sidenav-toggle" fuseMatSidenavToggler="dashboards-right-sidenav" fxHide.gt-md aria-label="Toggle Sidenav">
-            <mat-icon>menu</mat-icon>
+            <mat-icon>filter_list</mat-icon>
           </button>
+
+          <button fxHide fxShow.gt-md mat-button class="mat-icon-button sidenav-toggle"
+            (click)="toogleSideNav()">
+              <mat-icon>filter_list</mat-icon>
+            </button>
+
+
           <!-- <div class="toolbar-separator" *ngIf="hasSelectedMails"></div> -->
 
         </div>
@@ -31,7 +38,7 @@
       <div class="content">
 
         <!-- WIDGET GROUP -->
-        <div  class="widget-group grey-100-bg" fxLayout="row" fxFlex="100" fxLayoutWrap *fuseIfOnDom>
+        <div class="widget-group grey-100-bg" fxLayout="row" fxFlex="100" fxLayoutWrap *fuseIfOnDom>
 
 
 
@@ -96,14 +103,9 @@
               </div>
 
               <div class="h-400">
-                <ngx-charts-pie-chart *fuseIfOnDom
-                  [scheme]="eventTypeVsByVersionChart.scheme"
-                  [results]="eventTypeVsByVersionChart.results"
-                  [legend]="eventTypeVsByVersionChart.legend"
-                  [explodeSlices]="eventTypeVsByVersionChart.explodeSlices"
-                  [labels]="eventTypeVsByVersionChart.labels"
-                  [doughnut]="eventTypeVsByVersionChart.doughnut"
-                  [gradient]="eventTypeVsByVersionChart.gradient">
+                <ngx-charts-pie-chart *fuseIfOnDom [scheme]="eventTypeVsByVersionChart.scheme" [results]="eventTypeVsByVersionChart.results"
+                  [legend]="eventTypeVsByVersionChart.legend" [explodeSlices]="eventTypeVsByVersionChart.explodeSlices" [labels]="eventTypeVsByVersionChart.labels"
+                  [doughnut]="eventTypeVsByVersionChart.doughnut" [gradient]="eventTypeVsByVersionChart.gradient">
                 </ngx-charts-pie-chart>
               </div>
 
@@ -135,14 +137,9 @@
               </div>
 
               <div class="h-400">
-                <ngx-charts-pie-chart *fuseIfOnDom
-                  [scheme]="eventTypeVsByUsersChart.scheme"
-                  [results]="eventTypeVsByUsersChart.results"
-                  [legend]="eventTypeVsByUsersChart.legend"
-                  [explodeSlices]="eventTypeVsByUsersChart.explodeSlices"
-                  [labels]="eventTypeVsByUsersChart.labels"
-                  [doughnut]="eventTypeVsByUsersChart.doughnut"
-                  [gradient]="eventTypeVsByUsersChart.gradient">
+                <ngx-charts-pie-chart *fuseIfOnDom [scheme]="eventTypeVsByUsersChart.scheme" [results]="eventTypeVsByUsersChart.results"
+                  [legend]="eventTypeVsByUsersChart.legend" [explodeSlices]="eventTypeVsByUsersChart.explodeSlices" [labels]="eventTypeVsByUsersChart.labels"
+                  [doughnut]="eventTypeVsByUsersChart.doughnut" [gradient]="eventTypeVsByUsersChart.gradient">
                 </ngx-charts-pie-chart>
               </div>
 
@@ -174,27 +171,28 @@
     <!-- / CENTER -->
 
     <!-- SIDENAV -->
-    <mat-sidenav #sidenav class="sidenav" align="end" mode="side" opened="true" fuseMatSidenavHelper="dashboards-right-sidenav" mat-is-locked-open="gt-md">
+    <mat-sidenav #sidenav class="sidenav sidenav-custom-width" align="end" mode="side" opened="true" fuseMatSidenavHelper="dashboards-right-sidenav"
+      mat-is-locked-open="gt-md">
 
       <div class="sidenav-content" fusePerfectScrollbar *fuseIfOnDom>
 
-          <div class="search mat-white-bg" flex fxLayout="row" fxLayoutAlign="start center">
-              <mat-icon>search</mat-icon>
-              <input #inputFilter [placeholder]="'ESPECIFIC_CHART.SIDEBAR.SEARCH_PLACE_HOLDER' | translate" fxFlex>
-            </div>
+        <div class="search mat-white-bg" flex fxLayout="row" fxLayoutAlign="start center">
+          <mat-icon>search</mat-icon>
+          <input #inputFilter [placeholder]="'ESPECIFIC_CHART.SIDEBAR.SEARCH_PLACE_HOLDER' | translate" fxFlex>
+        </div>
 
-            <div class="nav">
+        <div class="nav">
 
-              <div class="nav-subheader">{{ 'ESPECIFIC_CHART.SIDEBAR.TITLE' | translate }} </div>
+          <div class="nav-subheader">{{ 'ESPECIFIC_CHART.SIDEBAR.TITLE' | translate }} </div>
 
-              <div class="nav-item" *ngFor="let eventType of eventOptionList">
-                <a class="nav-link" matRipple routerLinkActive="active" (click)="updateCharts(eventType)" >
-                  <mat-icon class="nav-link-icon">linear_scale</mat-icon>
-                  <span>{{eventType}}</span>
-                </a>
-              </div>
+          <div class="nav-item" *ngFor="let eventType of eventOptionList">
+            <a class="nav-link" matRipple routerLinkActive="active" (click)="updateCharts(eventType)">
+              <mat-icon class="nav-link-icon">linear_scale</mat-icon>
+              <span>{{eventType}}</span>
+            </a>
+          </div>
 
-            </div>
+        </div>
       </div>
 
     </mat-sidenav>

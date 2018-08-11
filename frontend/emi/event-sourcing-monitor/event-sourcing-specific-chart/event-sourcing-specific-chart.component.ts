@@ -220,7 +220,9 @@ export class EventSourcingSpecificChartComponent implements OnInit {
         () => { }
       );
     };
+  }
 
-
+  toogleSideNav(){
+    this.sideNav.opened = !this.sideNav.opened;
   }
 }
