@@ -4,30 +4,56 @@
 
     <!-- CENTER -->
     <div class="center" fusePerfectScrollbar>
-
       <!-- CONTENT TOOLBAR -->
       <div class="toolbar px-24 py-8">
 
-        <div class="mail-selection" fxFlex="row" fxLayoutAlign="end center">
+        <div fxLayout="column" fxLayoutAlign="space-between none">
+          <!-- TITTLE AND SIDE-TOOGLE-BUTTONS -->
+          <div >
+            <div fxFlex="95" id="details_title">
+              <h2 style="text-align: center">
+                {{ 'ESPECIFIC_CHART.TITLE_TEMPLATE' | translate }} {{ selectedEvent }}
+              </h2>
+            </div>
 
-          <div fxFlex="100" id="details_title">
-            <h2 style="text-align: center">
-              {{ 'ESPECIFIC_CHART.TITLE_TEMPLATE' | translate }} {{ selectedEvent }}
-            </h2>
-          </div>
-
-          <button mat-button class="mat-icon-button sidenav-toggle" fuseMatSidenavToggler="dashboards-right-sidenav" fxHide.gt-md aria-label="Toggle Sidenav">
-            <mat-icon>filter_list</mat-icon>
-          </button>
-
-          <button fxHide fxShow.gt-md mat-button class="mat-icon-button sidenav-toggle"
-            (click)="toogleSideNav()">
+            <button fxFlex="5" mat-button class="mat-icon-button sidenav-toggle" fuseMatSidenavToggler="dashboards-right-sidenav" fxHide.gt-md
+              aria-label="Toggle Sidenav">
               <mat-icon>filter_list</mat-icon>
             </button>
 
+            <button fxFlex="5" fxHide fxShow.gt-md mat-button class="mat-icon-button sidenav-toggle" (click)="toogleSideNav()">
+              <mat-icon>filter_list</mat-icon>
+            </button>
+          </div>
+          <!-- TITTLE AND SIDE-TOOGLE-BUTTONS -->
 
-          <!-- <div class="toolbar-separator" *ngIf="hasSelectedMails"></div> -->
-
+          <!-- HEADERS AND SELECT OPTIONS -->
+          <div>
+            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+              {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
+            </p>
+            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+              <mat-select class="simplified" [(ngModel)]="eventTypeChart.currentTimeRange" (change)="eventTypeChart.onScaleChanged($event.value)"
+                aria-label="Change range">
+                <mat-option *ngFor="let range of eventTypeChart.timeScales | keys" [value]="range.value">
+                  {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+              {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
+            </p>
+            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+              <mat-select class="simplified" [(ngModel)]="eventTypeChart.currentQuantity" (change)="eventTypeChart.onRangeChanged($event.value)"
+                aria-label="Change range">
+                <mat-option *ngFor="let qty of eventTypeChart.quantities | keys" [value]="qty.value">
+                  {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <!-- <div class="toolbar-separator" *ngIf="hasSelectedMails"></div> -->
+          </div>
+          <!-- HEADERS AND SELECT OPTIONS -->
         </div>
       </div>
       <!-- / CONTENT TOOLBAR -->
@@ -47,38 +73,6 @@
 
             <!-- Front -->
             <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
-              <!-- HEADERS AND SELECT OPTIONS -->
-              <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
-
-                <!-- <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
-                                  <strong> {{ 'WIDGETS.TITLES.GENERAL_OVERVIEW' | translate }} </strong>
-                                </div> -->
-                <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
-                  {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
-                </p>
-                <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
-                  <mat-select class="simplified" [(ngModel)]="eventTypeChart.currentTimeRange" (change)="eventTypeChart.onScaleChanged($event.value)"
-                    aria-label="Change range">
-                    <mat-option *ngFor="let range of eventTypeChart.timeScales | keys" [value]="range.value">
-                      {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}
-                    </mat-option>
-                  </mat-select>
-                </mat-form-field>
-                <p fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
-                  {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
-                </p>
-                <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="50" fxFlex.gt-sm="25">
-                  <mat-select class="simplified" [(ngModel)]="eventTypeChart.currentQuantity" (change)="eventTypeChart.onRangeChanged($event.value)"
-                    aria-label="Change range">
-                    <mat-option *ngFor="let qty of eventTypeChart.quantities | keys" [value]="qty.value">
-                      {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
-                    </mat-option>
-                  </mat-select>
-                </mat-form-field>
-                <!-- <div class="toolbar-separator" *ngIf="hasSelectedMails"></div> -->
-              </div>
-              <!-- HEADERS AND SELECT OPTIONS -->
-
               <mat-divider></mat-divider>
 
               <div class="h-400">
@@ -186,10 +180,12 @@
           <div class="nav-subheader">{{ 'ESPECIFIC_CHART.SIDEBAR.TITLE' | translate }} </div>
 
           <div class="nav-item" *ngFor="let eventType of eventOptionList">
-            <a class="nav-link" matRipple routerLinkActive="active" (click)="updateCharts(eventType)">
+            <a class="nav-link" matRipple routerLinkActive="active" (click)="updateCharts(eventType); toogleSideNav();">
               <mat-icon class="nav-link-icon">linear_scale</mat-icon>
               <span>{{eventType}}</span>
             </a>
+            <div class="toolbar-separator"></div>
+
           </div>
 
         </div>
