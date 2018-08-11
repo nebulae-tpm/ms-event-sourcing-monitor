@@ -10,7 +10,7 @@ import { EventSourcingMonitorService } from './event-sourcing-monitor.service';
 import { EventSourcingMonitorComponent } from './event-sourcing-monitor.component';
 import { MonitorFilterHelperComponent } from './monitor-filter-helper/monitor-filter-helper.component';
 import { MonitorIndicatorsComponent } from './monitor-indicators/monitor-indicators.component';
-
+import { SelectedItemDirective } from './monitor-indicators/monitor-indicators.directive.component';
 
 const routes: Routes = [
   {
@@ -34,7 +34,8 @@ const routes: Routes = [
     EventSourcingMonitorComponent,
     MonitorFilterHelperComponent,
     EventSourcingSpecificChartComponent,
-    MonitorIndicatorsComponent
+    MonitorIndicatorsComponent,
+    SelectedItemDirective
   ],
   providers: [ EventSourcingMonitorService, DatePipe]
 })
