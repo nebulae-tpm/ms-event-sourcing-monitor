@@ -39,6 +39,11 @@ export class GenericBaseChart{
     };
     plugins: any;
   };
+  onScaleChanged: () => void;
+  onRangeChanged: () => void;
+  toggleFilterForm: () => void;
+  updateFiltersApplied:() => void;
+
 
   constructor(chartName: string = ''){
     this.name = chartName;

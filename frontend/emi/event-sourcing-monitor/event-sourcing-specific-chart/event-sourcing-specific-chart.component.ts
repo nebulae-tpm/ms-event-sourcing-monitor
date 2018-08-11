@@ -43,6 +43,9 @@ export class EventSourcingSpecificChartComponent implements OnInit {
   eventOptionList: string[] = [];
 
   ngOnInit() {
+
+    this.initCharts();
+
     this.eventTypeVsByUsersChart.clearResultData = () => {
       this.eventTypeVsByUsersChart.results.length = 0;
       this.eventTypeVsByUsersChart.results = [];
@@ -58,9 +61,6 @@ export class EventSourcingSpecificChartComponent implements OnInit {
         mergeMap(params => {
           this.selectedEvent = params['name'];
           return this.updateEventTypeChart$(this.selectedEvent, 'MINUTE', 30);
-        }),
-        tap(() => {
-          this.initCharts();
         })
       )
       .subscribe(result => {
