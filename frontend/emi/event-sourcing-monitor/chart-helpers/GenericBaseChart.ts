@@ -39,8 +39,8 @@ export class GenericBaseChart{
     };
     plugins: any;
   };
-  onScaleChanged: () => void;
-  onRangeChanged: () => void;
+  onScaleChanged: (arg: number) => void;
+  onRangeChanged: (arg: number) => void;
   toggleFilterForm: () => void;
   updateFiltersApplied:() => void;
 
