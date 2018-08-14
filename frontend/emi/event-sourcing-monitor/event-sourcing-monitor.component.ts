@@ -260,7 +260,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
         )
       )
       .subscribe(
-        (result) => { console.log('Result => ', result); },
+        (result) => { },
         (error) => { console.log(error); },
         () => { }
       );
@@ -275,7 +275,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
         )
       )
       .subscribe(
-        (result) => { console.log('Result => ', result); },
+        (result) => { },
         (error) => { console.log(error); },
         () => { }
       );

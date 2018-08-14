@@ -57,7 +57,7 @@ export class EventSourcingSpecificChartComponent implements OnInit {
     this.observableMedia.asObservable()
       .map(change => grid.get(change.mqAlias))
       .startWith(start)
-      .subscribe((e: number) => { this.screenMode = e; console.log(e); });
+      .subscribe((e: number) => { this.screenMode = e; });
 
     this.initCharts();
 
@@ -78,9 +78,7 @@ export class EventSourcingSpecificChartComponent implements OnInit {
           return this.updateEventTypeChart$(this.selectedEvent, 'MINUTE', 30);
         })
       )
-      .subscribe(result => {
-        console.log('RESULt BY SPECIFIC EVENT TYPE ', result);
-      });
+      .subscribe(result => { });
 
 
   }
@@ -151,7 +149,6 @@ export class EventSourcingSpecificChartComponent implements OnInit {
    * @param array UPDATE THE CHART THAT REPRESENT THE VS BETTEWN USERS AND VERSIONS BY EVENT TYPE
    */
   processVsData$(array: any[]){
-    console.log('PROCESANDO DATA DEL LOS VS');
     return Rx.Observable.from(array)
     .pipe(
       map(summary => summary.eventTypes[0]),
@@ -220,7 +217,7 @@ export class EventSourcingSpecificChartComponent implements OnInit {
 
       this[functionToSubscribe](this.selectedEvent, TimeRanges[scaleTime], this[chartName].currentQuantity)
       .subscribe(
-        (result) => { console.log('Result => ', result); },
+        (result) => {  },
         (error) => { console.log(error); },
         () => { }
       );
@@ -230,7 +227,7 @@ export class EventSourcingSpecificChartComponent implements OnInit {
     this[chartName].onRangeChanged = (timeRange: number) => {
       this[functionToSubscribe](this.selectedEvent, TimeRanges[this.eventTypeChart.currentTimeRange], timeRange)
       .subscribe(
-        (result) => { console.log('Result => ', result); },
+        (result) => { },
         (error) => { console.log(error); },
         () => { }
       );

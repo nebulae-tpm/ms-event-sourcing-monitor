@@ -65,19 +65,13 @@ export class MonitorIndicatorsComponent implements OnInit {
     )
     .subscribe(
       (result: any[]) => {
-        console.log('OPTIONS: ', result);
         result.slice(1, 4).forEach((item, index) => {
           item.hits.forEach(currentKeyValue => {
-            console.log(new Date(result[index].id).toLocaleTimeString());
-            const totalArray = [];
-            const balanceArray = [];
             let previusKeyValue = result[index].hits.filter(o => o.key === currentKeyValue.key)[0];
             previusKeyValue = previusKeyValue ? previusKeyValue.value : 0;
             const balance =  previusKeyValue !== 0
               ? +(((currentKeyValue.value / previusKeyValue) - 1) * 100).toFixed(0)
               : -999;
-              console.log('previusKeyValue ==>', previusKeyValue, 'currentKeyValue.value', currentKeyValue.value, ' BALANCE ==>', balance);
-
             const indexInTopEvents = this.topEvents.findIndex(e => e.eventType === currentKeyValue.key);
             if (indexInTopEvents === -1){
               this.topEvents.push({
@@ -99,8 +93,6 @@ export class MonitorIndicatorsComponent implements OnInit {
 
 
         });
-
-        console.log('%%%%%%%%%%%%%%%%%%%', this.topEvents);
       },
       (e) => console.log(e),
       () => { }

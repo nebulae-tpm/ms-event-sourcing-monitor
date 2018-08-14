@@ -77,7 +77,7 @@ export class EventSourcingMonitorService {
                   if ( indexInSummaries === -1) {
                     options.push({eventName: e.key, count: e.value });
                   }else{
-                    options[indexInSummaries].value = options[indexInSummaries].value + e.value;
+                    options[indexInSummaries].count = options[indexInSummaries].count + e.value;
                   }
                 });
               });
