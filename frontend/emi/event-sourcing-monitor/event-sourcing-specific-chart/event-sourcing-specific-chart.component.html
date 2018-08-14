@@ -175,9 +175,16 @@
 
       <div class="sidenav-content" fusePerfectScrollbar *fuseIfOnDom>
 
-        <div class="search mat-white-bg" flex fxLayout="row" fxLayoutAlign="start center">
-          <mat-icon>search</mat-icon>
-          <input #inputFilter [placeholder]="'ESPECIFIC_CHART.SIDEBAR.SEARCH_PLACE_HOLDER' | translate" fxFlex>
+        <div style="margin-top: 10px;" class="search mat-white-bg" flex fxLayout="row" fxLayoutAlign="center center">
+            <mat-icon>search</mat-icon>
+            <mat-form-field class="example-form-field">
+              <input type="search" [formControl]="filterInput" matInput type="text"
+                placeholder="{{ 'ESPECIFIC_CHART.SIDEBAR.SEARCH_PLACE_HOLDER' | translate }}"
+                [(ngModel)]="filterValue">
+              <button mat-button *ngIf="filterValue" matSuffix mat-icon-button aria-label="Clear" (click)="filterValue=''">
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-form-field>
         </div>
 
         <div class="nav">
@@ -185,7 +192,8 @@
           <div class="nav-subheader">{{ 'ESPECIFIC_CHART.SIDEBAR.TITLE' | translate }} </div>
 
           <div class="nav-item" *ngFor="let event of eventOptionList">
-            <a class="nav-link" matRipple routerLinkActive="active" (click)="updateCharts(event.eventName); toogleSideNav(false);">
+            <a *ngIf="event.show" class="nav-link" matRipple routerLinkActive="active"
+              (click)="updateCharts(event.eventName); toogleSideNav(false);">
               <mat-chip-list>
                 <mat-chip color="primary" selected>{{event.count}}</mat-chip>
               </mat-chip-list>

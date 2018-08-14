@@ -1,5 +1,5 @@
 import { TimeRanges } from '../chart-helpers/ChartTools';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, AfterViewInit, ElementRef } from '@angular/core';
 import { FuseTranslationLoaderService } from './../../../../core/services/translation-loader.service';
 import { locale as english } from '../i18n/en';
 import { locale as spanish } from '../i18n/es';
@@ -15,6 +15,7 @@ import { forkJoin, of, pipe } from 'rxjs';
 import { GenericBaseChart } from '../chart-helpers/GenericBaseChart';
 import { NgxChartsPieChart } from '../chart-helpers/NgxChartsPieChart';
 import { ObservableMedia } from '@angular/flex-layout';
+import { FormControl } from '@angular/forms';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -23,14 +24,19 @@ import { ObservableMedia } from '@angular/flex-layout';
   styleUrls: ['./event-sourcing-specific-chart.component.scss']
 })
 
-export class EventSourcingSpecificChartComponent implements OnInit {
+export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, AfterViewInit {
+
 
   @ViewChild('sidenav') public sideNav: MatSidenav;
+  // @ViewChild('inputFilterValue') inputFilterValue: ElementRef;
+  filterInput: FormControl = new FormControl();
 
   eventTypeChart:  GenericBaseChart = new GenericBaseChart();
   eventTypeVsByUsersChart: NgxChartsPieChart = new NgxChartsPieChart();
   eventTypeVsByVersionChart: NgxChartsPieChart = new NgxChartsPieChart();
   selectedEvent: string = null;
+  filterValue: string = null;
+
 
   constructor(
     private translationLoader: FuseTranslationLoaderService,
@@ -42,7 +48,7 @@ export class EventSourcingSpecificChartComponent implements OnInit {
   }
 
 
-  eventOptionList: {eventName: string, count: number}[] = [];
+  eventOptionList: {eventName: string, count: number, show: boolean}[] = [];
   screenMode = 0;
 
   ngOnInit() {
@@ -72,14 +78,27 @@ export class EventSourcingSpecificChartComponent implements OnInit {
     };
 
     this.route.params
-      .pipe(
-        mergeMap(params => {
+      .pipe(mergeMap(params => {
           this.selectedEvent = params['name'];
           return this.updateEventTypeChart$(this.selectedEvent, 'MINUTE', 30);
-        })
-      )
-      .subscribe(result => { });
+        }))
+      .subscribe(result => {});
 
+
+    this.filterInput.valueChanges.subscribe(term => {
+      this.eventOptionList.forEach(e => {
+        e.show = (term && term !== '') ? e.eventName.toLowerCase().includes(term.toLowerCase()) : true;
+      });
+    });
+
+
+  }
+
+  ngAfterViewInit(){
+    // const filterinputObservable = Rx.Observable.fromEvent(this.inputFilterValue.nativeElement, 'keyup');
+
+  }
+  ngOnDestroy(): void {
 
   }
 
@@ -89,7 +108,7 @@ export class EventSourcingSpecificChartComponent implements OnInit {
       Rx.Observable.forkJoin(
         this.updateEventTypeChart$(evtType, TimeRanges[this.eventTypeChart.currentTimeRange], this.eventTypeChart.currentQuantity)
       ).subscribe(
-        (ok) => { console.log(ok); },
+        (ok) => { },
         (error) => { console.log(error); },
         () => { }
       );
@@ -111,7 +130,11 @@ export class EventSourcingSpecificChartComponent implements OnInit {
             this.processVsData$(array[0]),
             Rx.Observable.of(array).pipe(
               tap(r => {
-                this.eventOptionList = r[1];
+                this.eventOptionList = r[1].sort((a: any, b: any) => b.count - a.count );
+                this.eventOptionList.forEach(e => {
+                  e.show = (this.filterValue && this.filterValue !== '') ? e.eventName.toLowerCase().includes(this.filterValue.toLowerCase()) : true;
+                });
+
               }),
               map(resultAsArray => resultAsArray[0].sort((a: any, b: any) => a.id - b.id)),
               tap(allSummaries => {

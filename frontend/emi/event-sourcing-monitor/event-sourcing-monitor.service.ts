@@ -75,7 +75,7 @@ export class EventSourcingMonitorService {
                 summary.eventTypeHits.forEach(e => {
                 const indexInSummaries = options.findIndex((element: any) => element.eventName === e.key );
                   if ( indexInSummaries === -1) {
-                    options.push({eventName: e.key, count: e.value });
+                    options.push({eventName: e.key, count: e.value, show: true });
                   }else{
                     options[indexInSummaries].count = options[indexInSummaries].count + e.value;
                   }
