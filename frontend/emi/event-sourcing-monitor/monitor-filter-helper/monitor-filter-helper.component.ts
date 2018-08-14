@@ -3,6 +3,9 @@ import {FormBuilder, FormGroup} from '@angular/forms';
 // tslint:disable-next-line:import-blacklist
 import {Observable} from 'rxjs';
 import {startWith, map} from 'rxjs/operators';
+import { locale as english } from '../i18n/en';
+import { locale as spanish } from '../i18n/es';
+import { FuseTranslationLoaderService } from '../../../../core/services/translation-loader.service';
 
 export interface FilterOptions {
   letter: string;
@@ -29,7 +32,8 @@ export class MonitorFilterHelperComponent implements OnInit {
   @Output() filtersUpdated: EventEmitter<any> = new EventEmitter();
   @ViewChild('searchFilter') filterInput: ElementRef;
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder,
+    private translationLoader: FuseTranslationLoaderService) { }
 
   filterForm: FormGroup = this.fb.group({
     filterGroup: '',
@@ -41,6 +45,7 @@ export class MonitorFilterHelperComponent implements OnInit {
   eventGroupOptions: Observable<FilterOptions[]>;
 
   ngOnInit() {
+    this.translationLoader.loadTranslations(english, spanish);
     this.optionsToFilterByGroups = this.listOptions;
     // tslint:disable-next-line:no-non-null-assertion
     this.eventGroupOptions = this.filterForm.get('filterGroup')!.valueChanges

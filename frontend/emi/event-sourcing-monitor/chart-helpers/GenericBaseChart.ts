@@ -23,7 +23,8 @@ export class GenericBaseChart{
     spanGaps: boolean;
     legend: any;
     maintainAspectRatio: boolean;
-    tooltips: { position: string, mode: string, intersect: boolean };
+    tooltips: { position: string, mode: string, intersect: boolean } | any;
+    // events: any[];
     layout: any;
     elements: {
       point: {
@@ -42,7 +43,7 @@ export class GenericBaseChart{
   onScaleChanged: (arg: number) => void;
   onRangeChanged: (arg: number) => void;
   toggleFilterForm: () => void;
-  updateFiltersApplied:() => void;
+  updateFiltersApplied: () => void;
 
 
   constructor(chartName: string = ''){
@@ -63,7 +64,11 @@ export class GenericBaseChart{
       spanGaps: false,
       legend: { display: false },
       maintainAspectRatio: false,
-      tooltips: { position: 'nearest', mode: 'index', intersect: false },
+      tooltips: {
+        // position: 'nearest', mode: 'index', intersect: false,
+        mode: 'point', position: 'nearest',
+        // filter: (tooltipItem) => tooltipItem.yLabel !== 0
+      },
       layout: { padding: { left: 24, right: 32 } },
       elements: {
         point: {
@@ -148,13 +153,13 @@ export class GenericBaseChart{
         pointHoverBorderColor: '#ffffff'
       },
       {
-        borderColor: 'rgba(40, 10, 229, 0.87)',
+        borderColor: 'rgba(8, 181, 94, 0.5)',
         // backgroundColor: 'rgba(40, 10, 229, 0.3)',
-        backgroundColor: '',
-        pointBackgroundColor: 'rgba(40, 10, 229, 0.87)',
-        pointHoverBackgroundColor: 'rgba(40, 10, 229, 0.87)',
-        pointBorderColor: '#ffffff',
-        pointHoverBorderColor: '#ffffff'
+        backgroundColor: 'rgba(8, 181, 94, 0.5)',
+        pointBackgroundColor: 'rgba(8, 181, 94, 0.5)',
+        pointHoverBackgroundColor: 'rgba(8, 181, 94, 0.5)',
+        pointBorderColor: 'rgba(8, 181, 94, 0.5)',
+        pointHoverBorderColor: 'rgba(8, 181, 94, 0.5)'
       }
 
     ];

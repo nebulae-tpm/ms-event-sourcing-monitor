@@ -73,8 +73,11 @@ export class EventSourcingMonitorService {
               const options = [];
               data.forEach((summary: any ) => {
                 summary.eventTypeHits.forEach(e => {
-                  if (options.findIndex((element: any) => element === e.key ) === -1) {
-                    options.push(e.key);
+                const indexInSummaries = options.findIndex((element: any) => element.eventName === e.key );
+                  if ( indexInSummaries === -1) {
+                    options.push({eventName: e.key, count: e.value });
+                  }else{
+                    options[indexInSummaries].value = options[indexInSummaries].value + e.value;
                   }
                 });
               });

@@ -9,8 +9,13 @@
 
         <div fxLayout="column" fxLayoutAlign="space-between none">
           <!-- TITTLE AND SIDE-TOOGLE-BUTTONS -->
-          <div >
-            <div fxFlex="95" id="details_title">
+          <div>
+
+            <button fxFlex="5" mat-button [routerLink]="['../']" class="mat-icon-button sidenav-toggle">
+              <mat-icon>navigate_before</mat-icon>
+            </button>
+
+            <div fxFlex="90" id="details_title">
               <h2 style="text-align: center">
                 {{ 'ESPECIFIC_CHART.TITLE_TEMPLATE' | translate }} {{ selectedEvent }}
               </h2>
@@ -21,7 +26,7 @@
               <mat-icon>filter_list</mat-icon>
             </button>
 
-            <button fxFlex="5" fxHide fxShow.gt-md mat-button class="mat-icon-button sidenav-toggle" (click)="toogleSideNav()">
+            <button fxFlex="5" fxHide fxShow.gt-md mat-button class="mat-icon-button sidenav-toggle" (click)="toogleSideNav(true)">
               <mat-icon>filter_list</mat-icon>
             </button>
           </div>
@@ -179,10 +184,12 @@
 
           <div class="nav-subheader">{{ 'ESPECIFIC_CHART.SIDEBAR.TITLE' | translate }} </div>
 
-          <div class="nav-item" *ngFor="let eventType of eventOptionList">
-            <a class="nav-link" matRipple routerLinkActive="active" (click)="updateCharts(eventType); toogleSideNav();">
-              <mat-icon class="nav-link-icon">linear_scale</mat-icon>
-              <span>{{eventType}}</span>
+          <div class="nav-item" *ngFor="let event of eventOptionList">
+            <a class="nav-link" matRipple routerLinkActive="active" (click)="updateCharts(event.eventName); toogleSideNav(false);">
+              <mat-chip-list>
+                <mat-chip color="primary" selected>{{event.count}}</mat-chip>
+              </mat-chip-list>
+              <span style="padding-left: 5px">{{event.eventName}}</span>
             </a>
             <div class="toolbar-separator"></div>
 

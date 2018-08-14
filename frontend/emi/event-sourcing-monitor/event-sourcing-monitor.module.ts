@@ -11,6 +11,7 @@ import { EventSourcingMonitorComponent } from './event-sourcing-monitor.componen
 import { MonitorFilterHelperComponent } from './monitor-filter-helper/monitor-filter-helper.component';
 import { MonitorIndicatorsComponent } from './monitor-indicators/monitor-indicators.component';
 import { SelectedItemDirective } from './monitor-indicators/monitor-indicators.directive.component';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 const routes: Routes = [
   {
@@ -28,7 +29,8 @@ const routes: Routes = [
     SharedModule,
     RouterModule.forChild(routes),
     NgxChartsModule,
-    FuseWidgetModule
+    FuseWidgetModule,
+    FlexLayoutModule
   ],
   declarations: [
     EventSourcingMonitorComponent,

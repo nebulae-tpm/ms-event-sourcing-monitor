@@ -4,12 +4,12 @@
     <!-- FILTER OPTIONS -->
     <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
 
-      <button *ngIf="topEvents && topEvents.length > 0" mat-icon-button fxFlex="20" fxFlex.gt-sm="20" [routerLink]="[topEvents[0].eventType]">
-        <mat-icon aria-label="Example icon-button with a heart icon">featured_play_list</mat-icon>
-      </button>
+      <!-- <button *ngIf="topEvents && topEvents.length > 0" mat-icon-button fxFlex="10" fxFlex.gt-sm="20" [routerLink]="[topEvents[0].eventType]">
+        <mat-icon>pageview</mat-icon>
+      </button> -->
 
-      <div fxLayout="column" fxLayoutAlign="center center" fxFlex="60" fxFlex.gt-sm="60">
-        <div class="h2 pr-16">Top event Types</div>
+      <div fxLayout="column" fxLayoutAlign="center center" fxFlex="80" fxFlex.gt-sm="80">
+        <div class="h2 pr-16">{{ 'INDICATORS.TITLE' | translate }}</div>
       </div>
 
       <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="20">
@@ -24,7 +24,8 @@
     <!-- FILTER OPTIONS -->
     <!-- OPTION LIST -->
     <div id="allEventOptions" fxLayout="column" fxLayoutAlign="space-evenly stretch" fxFill style="margin-top: 10px">
-      <div appHighlight *ngFor="let row of topEvents.slice(0,5)" [routerLink]="[row.eventType]" fxLayout="row" fxLayout.gt-md="column" fxLayout.gt-xs="row" fxLayoutAlign="center center">
+      <div appHighlight *ngFor="let row of topEvents.slice(0,5)" [routerLink]="[row.eventType]" fxLayout="row" fxLayout.gt-md="column"
+        fxLayout.gt-xs="row" fxLayoutAlign="center center">
         <!-- EVENT NAME -->
         <div id="event_type" fxFlex.gt-xs="100" fxFlex.gt-md="100" fxLayoutAlign="center center">
           {{row.eventType}}
@@ -57,10 +58,7 @@
                 <div *ngIf="row.balance[i] === -999" fxLayout="row">
                   <p>N/A</p>
                 </div>
-
                 <p>{{')'}}</p>
-
-
               </td>
             </div>
             <div *ngIf="row.date[i] === '---'" fxLayoutAlign="center center">
@@ -69,7 +67,7 @@
           </div>
         </div>
         <!-- BALANCE BODY -->
-      </div>      
+      </div>
     </div>
     <!-- OPTION LIST -->
   </div>

@@ -12,9 +12,9 @@ import * as Rx from 'rxjs/Rx';
 import { mergeMap, map, tap, filter } from 'rxjs/operators';
 // tslint:disable-next-line:import-blacklist
 import { forkJoin, of, pipe } from 'rxjs';
-import { rxSubscriber } from 'rxjs/internal-compatibility';
 import { GenericBaseChart } from '../chart-helpers/GenericBaseChart';
 import { NgxChartsPieChart } from '../chart-helpers/NgxChartsPieChart';
+import { ObservableMedia } from '@angular/flex-layout';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -26,6 +26,7 @@ import { NgxChartsPieChart } from '../chart-helpers/NgxChartsPieChart';
 export class EventSourcingSpecificChartComponent implements OnInit {
 
   @ViewChild('sidenav') public sideNav: MatSidenav;
+
   eventTypeChart:  GenericBaseChart = new GenericBaseChart();
   eventTypeVsByUsersChart: NgxChartsPieChart = new NgxChartsPieChart();
   eventTypeVsByVersionChart: NgxChartsPieChart = new NgxChartsPieChart();
@@ -34,15 +35,29 @@ export class EventSourcingSpecificChartComponent implements OnInit {
   constructor(
     private translationLoader: FuseTranslationLoaderService,
     private eventSourcingMonitorervice: EventSourcingMonitorService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private observableMedia: ObservableMedia
   ) {
     this.translationLoader.loadTranslations(english, spanish);
   }
 
 
-  eventOptionList: string[] = [];
+  eventOptionList: {eventName: string, count: number}[] = [];
+  screenMode = 0;
 
   ngOnInit() {
+
+    const grid = new Map([['xs', 1], ['sm', 2], ['md', 2], ['lg', 3], ['xl', 3]]);
+    let start: number;
+    grid.forEach((cols, mqAlias) => {
+      if (this.observableMedia.isActive(mqAlias)) {
+        start = cols;
+      }
+    });
+    this.observableMedia.asObservable()
+      .map(change => grid.get(change.mqAlias))
+      .startWith(start)
+      .subscribe((e: number) => { this.screenMode = e; console.log(e); });
 
     this.initCharts();
 
@@ -222,7 +237,9 @@ export class EventSourcingSpecificChartComponent implements OnInit {
     };
   }
 
-  toogleSideNav(){
-    this.sideNav.opened = !this.sideNav.opened;
+  toogleSideNav(mandatory: boolean){
+    if ( mandatory || this.screenMode !== 3 ){
+      this.sideNav.opened = !this.sideNav.opened;
+    }
   }
 }

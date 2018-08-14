@@ -1,11 +1,11 @@
 import { TimeRanges } from './../chart-helpers/Tool';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { EventSourcingMonitorService } from '../event-sourcing-monitor.service';
 // tslint:disable-next-line:import-blacklist
 import * as Rx from 'rxjs/Rx';
 // tslint:disable-next-line:import-blacklist
 import { mergeMap, map, tap } from 'rxjs/operators';
-import { GenericBaseChart } from '../chart-helpers/GenericBaseChart';
+import { Observable } from 'rxjs/Observable';
 
 export interface TopEvent{
   eventType: string;
@@ -22,7 +22,8 @@ export interface TopEvent{
 })
 
 export class MonitorIndicatorsComponent implements OnInit {
-  // topEvents: { eventType: string, data: { total: number, balance: number[] } }[] = [];
+  public cols: Observable<number>;
+
   topEvents: TopEvent[] = [];
 
   balanceTable = {
@@ -40,9 +41,12 @@ export class MonitorIndicatorsComponent implements OnInit {
     }
   };
 
-  constructor(private eventSourcingMonitorervice: EventSourcingMonitorService) { }
+  constructor(
+    private eventSourcingMonitorervice: EventSourcingMonitorService
+  ) { }
 
   ngOnInit() {
+
     this.updateBalanceTable('MINUTE');
   }
 
@@ -82,23 +86,15 @@ export class MonitorIndicatorsComponent implements OnInit {
                 total: Array.apply(null, Array(3)).map(Number.prototype.valueOf, 0),
                 balance: Array.apply(null, Array(3)).map(Number.prototype.valueOf, 0)
               });
-              this.topEvents[this.topEvents.length - 1].date[index] = new Date(item.id).toLocaleString('es-CO', this.getLabelFormatter('MINUTE'));
+              this.topEvents[this.topEvents.length - 1].date[index] = new Date(item.id).toLocaleString('es-CO', this.getLabelFormatter(timeScale));
               this.topEvents[this.topEvents.length - 1].total[index] = currentKeyValue.value;
               this.topEvents[this.topEvents.length - 1].balance[index] = balance;
 
             }else{
-              this.topEvents[indexInTopEvents].date[index] = new Date(item.id).toLocaleString('es-CO', this.getLabelFormatter('MINUTE'));
+              this.topEvents[indexInTopEvents].date[index] = new Date(item.id).toLocaleString('es-CO', this.getLabelFormatter(timeScale));
               this.topEvents[indexInTopEvents].balance[index] = balance;
               this.topEvents[indexInTopEvents].total[index] = currentKeyValue.value;
             }
-            // if (this.topEvents.length <= 8) {
-            //   this.topEvents[index].push({
-            //     eventType: preKeyValue.key,
-            //     total: latestKeyValue ? latestKeyValue.value : 0,
-            //     balance: rowBalance
-            //   });
-            // }
-
           });
 
 

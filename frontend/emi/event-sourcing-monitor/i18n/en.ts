@@ -10,6 +10,9 @@ export const locale = {
       USER_VS_CHART_TITLE: 'Comparison between Users',
       VERSION_VS_CHART_TITLE: 'Comparison between Versions',
     },
+    INDICATORS: {
+        TITLE: 'Top 5 in the last'
+      },
     WIDGETS: {
       TITLES: {
         GENERAL_OVERVIEW: 'General overview about all events',

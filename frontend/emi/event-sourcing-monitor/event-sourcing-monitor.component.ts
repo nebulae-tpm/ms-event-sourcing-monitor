@@ -106,14 +106,15 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     // update OverViewByEventType chart
     let allDataSets = []; // var used to all datasets for OverViewByEventType chart
     // const filtersApplied = this.overViewByEventType.filtersApplied.slice();
-    allSummaries.forEach(({ eventTypeHits }) => {
+    allSummaries.forEach(({eventTypeHits}) => {
       eventTypeHits.forEach(({ key, value }) => {
         if (allDataSets.filter(o => o.label === key).length === 0) {
           allDataSets.push(
             {
               label: key,
-              data: Array.apply(null, Array(allSummaries.length)).map(Number.prototype.valueOf, 0),
-              fill: false
+              data: Array(allSummaries.length).fill(0), // .apply(null, Array(allSummaries.length)).map(Number.prototype.valueOf, 0),
+              fill: false,
+              hidden: allDataSets.length >= 5 ? true : false
             });
           // this.overViewByEventType.filtersApplied.push(key);
         }
@@ -151,7 +152,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     if (allDataSets.length === 0) {
       allDataSets = [{
         label: 'Event_A',
-        data: Array.apply(null, Array(allSummaries.length)).map(Number.prototype.valueOf, 0),
+        data: Array(allSummaries.length).fill(0), // Array.apply(null, Array(allSummaries.length)).map(Number.prototype.valueOf, 0),
         fill: 'start'
       }];
     }
@@ -174,8 +175,9 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
            allDataSets.push(
              {
                label: key,
-               data: Array.apply(null, Array(allSummaries.length)).map(Number.prototype.valueOf, 0),
-               fill: false
+               data: Array(allSummaries.length).fill(0), // .apply(null, Array(allSummaries.length)).map(Number.prototype.valueOf, 0),
+               fill: false,
+               hidden: allDataSets.length >= 5 ? true : false
              });
           //  this.overViewByAggregateType.filtersApplied.push(key);
          }
