@@ -108,18 +108,6 @@
                 </ngx-charts-pie-chart>
               </div>
 
-              <!-- <div class="py-8 mh-16 border-top" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
-                <div class="py-8 border-right" fxLayout="column" fxLayoutAlign="center center" fxFlex="100" fxFlex.gt-sm="50">
-                  <span class="mat-display-1 mb-0">{{widgets.widget6.footerLeft.count[widget6.currentRange]}}</span>
-                  <span class="h4">{{widgets.widget6.footerLeft.title}}</span>
-                </div>
-
-                <div class="py-8" fxLayout="column" fxLayoutAlign="center center" fxFlex="100" fxFlex.gt-sm="50">
-                  <span class="mat-display-1 mb-0">{{widgets.widget6.footerRight.count[widget6.currentRange]}}</span>
-                  <span class="h4">{{widgets.widget6.footerRight.title}}</span>
-                </div>
-              </div> -->
-
             </div>
             <!-- / Front -->
 
@@ -142,18 +130,6 @@
                 </ngx-charts-pie-chart>
               </div>
 
-              <!-- <div class="py-8 mh-16 border-top" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
-                <div class="py-8 border-right" fxLayout="column" fxLayoutAlign="center center" fxFlex="100" fxFlex.gt-sm="50">
-                  <span class="mat-display-1 mb-0">{{widgets.widget6.footerLeft.count[widget6.currentRange]}}</span>
-                  <span class="h4">{{widgets.widget6.footerLeft.title}}</span>
-                </div>
-
-                <div class="py-8" fxLayout="column" fxLayoutAlign="center center" fxFlex="100" fxFlex.gt-sm="50">
-                  <span class="mat-display-1 mb-0">{{widgets.widget6.footerRight.count[widget6.currentRange]}}</span>
-                  <span class="h4">{{widgets.widget6.footerRight.title}}</span>
-                </div>
-              </div> -->
-
             </div>
             <!-- / Front -->
 
@@ -175,7 +151,8 @@
 
       <div class="sidenav-content" fusePerfectScrollbar *fuseIfOnDom>
 
-        <div style="margin-top: 10px;" class="search mat-white-bg" flex fxLayout="row" fxLayoutAlign="center center">
+        <div style="margin-top: 10px; margin-left: 10px; margin-right: 10px;"
+          class="search mat-white-bg" flex fxLayout="row" fxLayoutAlign="center center">
             <mat-icon>search</mat-icon>
             <mat-form-field class="example-form-field">
               <input type="search" [formControl]="filterInput" matInput type="text"
@@ -187,9 +164,13 @@
             </mat-form-field>
         </div>
 
+
         <div class="nav">
 
-          <div class="nav-subheader">{{ 'ESPECIFIC_CHART.SIDEBAR.TITLE' | translate }} </div>
+          <div fxLayoutAlign="center center" >
+            <h3 style="margin: 0px">{{ 'ESPECIFIC_CHART.SIDEBAR.TITLE' | translate }}</h3>
+          </div>
+          <mat-divider></mat-divider>
 
           <div class="nav-item" *ngFor="let event of eventOptionList">
             <a *ngIf="event.show" class="nav-link" matRipple routerLinkActive="active"

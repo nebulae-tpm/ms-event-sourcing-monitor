@@ -4,7 +4,7 @@ export const locale = {
     ESPECIFIC_CHART: {
       SIDEBAR: {
         TITLE: 'Event list',
-        SEARCH_PLACE_HOLDER: 'Event'
+        SEARCH_PLACE_HOLDER: 'Filter'
       },
       TITLE_TEMPLATE: 'Details about ',
       USER_VS_CHART_TITLE: 'Comparison between Users',
