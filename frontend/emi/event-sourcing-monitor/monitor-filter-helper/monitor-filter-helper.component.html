@@ -11,7 +11,7 @@
           </mat-chip-list>
 
           <input style="width: 100%" #searchFilter
-            placeholder="FILTRO"
+            placeholder="{{ 'FILTER.PLACEHOLDER' | translate }}"
             matChipInputAddOnBlur="true"
             formControlName="filterGroup"
             [matChipInputFor]="filterList"

@@ -45,6 +45,9 @@ export const locale = {
     OVERVIEW_WIDGET: {
       SCALE: 'Escala',
       RANGE: 'Rango'
+    },
+    FILTER: {
+      PLACEHOLDER: 'Filtros'
     }
   }
 };

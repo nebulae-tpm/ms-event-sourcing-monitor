@@ -3,7 +3,7 @@ export const locale = {
   data: {
     ESPECIFIC_CHART: {
       SIDEBAR: {
-        TITLE: 'Lista de eventos',
+        TITLE: 'Event list',
         SEARCH_PLACE_HOLDER: 'Event'
       },
       TITLE_TEMPLATE: 'Details about ',
@@ -45,6 +45,9 @@ export const locale = {
     OVERVIEW_WIDGET: {
       SCALE: 'Scale',
       RANGE: 'Range'
+    },
+    FILTER: {
+      PLACEHOLDER: 'FILTERS'
     }
   }
 };
