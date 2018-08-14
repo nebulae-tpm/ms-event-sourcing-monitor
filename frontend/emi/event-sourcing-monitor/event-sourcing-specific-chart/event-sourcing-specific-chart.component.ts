@@ -203,11 +203,19 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
     );
   }
 
+  /**
+   * cumulate
+   * @param chartName ChartName
+   * @param dataToCummulate
+   */
   cumulateDataInChart$(chartName: string, dataToCummulate: any[]){
     return Rx.Observable.from(dataToCummulate)
     .pipe(
       mergeMap(({key, value}) => {
-        return Rx.Observable.of({key, value})
+        return Rx.Observable.of({
+            key: chartName === 'eventTypeVsByVersionChart' ? `Version: ${key}` : key,
+            value
+        })
         .pipe(
           map(item => {
             const indexOf = this[chartName].results.findIndex(o => o.name === item.key);

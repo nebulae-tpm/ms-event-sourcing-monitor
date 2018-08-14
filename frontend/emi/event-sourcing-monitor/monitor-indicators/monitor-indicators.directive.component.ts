@@ -17,7 +17,7 @@ import { Directive, HostListener,
    }
 
     @HostListener('mouseenter') turnOnBackground() {
-      this.background = 'rgba(57, 73, 172, 0.20)'; // E1EAEE
+      this.background = 'rgba(57, 73, 172, 0.10)'; // E1EAEE
       this.cursor = 'pointer';
     }
     @HostListener('mouseleave') turnOffBackground() {

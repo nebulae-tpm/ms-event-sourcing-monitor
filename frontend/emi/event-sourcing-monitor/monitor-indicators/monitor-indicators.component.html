@@ -26,6 +26,7 @@
     <div id="allEventOptions" fxLayout="column" fxLayoutAlign="space-evenly stretch" fxFill style="margin-top: 10px">
       <div appHighlight *ngFor="let row of topEvents.slice(0,5)" [routerLink]="[row.eventType]" fxLayout="row" fxLayout.gt-md="column"
         fxLayout.gt-xs="row" fxLayoutAlign="center center">
+        <mat-divider [inset]="true"></mat-divider>
         <!-- EVENT NAME -->
         <div id="event_type" fxFlex.gt-xs="100" fxFlex.gt-md="100" fxLayoutAlign="center center">
           {{row.eventType}}
@@ -66,8 +67,10 @@
             </div>
           </div>
         </div>
+        <mat-divider [inset]="true"></mat-divider>
         <!-- BALANCE BODY -->
       </div>
+
     </div>
     <!-- OPTION LIST -->
   </div>
