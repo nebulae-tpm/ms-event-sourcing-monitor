@@ -110,7 +110,7 @@ export class MonitorIndicatorsComponent implements OnInit {
           });
           this.topEvents = this.topEvents
           .sort((a, b) => b.totals.reduce((x, y) => x + y, 0) - a.totals.reduce((x, y) => x + y, 0))
-          .slice(0, 7);
+          // .slice(0, 7);
           this.tableDataReady = true;
         },
         (e) => console.log(e),

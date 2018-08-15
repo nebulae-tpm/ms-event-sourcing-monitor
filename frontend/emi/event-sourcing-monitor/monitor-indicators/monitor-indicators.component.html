@@ -76,7 +76,7 @@
     </div> -->
     <!-- OPTION LIST -->
 
-    <mat-table *ngIf="tableDataReady"  [dataSource]="topEvents" fusePerfectScrollbar>
+    <mat-table class="events-table"  *ngIf="tableDataReady"  [dataSource]="topEvents" fusePerfectScrollbar>
 
       <!-- EventName Column -->
       <ng-container cdkColumnDef="eventType">
@@ -176,7 +176,7 @@
 
 
       <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
-      <mat-row *cdkRowDef="let event; columns: displayedColumns;" matRipple [routerLink]="[event.eventType ]" >
+      <mat-row *cdkRowDef="let event; columns: displayedColumns;" class="product" matRipple [routerLink]="[event.eventType ]" >
       </mat-row>
 
     </mat-table>

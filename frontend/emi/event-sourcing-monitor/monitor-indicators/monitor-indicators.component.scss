@@ -1,12 +1,31 @@
-p{
-    margin: 0px
-}
-.balance_content{
-    margin-left: 5px;
-    margin-right: 105pxpx;
-    margin-bottom: 5px;
-    margin-top: 5px;
-    // border: 1px solid #4CAF50;
-    background: rgba(57, 73, 172, 0.10);
-    border-radius: 10px;
+@import 'src/app/core/scss/fuse';
+
+:host {
+  .mat-header-cell {
+    color: #444444;
+    font-size: 15px;
+  }
+
+  .mat-header-row {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 9999
+  }
+
+  .events-table {
+    flex: 1 1 auto;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    overflow: auto;
+
+    .mat-header-row {
+      min-height: 64px;
+    }
+
+    .product {
+      position: relative;
+      cursor: pointer;
+      height: 51px;
+    }
+  }
 }
