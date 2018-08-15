@@ -15,10 +15,13 @@
               <mat-icon>navigate_before</mat-icon>
             </button>
 
-            <div fxFlex="90" id="details_title">
-              <h2 style="text-align: center">
+            <div fxLayout="column" fxFlex="90" id="details_title">
+              <h2 fxHide fxShow.gt-xs style="text-align: center">
                 {{ 'ESPECIFIC_CHART.TITLE_TEMPLATE' | translate }} {{ selectedEvent }}
               </h2>
+              <h3 fxShow fxHide.gt-xs style="text-align: center">
+                  {{ 'ESPECIFIC_CHART.TITLE_TEMPLATE' | translate }} {{ selectedEvent }}
+              </h3>
             </div>
 
             <button fxFlex="5" mat-button class="mat-icon-button sidenav-toggle" fuseMatSidenavToggler="dashboards-right-sidenav" fxHide.gt-md
@@ -160,7 +163,7 @@
           class="search mat-white-bg" flex fxLayout="row" fxLayoutAlign="center center">
             <mat-icon>search</mat-icon>
             <mat-form-field class="example-form-field">
-              <input [formControl]="filterInput" matInput 
+              <input [formControl]="filterInput" matInput
                 placeholder="{{ 'ESPECIFIC_CHART.SIDEBAR.SEARCH_PLACE_HOLDER' | translate }}"
                 [(ngModel)]="filterValue">
               <button mat-button *ngIf="filterValue" matSuffix mat-icon-button aria-label="Clear" (click)="filterValue=''">

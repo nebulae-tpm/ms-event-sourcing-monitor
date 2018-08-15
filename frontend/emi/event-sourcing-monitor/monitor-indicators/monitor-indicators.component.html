@@ -23,63 +23,12 @@
       </mat-form-field>
     </div>
     <!-- HEADER AND FILTER OPTIONS -->
-    <!-- OPTION LIST -->
-    <!-- <div id="allEventOptions" fxLayout="column" fxLayoutAlign="space-evenly stretch" fxFill style="margin-top: 10px">
-      <div appHighlight *ngFor="let row of topEvents.slice(0,5)" [routerLink]="[row.eventType]" fxLayout="row" fxLayout.gt-md="column"
-        fxLayout.gt-xs="row" fxLayoutAlign="center center">
-        <mat-divider [inset]="true"></mat-divider> -->
-    <!-- EVENT NAME -->
-    <!-- <div id="event_type" fxFlex.gt-xs="100" fxFlex.gt-md="100" fxLayoutAlign="center center">
-          {{row.eventType}}
-        </div> -->
-    <!-- EVENT NAME -->
-    <!-- BALANCE BODY -->
-    <!-- <div id="balances" fxFlex.gt-xs="40" fxFlex.gt-md="100" fxLayout="row" fxLayoutAlign="space-evenly center">
 
-          <div class="balance_content" *ngFor="let i of [0, 1, 2]" fxFlex.gt-xs="33" fxFlex.gt-md="100">
-            <div id="balance_title" fxLayoutAlign="center center">
-              {{row.date[i]}}
-            </div>
-            <div *ngIf="row.date[i] !== '---'">
-              <td fxLayout="row" fxLayoutAlign="center center">
-
-                <p>{{row.total[i] + '( ' }}</p>
-                <div *ngIf="row.balance[i] !== -999" fxLayout="row">
-                  <mat-icon class="s-18 pr-4 red-fg" *ngIf="row.balance[i] < 0">
-                    arrow_downward
-                  </mat-icon>
-
-                  <mat-icon class="s-18 pr-4 green-fg" *ngIf="row.balance[i] > 0">
-                    arrow_upward
-                  </mat-icon>
-
-                  <div [ngClass]="{'red-fg': row.balance[i] < 0, 'green-fg': row.balance[i] > 0}">
-                    {{ (row.balance[i] + '').replace('-', '')}}%
-                  </div>
-                </div>
-                <div *ngIf="row.balance[i] === -999" fxLayout="row">
-                  <p>N/A</p>
-                </div>
-                <p>{{')'}}</p>
-              </td>
-            </div>
-            <div *ngIf="row.date[i] === '---'" fxLayoutAlign="center center">
-              <p>N/A</p>
-            </div>
-          </div>
-        </div>
-        <mat-divider [inset]="true"></mat-divider> -->
-    <!-- BALANCE BODY -->
-    <!-- </div>
-
-    </div> -->
-    <!-- OPTION LIST -->
-
+    <!-- OPTION TABLE -->
     <mat-table class="events-table" *ngIf="tableDataReady" [dataSource]="topEvents" fusePerfectScrollbar>
-
       <!-- EventName Column -->
       <ng-container cdkColumnDef="eventType">
-        <mat-header-cell  *cdkHeaderCellDef>{{'INDICATORS.EVENT_HEADER_NAME' | translate}}</mat-header-cell>
+        <mat-header-cell *cdkHeaderCellDef>{{'INDICATORS.EVENT_HEADER_NAME' | translate}}</mat-header-cell>
         <mat-cell *cdkCellDef="let eventTop">
           <div class="text-truncate">{{eventTop.eventType}}</div>
         </mat-cell>
@@ -87,11 +36,9 @@
 
       <!-- BEFORELAST_BALANCE COLUMN -->
       <ng-container cdkColumnDef="balance_0">
-        <mat-header-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25"
-          fxLayout="row" fxLayoutAlign="center center" fxHide fxShow.gt-sm fxHide.gt-md *cdkHeaderCellDef>{{
-          balanceTable.datesHeaders[0] }}</mat-header-cell>
-        <mat-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25"
-         fxHide fxShow.gt-sm fxHide.gt-md *cdkCellDef="let eventTop">
+        <mat-header-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25" fxLayout="row" fxLayoutAlign="center center"
+          fxHide fxShow.gt-sm fxHide.gt-md *cdkHeaderCellDef>{{ balanceTable.datesHeaders[0] }}</mat-header-cell>
+        <mat-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25" fxHide fxShow.gt-sm fxHide.gt-md *cdkCellDef="let eventTop">
           <div fxLayout="column" fxLayoutAlign="center center">
             <p>{{ eventTop.totals[0] }}</p>
             <div *ngIf="eventTop.balance[0] !== -999" fxLayout="row">
@@ -118,11 +65,9 @@
 
       <!-- LAST_BALANCE COLUMN -->
       <ng-container cdkColumnDef="balance_1">
-        <mat-header-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25"
-          fxLayout="row" fxLayoutAlign="center center" fxHide fxShow.gt-xs fxHide.gt-md *cdkHeaderCellDef>{{
-          balanceTable.datesHeaders[1] }}</mat-header-cell>
-        <mat-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25"
-         fxHide fxShow.gt-xs fxHide.gt-md *cdkCellDef="let eventTop">
+        <mat-header-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25" fxLayout="row" fxLayoutAlign="center center"
+          fxHide fxShow.gt-xs fxHide.gt-md *cdkHeaderCellDef>{{ balanceTable.datesHeaders[1] }}</mat-header-cell>
+        <mat-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25" fxHide fxShow.gt-xs fxHide.gt-md *cdkCellDef="let eventTop">
           <div fxLayout="column" fxLayoutAlign="center center">
             <p>{{ eventTop.totals[1] }}</p>
             <div *ngIf="eventTop.balance[1] !== -999" fxLayout="row">
@@ -149,10 +94,9 @@
 
       <!-- CURRENTBALANCE COLUMN-->
       <ng-container cdkColumnDef="balance_2">
-        <mat-header-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25"
-          fxLayout="row" fxLayoutAlign="center center" *cdkHeaderCellDef>{{ balanceTable.datesHeaders[2] }}</mat-header-cell>
-        <mat-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25"
-         *cdkCellDef="let eventTop">
+        <mat-header-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25" fxLayout="row" fxLayoutAlign="center center"
+          *cdkHeaderCellDef>{{ balanceTable.datesHeaders[2] }}</mat-header-cell>
+        <mat-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25" *cdkCellDef="let eventTop">
           <div fxLayout="column" fxLayoutAlign="center center">
             <p>{{ eventTop.totals[2] }}</p>
             <div *ngIf="eventTop.balance[2] !== -999" fxLayout="row">
@@ -182,6 +126,9 @@
       </mat-row>
 
     </mat-table>
+    <!-- OPTION TABLE -->
+
+
 
 
 
