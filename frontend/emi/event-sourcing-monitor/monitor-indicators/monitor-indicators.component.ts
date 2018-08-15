@@ -14,6 +14,11 @@ export interface TopEvent{
   balance: number[];
 }
 
+export interface Transaction {
+  item: string;
+  cost: number;
+}
+
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'app-monitor-indicators',
@@ -25,6 +30,17 @@ export class MonitorIndicatorsComponent implements OnInit {
   public cols: Observable<number>;
   listeningEvent = false;
   topEvents: TopEvent[] = [];
+  tableDataReady = false;
+
+  displayedColumns: string[] = ['eventType', 'balance_0', 'balance_1', 'balance_2'];
+  transactions: Transaction[] = [
+    {item: 'Beach ball', cost: 4},
+    {item: 'Towel', cost: 5},
+    {item: 'Frisbee', cost: 2},
+    {item: 'Sunscreen', cost: 4},
+    {item: 'Cooler', cost: 25},
+    {item: 'Swim suit', cost: 15},
+  ];
 
   balanceTable = {
     currentTimeRange: TimeRanges.MINUTE,
@@ -51,6 +67,7 @@ export class MonitorIndicatorsComponent implements OnInit {
   }
 
   updateBalanceTable(timeScale: string){
+    this.tableDataReady = false;
     this.topEvents = [];
     this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(timeScale, Date.now(), 3)
     .pipe(
@@ -90,9 +107,9 @@ export class MonitorIndicatorsComponent implements OnInit {
               this.topEvents[indexInTopEvents].total[index] = currentKeyValue.value;
             }
           });
-
-
         });
+        console.log(this.topEvents);
+        this.tableDataReady = true;
       },
       (e) => console.log(e),
       () => { }

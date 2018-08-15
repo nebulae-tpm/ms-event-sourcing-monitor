@@ -63,7 +63,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
     this.observableMedia.asObservable()
       .map(change => grid.get(change.mqAlias))
       .startWith(start)
-      .subscribe((e: number) => { this.screenMode = e; });
+      .subscribe((e: number) => { this.screenMode = e; console.log('Selected ==> ', e ); });
 
     this.initCharts();
 
