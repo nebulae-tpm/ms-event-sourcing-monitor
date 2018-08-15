@@ -40,7 +40,6 @@ type Query {
   getTimeFramesSinceTimestampFromEventSourcingMonitor( timeFrameType:EventSourcingMonitorTimeFrameType!, initTimestamp: BigInt!, quantity: Int!): [EventSourcingMonitorTimeFrame]
 }
 
-# type Subscription {
-#   "Hello world sample, please remove"
-#   EventSourcingMonitorHelloWorldSubscription: HelloWorldEventSourcingMonitor  
-# }
+type Subscription {
+  EventMonitorUpdateAvailable: BigInt  
+}

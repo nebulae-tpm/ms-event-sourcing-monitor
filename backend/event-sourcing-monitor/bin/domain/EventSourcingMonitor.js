@@ -9,6 +9,8 @@ const YearAccumulatorDA = require("../data/YearAccumulatorDA");
 const { CustomError, DefaultError } = require("../tools/customError");
 const broker = require("../tools/broker/BrokerFactory")();
 const MATERIALIZED_VIEW_TOPIC = "materialized-view-updates";
+const lastEventMonitorUpdateSentToClientDBKey = "lastEventUpdateSentToClient";
+const CommonVarsDA = require("../data/CommonVars");
 
 /**
  * Singleton instance
@@ -17,7 +19,36 @@ let instance;
 
 class EventSourcingMonitor {
   constructor() {
-    // this.initHelloWorldEventGenerator();
+    this.frontendEventMonitorUpdated$ = new Rx.Subject();
+    this.prepareSubjects();
+  }
+
+  prepareSubjects(){
+    this.frontendEventMonitorUpdated$
+    .map((eventUpdateTimestamp) => { return { timestamp: eventUpdateTimestamp , timeRange: 1 } })
+    .mergeMap((eventUpdate) => Rx.Observable.forkJoin(
+      Rx.Observable.of(eventUpdate),
+      CommonVarsDA.getVarValue$(lastEventMonitorUpdateSentToClientDBKey)
+      .map(result => result ? result.value : null)
+    ))
+    .map(([eventUpdate, lastFrontendEventUpdateSent]) => {
+      return { ...eventUpdate, lastFrontendEventUpdateSent }
+    })
+    .filter((eventUpdate) => (eventUpdate.timestamp + 5000) > eventUpdate.lastFrontendEventUpdateSent
+       || eventUpdate.lastFrontendEventUpdateSent == null
+    )
+    .mergeMap(() => CommonVarsDA.updateVarValue$(lastEventMonitorUpdateSentToClientDBKey, Date.now()))
+      .mergeMap(() =>
+        broker.send$(
+          MATERIALIZED_VIEW_TOPIC,
+          "EventMonitorUpdateAvailable",
+          Date.now()
+        )
+      )
+    .subscribe(
+      (ok) => { console.log(ok) },
+      error => console.log(error)),
+      () => console.log("COMPLETED !!")
   }
   
   
@@ -33,6 +64,7 @@ class EventSourcingMonitor {
       MonthAccumulatorDA.cumulateEvent$(evt),
       YearAccumulatorDA.cumulateEvent$(evt)
     )
+    .mergeMap(() => Rx.Observable.defer(() => this.frontendEventMonitorUpdated$.next(evt.timestamp)))
   }
 
   /**

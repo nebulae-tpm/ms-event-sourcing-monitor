@@ -42,13 +42,7 @@ export const getTimeFrameInRangeSince = gql`
 `;
 
 
-
-
-
-//Hello world sample, please remove
-export const EventSourcingMonitorHelloWorldSubscription = gql`
-  subscription {
-    EventSourcingMonitorHelloWorldSubscription {
-      sn
-    }
-  }`;
+export const eventMonitorUpdateAvailable = gql`
+  subscription{
+  EventMonitorUpdateAvailable
+}`;

@@ -22,21 +22,8 @@ function getReponseFromBackEnd$(response) {
 
 
 module.exports = {
-
     //// QUERY ///////
-
     Query: {
-        // getHelloWorldFromEventSourcingMonitor(root, args, context) {
-        //     return broker
-        //         .forwardAndGetReply$(
-        //             "HelloWorld",
-        //             "gateway.graphql.query.getHelloWorldFromEventSourcingMonitor",
-        //             { root, args, jwt: context.encodedToken },
-        //             2000
-        //         )
-        //         .mergeMap(response => getReponseFromBackEnd$(response))
-        //         .toPromise();
-        // },
         getTimeFramesSinceTimestampFromEventSourcingMonitor(root, args, context){
             return broker
                 .forwardAndGetReply$(
@@ -53,20 +40,20 @@ module.exports = {
     //// MUTATIONS ///////
 
 
-    //// SUBSCRIPTIONS ///////
-    // Subscription: {
-    //     EventSourcingMonitorHelloWorldSubscription: {
-    //         subscribe: withFilter(
-    //             (payload, variables, context, info) => {
-    //                 return pubsub.asyncIterator("EventSourcingMonitorHelloWorldSubscription");
-    //             },
-    //             (payload, variables, context, info) => {
-    //                 return true;
-    //             }
-    //         )
-    //     }
+    // SUBSCRIPTIONS ///////
+    Subscription: {
+        EventMonitorUpdateAvailable: {
+            subscribe: withFilter(
+                (payload, variables, context, info) => {
+                    return pubsub.asyncIterator("EventMonitorUpdateAvailable");
+                },
+                (payload, variables, context, info) => {
+                    return true;
+                }
+            )
+        }
 
-    // }
+    }
 };
 
 
@@ -74,13 +61,13 @@ module.exports = {
 //// SUBSCRIPTIONS SOURCES ////
 
 const eventDescriptors = [
-    // {
-    //     backendEventName: 'EventSourcingMonitorHelloWorldEvent',
-    //     gqlSubscriptionName: 'EventSourcingMonitorHelloWorldSubscription',
-    //     //dataExtractor: (evt) => evt.data,// OPTIONAL, only use if needed
-    //     //onError: (error, descriptor) => console.log(`Error processing ${descriptor.backendEventName}`),// OPTIONAL, only use if needed
-    //     //onEvent: (evt, descriptor) => console.log(`Event of type  ${descriptor.backendEventName} arraived: ${JSON.stringify(evt)}`),// OPTIONAL, only use if needed
-    // },
+    {
+        backendEventName: 'EventMonitorUpdateAvailable',
+        gqlSubscriptionName: 'EventMonitorUpdateAvailable',
+        //dataExtractor: (evt) => evt.data,// OPTIONAL, only use if needed
+        //onError: (error, descriptor) => console.log(`Error processing ${descriptor.backendEventName}`),// OPTIONAL, only use if needed
+        //onEvent: (evt, descriptor) => console.log(`Event of type  ${descriptor.backendEventName} arraived: ${JSON.stringify(evt)}`),// OPTIONAL, only use if needed
+    },
 ];
 
 

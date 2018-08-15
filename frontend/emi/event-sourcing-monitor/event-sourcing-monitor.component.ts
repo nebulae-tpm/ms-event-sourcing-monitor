@@ -1,3 +1,4 @@
+import { Subscription } from 'rxjs/Subscription';
 import { TimeRanges } from './chart-helpers/ChartTools';
 import { FuseTranslationLoaderService } from './../../../core/services/translation-loader.service';
 import { EventSourcingMonitorService } from './event-sourcing-monitor.service';
@@ -31,6 +32,8 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
   generalEventsOverViewChart: GenericBaseChart = new GenericBaseChart();
   overViewByEventType: GenericBaseChart = new GenericBaseChart();
   overViewByAggregateType: GenericBaseChart = new GenericBaseChart();
+  allSubscriptionis: Subscription[] = [];
+  listeningEventSubscription: Subscription;
 
   constructor(
     private eventSourcingMonitorervice: EventSourcingMonitorService,
@@ -42,13 +45,26 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.initCharts();
     this.initialQueries();
+
+      this.eventSourcingMonitorervice.listeningEvent$
+      .subscribe(
+        (listeningEvents) => {
+          listeningEvents ? this.startToListenEvents() : this.stopListeningEvents();
+        },
+        (error) => {
+
+        },
+      );
+
+
+
   }
 
   ngOnDestroy() {
+    this.allSubscriptionis.forEach(e => e.unsubscribe());
   }
 
   initialQueries(){
-
     this.eventSourcingMonitorervice.getTimeFrameInRangeSince$('MINUTE', Date.now(),  GenericBaseChart.getDefaultLimitByTimeRangeType('MINUTE'))
       .pipe(
         map(result => JSON.parse(JSON.stringify(result))),
@@ -296,4 +312,50 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     };
 
   }
+
+  startToListenEvents(){
+    this.listeningEventSubscription = this.eventSourcingMonitorervice.listenAvailableUpdates$()
+      .pipe(
+        mergeMap(() => Rx.Observable.forkJoin(
+          this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(
+            TimeRanges[this.generalEventsOverViewChart.currentTimeRange], Date.now(),
+            this.generalEventsOverViewChart.currentQuantity
+          )
+            .pipe(
+              map(result => JSON.parse(JSON.stringify(result))),
+              map(resultAsArray => resultAsArray.sort((a, b) => a.id - b.id)),
+              mergeMap((arrayResult: any) => this.updateGeneralEventsOverViewChart$(arrayResult, TimeRanges[this.generalEventsOverViewChart.currentTimeRange]))
+            ),
+
+          this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(
+            TimeRanges[this.overViewByEventType.currentTimeRange], Date.now(),
+            this.overViewByEventType.currentQuantity
+          )
+            .pipe(
+              map(result => JSON.parse(JSON.stringify(result))),
+              map(resultAsArray => resultAsArray.sort((a, b) => a.id - b.id)),
+              mergeMap((arrayResult: any) => this.updateOverViewByEventType$(arrayResult, TimeRanges[this.overViewByEventType.currentTimeRange]))
+            ),
+          this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(
+            TimeRanges[this.overViewByAggregateType.currentTimeRange], Date.now(),
+            this.overViewByAggregateType.currentQuantity
+          )
+            .pipe(
+              map(result => JSON.parse(JSON.stringify(result))),
+              map(resultAsArray => resultAsArray.sort((a, b) => a.id - b.id)),
+              mergeMap((arrayResult: any) => this.updateOverViewByAggregateType$(arrayResult, TimeRanges[this.overViewByAggregateType.currentTimeRange]))
+            )
+        ))
+      )
+      .subscribe(
+        (timestamp: any) => { },
+        (error) => console.log(error)
+      );
+    // this.allSubscriptionis.push(this.listeningEventSubscription);
+  }
+
+  stopListeningEvents(){
+    this.listeningEventSubscription.unsubscribe();
+  }
+
 }

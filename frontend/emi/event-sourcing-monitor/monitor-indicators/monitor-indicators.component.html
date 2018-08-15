@@ -4,11 +4,13 @@
     <!-- FILTER OPTIONS -->
     <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
 
-      <!-- <button *ngIf="topEvents && topEvents.length > 0" mat-icon-button fxFlex="10" fxFlex.gt-sm="20" [routerLink]="[topEvents[0].eventType]">
-        <mat-icon>pageview</mat-icon>
-      </button> -->
+      <button *ngIf="topEvents && topEvents.length > 0" mat-icon-button fxFlex="10" fxFlex.gt-sm="10"
+          (click)="eventListenerSwicht()" >
+        <mat-icon *ngIf="listeningEvent">flash_on</mat-icon>
+        <mat-icon *ngIf="!listeningEvent">flash_off</mat-icon>
+      </button>
 
-      <div fxLayout="column" fxLayoutAlign="center center" fxFlex="80" fxFlex.gt-sm="80">
+      <div fxLayout="column" fxLayoutAlign="center center" fxFlex="70" fxFlex.gt-sm="70">
         <div class="h2 pr-16">{{ 'INDICATORS.TITLE' | translate }}</div>
       </div>
 

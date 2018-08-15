@@ -23,7 +23,7 @@ export interface TopEvent{
 
 export class MonitorIndicatorsComponent implements OnInit {
   public cols: Observable<number>;
-
+  listeningEvent = false;
   topEvents: TopEvent[] = [];
 
   balanceTable = {
@@ -114,6 +114,12 @@ export class MonitorIndicatorsComponent implements OnInit {
       case 'YEAR':   return { year: 'numeric',  hour12: false };
       default: {}
     }
+  }
+
+
+  eventListenerSwicht(){
+    this.listeningEvent = !this.listeningEvent;
+    this.eventSourcingMonitorervice.listeningEvent$.next(this.listeningEvent);
   }
 
 }

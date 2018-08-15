@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { GatewayService } from '../../../api/gateway.service';
 import {
-  EventSourcingMonitorHelloWorldSubscription,
+  eventMonitorUpdateAvailable,
   getTimeFrameInRangeSince
 } from './gql/EventSourcingMonitor';
 // tslint:disable-next-line:import-blacklist
@@ -14,6 +14,7 @@ import { forkJoin } from 'rxjs';
 @Injectable()
 export class EventSourcingMonitorService {
   lastDataQueried: any[] = [];
+  listeningEvent$ = new Rx.Subject<boolean>();
   constructor(private gateway: GatewayService) {}
 
 
@@ -86,6 +87,15 @@ export class EventSourcingMonitorService {
           );
         })
       );
+  }
+
+
+  listenAvailableUpdates$(){
+    return this.gateway.apollo
+    .subscribe({
+      query: eventMonitorUpdateAvailable
+    })
+    .map((resp) => resp.data.EventMonitorUpdateAvailable );
   }
 
 
