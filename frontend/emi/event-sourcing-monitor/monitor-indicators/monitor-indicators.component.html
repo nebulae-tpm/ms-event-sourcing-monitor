@@ -4,8 +4,7 @@
     <!-- HEADER AND FILTER OPTIONS -->
     <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
 
-      <button *ngIf="topEvents && topEvents.length > 0" mat-icon-button fxFlex="10" fxFlex.gt-sm="10"
-          (click)="eventListenerSwicht()" >
+      <button *ngIf="topEvents && topEvents.length > 0" mat-icon-button fxFlex="10" fxFlex.gt-sm="10" (click)="eventListenerSwicht()">
         <mat-icon *ngIf="listeningEvent">sync</mat-icon>
         <mat-icon *ngIf="!listeningEvent">sync_disabled</mat-icon>
       </button>
@@ -29,13 +28,13 @@
       <div appHighlight *ngFor="let row of topEvents.slice(0,5)" [routerLink]="[row.eventType]" fxLayout="row" fxLayout.gt-md="column"
         fxLayout.gt-xs="row" fxLayoutAlign="center center">
         <mat-divider [inset]="true"></mat-divider> -->
-        <!-- EVENT NAME -->
-        <!-- <div id="event_type" fxFlex.gt-xs="100" fxFlex.gt-md="100" fxLayoutAlign="center center">
+    <!-- EVENT NAME -->
+    <!-- <div id="event_type" fxFlex.gt-xs="100" fxFlex.gt-md="100" fxLayoutAlign="center center">
           {{row.eventType}}
         </div> -->
-        <!-- EVENT NAME -->
-        <!-- BALANCE BODY -->
-        <!-- <div id="balances" fxFlex.gt-xs="40" fxFlex.gt-md="100" fxLayout="row" fxLayoutAlign="space-evenly center">
+    <!-- EVENT NAME -->
+    <!-- BALANCE BODY -->
+    <!-- <div id="balances" fxFlex.gt-xs="40" fxFlex.gt-md="100" fxLayout="row" fxLayoutAlign="space-evenly center">
 
           <div class="balance_content" *ngFor="let i of [0, 1, 2]" fxFlex.gt-xs="33" fxFlex.gt-md="100">
             <div id="balance_title" fxLayoutAlign="center center">
@@ -70,31 +69,33 @@
           </div>
         </div>
         <mat-divider [inset]="true"></mat-divider> -->
-        <!-- BALANCE BODY -->
-      <!-- </div>
+    <!-- BALANCE BODY -->
+    <!-- </div>
 
     </div> -->
     <!-- OPTION LIST -->
 
-    <mat-table class="events-table"  *ngIf="tableDataReady"  [dataSource]="topEvents" fusePerfectScrollbar>
+    <mat-table class="events-table" *ngIf="tableDataReady" [dataSource]="topEvents" fusePerfectScrollbar>
 
       <!-- EventName Column -->
       <ng-container cdkColumnDef="eventType">
         <mat-header-cell  *cdkHeaderCellDef>{{'INDICATORS.EVENT_HEADER_NAME' | translate}}</mat-header-cell>
-        <mat-cell  *cdkCellDef="let eventTop">
-          <p class="text-truncate">{{eventTop.eventType}}</p>
+        <mat-cell *cdkCellDef="let eventTop">
+          <div class="text-truncate">{{eventTop.eventType}}</div>
         </mat-cell>
       </ng-container>
 
       <!-- BEFORELAST_BALANCE COLUMN -->
       <ng-container cdkColumnDef="balance_0">
-        <mat-header-cell fxLayout="row" fxLayoutAlign="center center"
-          fxHide fxShow.gt-sm fxHide.gt-md *cdkHeaderCellDef>{{ balanceTable.datesHeaders[0] }}</mat-header-cell>
-        <mat-cell fxHide fxShow.gt-sm fxHide.gt-md *cdkCellDef="let eventTop">
-          <div fxLayout="row" fxLayoutAlign="center center">
-
-            <p>{{eventTop.totals[0] + '( ' }}</p>
+        <mat-header-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25"
+          fxLayout="row" fxLayoutAlign="center center" fxHide fxShow.gt-sm fxHide.gt-md *cdkHeaderCellDef>{{
+          balanceTable.datesHeaders[0] }}</mat-header-cell>
+        <mat-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25"
+         fxHide fxShow.gt-sm fxHide.gt-md *cdkCellDef="let eventTop">
+          <div fxLayout="column" fxLayoutAlign="center center">
+            <p>{{ eventTop.totals[0] }}</p>
             <div *ngIf="eventTop.balance[0] !== -999" fxLayout="row">
+              <div [ngClass]="{'red-fg': eventTop.balance[0] < 0, 'green-fg': eventTop.balance[0] > 0}"> {{'('}} </div>
               <mat-icon class="s-18 pr-4 red-fg" *ngIf="eventTop.balance[0] < 0">
                 arrow_downward
               </mat-icon>
@@ -104,13 +105,12 @@
               </mat-icon>
 
               <div [ngClass]="{'red-fg': eventTop.balance[0] < 0, 'green-fg': eventTop.balance[0] > 0}">
-                {{ (eventTop.balance[0] + '').replace('-', '')}}%
+                {{ (eventTop.balance[0] + '').replace('-', '')}}% {{')'}}
               </div>
             </div>
             <div *ngIf="eventTop.balance[0] === -999" fxLayout="row">
-              <p>N/A</p>
+              {{'( '}}N/A{{')'}}
             </div>
-            <p>{{')'}}</p>
           </div>
         </mat-cell>
       </ng-container>
@@ -118,65 +118,67 @@
 
       <!-- LAST_BALANCE COLUMN -->
       <ng-container cdkColumnDef="balance_1">
-        <mat-header-cell fxLayout="row" fxLayoutAlign="center center"
-         fxHide fxShow.gt-xs fxHide.gt-md *cdkHeaderCellDef>{{ balanceTable.datesHeaders[1] }}</mat-header-cell>
-        <mat-cell fxHide fxShow.gt-xs fxHide.gt-md *cdkCellDef="let eventTop">
-            <div fxLayout="row" fxLayoutAlign="center center">
-              <p>{{eventTop.totals[1] + '( ' }}</p>
-              <div *ngIf="eventTop.balance[1] !== -999" fxLayout="row">
-                <mat-icon class="s-18 pr-4 red-fg" *ngIf="eventTop.balance[1] < 0">
-                  arrow_downward
-                </mat-icon>
+        <mat-header-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25"
+          fxLayout="row" fxLayoutAlign="center center" fxHide fxShow.gt-xs fxHide.gt-md *cdkHeaderCellDef>{{
+          balanceTable.datesHeaders[1] }}</mat-header-cell>
+        <mat-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25"
+         fxHide fxShow.gt-xs fxHide.gt-md *cdkCellDef="let eventTop">
+          <div fxLayout="column" fxLayoutAlign="center center">
+            <p>{{ eventTop.totals[1] }}</p>
+            <div *ngIf="eventTop.balance[1] !== -999" fxLayout="row">
+              <div [ngClass]="{'red-fg': eventTop.balance[1] < 0, 'green-fg': eventTop.balance[1] > 0}"> {{'('}} </div>
+              <mat-icon class="s-18 pr-4 red-fg" *ngIf="eventTop.balance[1] < 0">
+                arrow_downward
+              </mat-icon>
 
-                <mat-icon class="s-18 pr-4 green-fg" *ngIf="eventTop.balance[1] > 0">
-                  arrow_upward
-                </mat-icon>
+              <mat-icon class="s-18 pr-4 green-fg" *ngIf="eventTop.balance[1] > 0">
+                arrow_upward
+              </mat-icon>
 
-                <div [ngClass]="{'red-fg': eventTop.balance[1] < 0, 'green-fg': eventTop.balance[1] > 0}">
-                  {{ (eventTop.balance[1] + '').replace('-', '')}}%
-                </div>
+              <div [ngClass]="{'red-fg': eventTop.balance[1] < 0, 'green-fg': eventTop.balance[1] > 0}">
+                {{ (eventTop.balance[1] + '').replace('-', '')}}% {{')'}}
               </div>
-              <div *ngIf="eventTop.balance[1] === -999" fxLayout="row">
-                <p>N/A</p>
-              </div>
-              <p>{{')'}}</p>
             </div>
+            <div *ngIf="eventTop.balance[1] === -999" fxLayout="row">
+              {{'( '}}N/A{{')'}}
+            </div>
+          </div>
         </mat-cell>
       </ng-container>
       <!-- LAST_BALANCE COLUMN -->
 
       <!-- CURRENTBALANCE COLUMN-->
       <ng-container cdkColumnDef="balance_2">
-        <mat-header-cell fxLayout="row" fxLayoutAlign="center center"
-          *cdkHeaderCellDef>{{ balanceTable.datesHeaders[2] }}</mat-header-cell>
-        <mat-cell *cdkCellDef="let eventTop">
-            <div fxLayout="row" fxLayoutAlign="center center">
-              <p>{{eventTop.totals[2] + '( ' }}</p>
-              <div *ngIf="eventTop.balance[2] !== -999" fxLayout="row">
-                <mat-icon class="s-18 pr-4 " *ngIf="eventTop.balance[2] < 0">
-                  arrow_downward
-                </mat-icon>
+        <mat-header-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25"
+          fxLayout="row" fxLayoutAlign="center center" *cdkHeaderCellDef>{{ balanceTable.datesHeaders[2] }}</mat-header-cell>
+        <mat-cell fxFlex="30" fxFlex.gt-xs="15" fxFlex.gt-sm="20" fxFlex.gt-md="25"
+         *cdkCellDef="let eventTop">
+          <div fxLayout="column" fxLayoutAlign="center center">
+            <p>{{ eventTop.totals[2] }}</p>
+            <div *ngIf="eventTop.balance[2] !== -999" fxLayout="row">
+              <div> {{'('}} </div>
+              <mat-icon class="s-18 pr-4 " *ngIf="eventTop.balance[2] < 0">
+                arrow_downward
+              </mat-icon>
 
-                <mat-icon class="s-18 pr-4" *ngIf="eventTop.balance[2] > 0">
-                  arrow_upward
-                </mat-icon>
+              <mat-icon class="s-18 pr-4" *ngIf="eventTop.balance[2] > 0">
+                arrow_upward
+              </mat-icon>
 
-                <div >
-                  {{ (eventTop.balance[2] + '').replace('-', '')}}%
-                </div>
+              <div>
+                {{ (eventTop.balance[2] + '').replace('-', '')}}% {{')'}}
               </div>
-              <div *ngIf="eventTop.balance[2] === -999" fxLayout="row">
-                <p>N/A</p>
-              </div>
-              <p>{{')'}}</p>
             </div>
+            <div *ngIf="eventTop.balance[2] === -999" fxLayout="row">
+              {{'( '}}N/A{{')'}}
+            </div>
+          </div>
         </mat-cell>
       </ng-container>
       <!-- CURRENTBALANCE COLUMN-->
 
-
       <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
-      <mat-row *cdkRowDef="let event; columns: displayedColumns;" class="product" matRipple [routerLink]="[event.eventType ]" >
+      <mat-row *cdkRowDef="let event; columns: displayedColumns;" class="mat-row" matRipple [routerLink]="[event.eventType ]">
       </mat-row>
 
     </mat-table>

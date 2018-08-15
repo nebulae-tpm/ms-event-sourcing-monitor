@@ -20,12 +20,19 @@
 
     .mat-header-row {
       min-height: 64px;
+      padding: 0 12px !important;
     }
 
-    .product {
+    .mat-row {
       position: relative;
       cursor: pointer;
       height: 51px;
+      padding: 0 12px !important;
     }
   }
+}
+p{
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-weight: bold;
 }
