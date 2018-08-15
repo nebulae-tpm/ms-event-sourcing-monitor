@@ -11,7 +11,7 @@ export const locale = {
       VERSION_VS_CHART_TITLE: 'Comparison between Versions',
     },
     INDICATORS: {
-        TITLE: 'Top 5 in the last',
+        TITLE: 'Top 7 in the last',
         EVENT_HEADER_NAME: 'Event name'
       },
     WIDGETS: {

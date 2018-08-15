@@ -18,7 +18,7 @@
         <mat-select class="simplified" [(ngModel)]="balanceTable.currentTimeRange" (change)="balanceTable.onScaleChanged($event.value)"
           aria-label="Change range">
           <mat-option *ngFor="let range of balanceTable.timeScales | keys" [value]="range.value">
-            {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}
+            {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}{{'s'}}
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -76,13 +76,12 @@
     </div> -->
     <!-- OPTION LIST -->
 
-    <mat-table *ngIf="tableDataReady"  [dataSource]="topEvents"
-      fusePerfectScrollbar>
+    <mat-table *ngIf="tableDataReady"  [dataSource]="topEvents" fusePerfectScrollbar>
 
       <!-- EventName Column -->
       <ng-container cdkColumnDef="eventType">
-        <mat-header-cell *cdkHeaderCellDef>{{'INDICATORS.EVENT_HEADER_NAME' | translate}}</mat-header-cell>
-        <mat-cell *cdkCellDef="let eventTop">
+        <mat-header-cell  *cdkHeaderCellDef>{{'INDICATORS.EVENT_HEADER_NAME' | translate}}</mat-header-cell>
+        <mat-cell  *cdkCellDef="let eventTop">
           <p class="text-truncate">{{eventTop.eventType}}</p>
         </mat-cell>
       </ng-container>
@@ -90,11 +89,11 @@
       <!-- BEFORELAST_BALANCE COLUMN -->
       <ng-container cdkColumnDef="balance_0">
         <mat-header-cell fxLayout="row" fxLayoutAlign="center center"
-          fxHide fxShow.gt-sm fxHide.gt-md *cdkHeaderCellDef>{{ topEvents[0].date[0] }}</mat-header-cell>
+          fxHide fxShow.gt-sm fxHide.gt-md *cdkHeaderCellDef>{{ balanceTable.datesHeaders[0] }}</mat-header-cell>
         <mat-cell fxHide fxShow.gt-sm fxHide.gt-md *cdkCellDef="let eventTop">
           <div fxLayout="row" fxLayoutAlign="center center">
 
-            <p>{{eventTop.total[0] + '( ' }}</p>
+            <p>{{eventTop.totals[0] + '( ' }}</p>
             <div *ngIf="eventTop.balance[0] !== -999" fxLayout="row">
               <mat-icon class="s-18 pr-4 red-fg" *ngIf="eventTop.balance[0] < 0">
                 arrow_downward
@@ -120,10 +119,10 @@
       <!-- LAST_BALANCE COLUMN -->
       <ng-container cdkColumnDef="balance_1">
         <mat-header-cell fxLayout="row" fxLayoutAlign="center center"
-         fxHide fxShow.gt-xs fxHide.gt-md *cdkHeaderCellDef>{{ topEvents[0].date[1] }}</mat-header-cell>
+         fxHide fxShow.gt-xs fxHide.gt-md *cdkHeaderCellDef>{{ balanceTable.datesHeaders[1] }}</mat-header-cell>
         <mat-cell fxHide fxShow.gt-xs fxHide.gt-md *cdkCellDef="let eventTop">
             <div fxLayout="row" fxLayoutAlign="center center">
-              <p>{{eventTop.total[1] + '( ' }}</p>
+              <p>{{eventTop.totals[1] + '( ' }}</p>
               <div *ngIf="eventTop.balance[1] !== -999" fxLayout="row">
                 <mat-icon class="s-18 pr-4 red-fg" *ngIf="eventTop.balance[1] < 0">
                   arrow_downward
@@ -149,10 +148,10 @@
       <!-- CURRENTBALANCE COLUMN-->
       <ng-container cdkColumnDef="balance_2">
         <mat-header-cell fxLayout="row" fxLayoutAlign="center center"
-          *cdkHeaderCellDef>{{ topEvents[0].date[2] }}</mat-header-cell>
+          *cdkHeaderCellDef>{{ balanceTable.datesHeaders[2] }}</mat-header-cell>
         <mat-cell *cdkCellDef="let eventTop">
             <div fxLayout="row" fxLayoutAlign="center center">
-              <p>{{eventTop.total[2] + '( ' }}</p>
+              <p>{{eventTop.totals[2] + '( ' }}</p>
               <div *ngIf="eventTop.balance[2] !== -999" fxLayout="row">
                 <mat-icon class="s-18 pr-4 " *ngIf="eventTop.balance[2] < 0">
                   arrow_downward

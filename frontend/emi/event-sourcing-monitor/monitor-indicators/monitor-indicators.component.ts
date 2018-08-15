@@ -9,8 +9,7 @@ import { Observable } from 'rxjs/Observable';
 
 export interface TopEvent{
   eventType: string;
-  date: string[];
-  total: number[];
+  totals: number[];
   balance: number[];
 }
 
@@ -43,6 +42,7 @@ export class MonitorIndicatorsComponent implements OnInit {
   ];
 
   balanceTable = {
+    datesHeaders: ['---', '---', '---'],
     currentTimeRange: TimeRanges.MINUTE,
     timeScales: {
       MINUTE: 1,
@@ -66,54 +66,56 @@ export class MonitorIndicatorsComponent implements OnInit {
     this.updateBalanceTable('MINUTE');
   }
 
-  updateBalanceTable(timeScale: string){
+  updateBalanceTable(timeScale: string) {
     this.tableDataReady = false;
     this.topEvents = [];
     this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(timeScale, Date.now(), 3)
-    .pipe(
-      map(result => JSON.parse(JSON.stringify(result))),
-      map((resultAsArray: any[]) => resultAsArray.sort((a, b) =>  a.id - b.id) ),
-      mergeMap((arrayResult: any) =>
-        Rx.Observable.from(arrayResult)
-        .pipe(
-          map((r: any) => ({ id: r.id, hits: r.eventTypeHits }) )
-        ).toArray()
+      .pipe(
+        map(result => JSON.parse(JSON.stringify(result))),
+        map((resultAsArray: any[]) => resultAsArray.sort((a, b) => a.id - b.id)),
+        mergeMap((arrayResult: any) =>
+          Rx.Observable.from(arrayResult)
+            .pipe(
+              map((r: any) => ({ id: r.id, hits: r.eventTypeHits }))
+            ).toArray()
+        )
       )
-    )
-    .subscribe(
-      (result: any[]) => {
-        result.slice(1, 4).forEach((item, index) => {
-          item.hits.forEach(currentKeyValue => {
-            let previusKeyValue = result[index].hits.filter(o => o.key === currentKeyValue.key)[0];
-            previusKeyValue = previusKeyValue ? previusKeyValue.value : 0;
-            const balance =  previusKeyValue !== 0
-              ? +(((currentKeyValue.value / previusKeyValue) - 1) * 100).toFixed(0)
-              : -999;
-            const indexInTopEvents = this.topEvents.findIndex(e => e.eventType === currentKeyValue.key);
-            if (indexInTopEvents === -1){
-              this.topEvents.push({
-                eventType: currentKeyValue.key,
-                date: ['---', '---', '---'],
-                total: Array.apply(null, Array(3)).map(Number.prototype.valueOf, 0),
-                balance: Array.apply(null, Array(3)).map(Number.prototype.valueOf, 0)
-              });
-              this.topEvents[this.topEvents.length - 1].date[index] = new Date(item.id).toLocaleString('es-CO', this.getLabelFormatter(timeScale));
-              this.topEvents[this.topEvents.length - 1].total[index] = currentKeyValue.value;
-              this.topEvents[this.topEvents.length - 1].balance[index] = balance;
+      .subscribe(
+        (result: any[]) => {
+          result.slice(1, 4).forEach((item, index) => {
+            item.hits.forEach(currentKeyValue => {
+              let previusKeyValue = result[index].hits.filter(o => o.key === currentKeyValue.key)[0];
+              previusKeyValue = previusKeyValue ? previusKeyValue.value : 0;
+              const balance = previusKeyValue !== 0
+                ? +(((currentKeyValue.value / previusKeyValue) - 1) * 100).toFixed(0)
+                : -999;
+              const indexInTopEvents = this.topEvents.findIndex(e => e.eventType === currentKeyValue.key);
 
-            }else{
-              this.topEvents[indexInTopEvents].date[index] = new Date(item.id).toLocaleString('es-CO', this.getLabelFormatter(timeScale));
-              this.topEvents[indexInTopEvents].balance[index] = balance;
-              this.topEvents[indexInTopEvents].total[index] = currentKeyValue.value;
-            }
+                if (indexInTopEvents === -1) {
+                  this.topEvents.push({
+                    eventType: currentKeyValue.key,
+                    totals: Array.apply(null, Array(3)).map(Number.prototype.valueOf, 0),
+                    balance: Array.apply(null, Array(3)).map(Number.prototype.valueOf, 0)
+                  });
+                  this.balanceTable.datesHeaders[index] = new Date(item.id).toLocaleString('es-CO', this.getLabelFormatter(timeScale));
+                  this.topEvents[this.topEvents.length - 1].totals[index] = currentKeyValue.value;
+                  this.topEvents[this.topEvents.length - 1].balance[index] = balance;
+
+                } else {
+                  this.balanceTable.datesHeaders[index] = new Date(item.id).toLocaleString('es-CO', this.getLabelFormatter(timeScale));
+                  this.topEvents[indexInTopEvents].balance[index] = balance;
+                  this.topEvents[indexInTopEvents].totals[index] = currentKeyValue.value;
+                }
+            });
           });
-        });
-        console.log(this.topEvents);
-        this.tableDataReady = true;
-      },
-      (e) => console.log(e),
-      () => { }
-    );
+          this.topEvents = this.topEvents
+          .sort((a, b) => b.totals.reduce((x, y) => x + y, 0) - a.totals.reduce((x, y) => x + y, 0))
+          .slice(0, 7);
+          this.tableDataReady = true;
+        },
+        (e) => console.log(e),
+        () => { }
+      );
   }
 
 
