@@ -19,7 +19,7 @@
     overflow: auto;
 
     .mat-header-row {
-      min-height: 64px;
+      min-height: 60px;
       padding: 0 12px !important;
     }
 
@@ -35,4 +35,16 @@ p{
   margin-top: 5px;
   margin-bottom: 5px;
   font-weight: bold;
+}
+.no-margin {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
+}
+.text-bold {
+  font-weight: bold
+}
+.center-text {
+  text-align: center;
 }

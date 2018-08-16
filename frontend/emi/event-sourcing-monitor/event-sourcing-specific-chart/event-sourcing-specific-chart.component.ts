@@ -9,7 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 // tslint:disable-next-line:import-blacklist
 import * as Rx from 'rxjs/Rx';
 // tslint:disable-next-line:import-blacklist
-import { mergeMap, map, tap, filter } from 'rxjs/operators';
+import { mergeMap, map, tap, filter, toArray } from 'rxjs/operators';
 // tslint:disable-next-line:import-blacklist
 import { forkJoin, of, pipe } from 'rxjs';
 import { GenericBaseChart } from '../chart-helpers/GenericBaseChart';
@@ -32,8 +32,8 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
   filterInput: FormControl = new FormControl();
 
   eventTypeChart:  GenericBaseChart = new GenericBaseChart();
-  eventTypeVsByUsersChart: NgxChartsPieChart = new NgxChartsPieChart();
-  eventTypeVsByVersionChart: NgxChartsPieChart = new NgxChartsPieChart();
+  eventTypeVsByUsersChart: NgxChartsPieChart = new NgxChartsPieChart('eventTypeVsByUsersChart');
+  eventTypeVsByVersionChart: NgxChartsPieChart = new NgxChartsPieChart('eventTypeVsByVersionChart');
   selectedEvent: string = null;
   filterValue: string = null;
 
@@ -159,10 +159,6 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
               })
             )
           );
-        }),
-        tap(() => {
-          this.eventTypeVsByUsersChart.results = this.eventTypeVsByUsersChart.results.slice();
-          this.eventTypeVsByVersionChart.results =  this.eventTypeVsByVersionChart.results.slice();
         })
       );
 
@@ -171,36 +167,59 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
    *
    * @param array UPDATE THE CHART THAT REPRESENT THE VS BETTEWN USERS AND VERSIONS BY EVENT TYPE
    */
-  processVsData$(array: any[]){
+  processVsData$(array: any[]) {
     return Rx.Observable.from(array)
-    .pipe(
-      map(summary => summary.eventTypes[0]),
-      mergeMap(eventBalance => {
-        return Rx.Observable.of(eventBalance)
-        .pipe(
-          mergeMap((eventtByVs: any) => Rx.Observable.forkJoin(
-            Rx.Observable.of(eventtByVs).pipe(
-              filter(item => item),
-              map((r: any) => r.value),
-              map((arrayWithVs: any[]) => arrayWithVs.filter(vs => vs.key === 'userHits')),
-              filter((userHits: any[]) => userHits.length > 0),
-              map((r: any) => r[0].value),
-              mergeMap((cumulators: {key: string, value: number}[]) => this.cumulateDataInChart$('eventTypeVsByUsersChart', cumulators))
-            ),
-            Rx.Observable.of(eventtByVs).pipe(
-              filter(item => item),
-              map((r: any) => r.value),
-              map((arrayWithVs: any[]) => arrayWithVs.filter(vs => vs.key === 'versionHits')),
-              filter((userHits: any[]) => userHits.length > 0),
-              map((r: any) => r[0].value),
-              mergeMap((cumulators: {key: string, value: number}[]) => this.cumulateDataInChart$('eventTypeVsByVersionChart', cumulators))
-            ),
-          ))
-
-        );
-      }),
-      map(() => {} )
-    );
+      .pipe(
+        map(summary => summary.eventTypes[0]),
+        mergeMap(eventBalance => {
+          return Rx.Observable.of(eventBalance)
+            .pipe(
+              mergeMap((eventtByVs: any) => Rx.Observable.forkJoin(
+                Rx.Observable.of(eventtByVs).pipe(
+                  filter(item => item),
+                  map((r: any) => r.value),
+                  map((arrayWithVs: any[]) => arrayWithVs.filter(vs => vs.key === 'userHits')),
+                  filter((userHits: any[]) => userHits.length > 0),
+                  map((r: any) => r[0].value),
+                  mergeMap((cumulators: { key: string, value: number }[]) => this.cumulateDataInChart$(this.eventTypeVsByUsersChart.name, cumulators))
+                ),
+                Rx.Observable.of(eventtByVs).pipe(
+                  filter(item => item),
+                  map((r: any) => r.value),
+                  map((arrayWithVs: any[]) => arrayWithVs.filter(vs => vs.key === 'versionHits')),
+                  filter((userHits: any[]) => userHits.length > 0),
+                  map((r: any) => r[0].value),
+                  mergeMap((cumulators: { key: string, value: number }[]) => this.cumulateDataInChart$(this.eventTypeVsByVersionChart.name, cumulators))
+                ),
+              ))
+            );
+        })
+      )
+      .toArray()
+      .pipe(
+        mergeMap(() => {
+          // sorting the data by the total count per version
+          const resultsOrdered = this.eventTypeVsByVersionChart.results.sort((a, b) => b.value - a.value);
+          const readyResult = resultsOrdered.slice(0, 10);
+          return Rx.Observable.from(resultsOrdered.slice(10))
+            .pipe(
+              map((result) => {
+                readyResult[10] = {
+                  name: 'otros',
+                  value: readyResult[10] ? readyResult[10].value + result.value : result.value
+                };
+              })
+            ).toArray()
+            .pipe(
+              map(() => {
+                // updating the data charts
+                this.eventTypeVsByUsersChart.results = this.eventTypeVsByUsersChart.results.slice();
+                this.eventTypeVsByVersionChart.results = readyResult.slice();
+              })
+            );
+        }
+        )
+      );
   }
 
   /**
@@ -213,7 +232,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
     .pipe(
       mergeMap(({key, value}) => {
         return Rx.Observable.of({
-            key: chartName === 'eventTypeVsByVersionChart' ? `Version: ${key}` : key,
+            key: chartName === this.eventTypeVsByVersionChart.name ? `Version: ${key}` : key,
             value
         })
         .pipe(

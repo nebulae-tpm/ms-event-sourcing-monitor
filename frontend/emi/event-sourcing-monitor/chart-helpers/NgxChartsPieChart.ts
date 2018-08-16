@@ -1,4 +1,5 @@
 export class NgxChartsPieChart {
+  name: string;
   doughnut: boolean;
   explodeSlices: boolean;
   results: { name: string; value: number }[];
@@ -9,7 +10,8 @@ export class NgxChartsPieChart {
   onSelect: () => void;
   clearResultData: () => void;
   updateResultData: () => void;
-  constructor(){
+  constructor(name: string){
+    this.name = name;
     this.doughnut = true;
     this.results = [];
     this.explodeSlices = false;

@@ -27,7 +27,6 @@ export interface Transaction {
 
 export class MonitorIndicatorsComponent implements OnInit {
   public cols: Observable<number>;
-  listeningEvent = false;
   topEvents: TopEvent[] = [];
   tableDataReady = false;
 
@@ -134,11 +133,4 @@ export class MonitorIndicatorsComponent implements OnInit {
       default: {}
     }
   }
-
-
-  eventListenerSwicht(){
-    this.listeningEvent = !this.listeningEvent;
-    this.eventSourcingMonitorervice.listeningEvent$.next(this.listeningEvent);
-  }
-
 }

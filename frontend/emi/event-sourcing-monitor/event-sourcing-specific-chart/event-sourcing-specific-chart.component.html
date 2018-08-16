@@ -37,10 +37,10 @@
 
           <!-- HEADERS AND SELECT OPTIONS -->
           <div>
-            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
               {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
             </p>
-            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
               <mat-select class="simplified" [(ngModel)]="eventTypeChart.currentTimeRange" (change)="eventTypeChart.onScaleChanged($event.value)"
                 aria-label="Change range">
                 <mat-option *ngFor="let range of eventTypeChart.timeScales | keys" [value]="range.value">
@@ -48,10 +48,11 @@
                 </mat-option>
               </mat-select>
             </mat-form-field>
-            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+            <div fxHide fxShow.gt-xs fxFlex.gt-xs="15" fxFlex.gt-sm="10"></div>
+            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
               {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
             </p>
-            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
               <mat-select class="simplified" [(ngModel)]="eventTypeChart.currentQuantity" (change)="eventTypeChart.onRangeChanged($event.value)"
                 aria-label="Change range">
                 <mat-option *ngFor="let qty of eventTypeChart.quantities | keys" [value]="qty.value">

@@ -11,7 +11,7 @@ export const locale = {
       VERSION_VS_CHART_TITLE: 'Comparison between Versions',
     },
     INDICATORS: {
-        TITLE: 'Top 7 about',
+        TITLE: 'Top events for',
         EVENT_HEADER_NAME: 'Event name'
       },
     WIDGETS: {
@@ -19,6 +19,9 @@ export const locale = {
         GENERAL_OVERVIEW: 'General overview about all events',
         OVERVIEW_BY_EVENT_TYPE: 'Overview by event type',
         OVERVIEW_BY_AGGREGATE_TYPE: 'Overview by aggregate type'
+      },
+      LABELS: {
+        GENERAL_EVENT_COUNT: 'Count'
       },
       TIMESCALES: {
         MINUTE: 'Minute',

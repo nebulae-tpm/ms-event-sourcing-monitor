@@ -3,24 +3,68 @@
   <div class="content">
     <!--  class="content p-24 w-100-p" -->
     <div class="widget-group" fxLayout="row" fxFlex="100" fxLayoutWrap fxLayoutAlign="start start" *fuseIfOnDom [@animateStagger]="{value:'50'}">
-      <!-- OVERVIEW GENERAL -->
-      <div fxFlex.gt-xs="100" fxFlex.gt-md="40">
+
+      <!-- TITLE BAR -->
+      <div style="margin-top: 5px" fxLayoutWrap fxLayout="row" fxLayoutAlign="space-around center" class="widget" fxFlex="100">
+
+        <div fxFlex="85" fxLayoutAlign="center center">
+          <h1 class="no-margin shadow center-text" fxHide fxShow.gt-xs> Event sourcing events monitor </h1>
+          <h3 class="no-margin center-text text-bold" fxShow fxHide.gt-xs> Event sourcing events monitor </h3>
+        </div>
+        <div fxFlex="15" fxLayoutAlign="center center">
+          <button mat-mini-fab [color]="listeningEvent ? 'accent' : ''" mat-icon-button (click)="eventListenerSwicht()">
+            <mat-icon *ngIf="listeningEvent">sync</mat-icon>
+            <mat-icon *ngIf="!listeningEvent">sync_disabled</mat-icon>
+          </button>
+        </div>
+        <div fxLayout="row" fxFlex="100" fxLayoutAlign="center center">
+          <h3 class="no-margin text-bold" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
+            {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
+          </h3>
+          <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
+            <mat-select class="simplified" [(ngModel)]="generalEventsOverViewChart.currentTimeRange" (change)="generalEventsOverViewChart.onScaleChanged($event.value)"
+              aria-label="Change range">
+              <mat-option *ngFor="let range of generalEventsOverViewChart.timeScales | keys" [value]="range.value">
+                {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div fxHide fxShow.gt-xs fxFlex.gt-xs="15" fxFlex.gt-sm="10"></div>
+          <h3 class="no-margin text-bold" fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
+            {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
+          </h3>
+          <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
+            <mat-select class="simplified" [(ngModel)]="generalEventsOverViewChart.currentQuantity" (change)="generalEventsOverViewChart.onRangeChanged($event.value)"
+              aria-label="Change range">
+              <mat-option *ngFor="let qty of generalEventsOverViewChart.quantities | keys" [value]="qty.value">
+                {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+
+      </div>
+      <!-- TITLE BAR -->
+
+      <fuse-widget class="widget h-500" class="widget" fxFlex.gt-xs="100" fxFlex.gt-md="40">
         <app-monitor-indicators>
         </app-monitor-indicators>
-      </div>
+      </fuse-widget>
+      <!-- OVERVIEW GENERAL -->
       <fuse-widget *ngIf="generalEventsOverViewChart.ready" class="widget" fxFlex="100" fxFlex.gt-xs="100" fxFlex.gt-md="60">
 
         <div class="fuse-widget-front mat-white-bg mat-elevation-z2">
           <!-- HEADERS AND SELECT OPTIONS -->
           <div class="px-16 border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
 
-            <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
-              <strong> {{ 'WIDGETS.TITLES.GENERAL_OVERVIEW' | translate }} </strong>
+            <div style="height: 60px;" class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
+              <h2 class="text-bold no-margin" > {{ 'WIDGETS.TITLES.GENERAL_OVERVIEW' | translate }} </h2>
             </div>
-            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="15">
+            <!-- <p fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10" >
               {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
             </p>
-            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="15">
+            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10" >
               <mat-select class="simplified" [(ngModel)]="generalEventsOverViewChart.currentTimeRange" (change)="generalEventsOverViewChart.onScaleChanged($event.value)"
                 aria-label="Change range">
                 <mat-option *ngFor="let range of generalEventsOverViewChart.timeScales | keys" [value]="range.value">
@@ -28,23 +72,23 @@
                 </mat-option>
               </mat-select>
             </mat-form-field>
-            <div fxHide fxShow.gt-sm fxFlex.gt-sm="10"></div>
-            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="15">
+            <div fxHide fxShow.gt-xs fxFlex.gt-xs="15" fxFlex.gt-sm="10" ></div>
+            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10" >
               {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
             </p>
-            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="15">
+            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10" >
               <mat-select class="simplified" [(ngModel)]="generalEventsOverViewChart.currentQuantity" (change)="generalEventsOverViewChart.onRangeChanged($event.value)"
                 aria-label="Change range">
                 <mat-option *ngFor="let qty of generalEventsOverViewChart.quantities | keys" [value]="qty.value">
                   {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
                 </mat-option>
               </mat-select>
-            </mat-form-field>
+            </mat-form-field> -->
 
           </div>
           <!-- HEADERS AND SELECT OPTIONS -->
           <!-- GENERAL OVERVIEW CHART -->
-          <div class="h-400">
+          <div style="height: 430px;">
             <canvas baseChart [datasets]="generalEventsOverViewChart.datasets" [labels]="generalEventsOverViewChart.labels" [colors]="generalEventsOverViewChart.colors"
               [options]="generalEventsOverViewChart.options" [chartType]="generalEventsOverViewChart.chartType">
             </canvas>
@@ -69,8 +113,9 @@
               </button>
             </div>
             <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="95" fxFlex.gt-sm="95">
-              <strong> {{ 'WIDGETS.TITLES.OVERVIEW_BY_EVENT_TYPE' | translate }} </strong>
+              <h2 class="text-bold no-margin" > {{ 'WIDGETS.TITLES.OVERVIEW_BY_EVENT_TYPE' | translate }} </h2>
             </div>
+
 
             <!-- FILTER -->
             <div *ngIf="overViewByEventType.showFilterForm" fxLayoutAlign="center center" fxFlex="100" fxFlex.gt-sm="100">
@@ -80,10 +125,10 @@
             </div>
             <!-- FILTER -->
 
-            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+            <!-- <p fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
               {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
             </p>
-            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
               <mat-select class="simplified" [(ngModel)]="overViewByEventType.currentTimeRange" (change)="overViewByEventType.onScaleChanged($event.value)"
                 aria-label="Change range">
                 <mat-option *ngFor="let range of overViewByEventType.timeScales | keys" [value]="range.value">
@@ -91,18 +136,18 @@
                 </mat-option>
               </mat-select>
             </mat-form-field>
-            <div fxHide fxShow.gt-sm fxFlex.gt-sm="10"></div>
-            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+            <div fxHide fxShow.gt-xs fxFlex.gt-xs="15" fxFlex.gt-sm="10"></div>
+            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
               {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
             </p>
-            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
               <mat-select class="simplified" [(ngModel)]="overViewByEventType.currentQuantity" (change)="overViewByEventType.onRangeChanged($event.value)"
                 aria-label="Change range">
                 <mat-option *ngFor="let qty of overViewByEventType.quantities | keys" [value]="qty.value">
                   {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
                 </mat-option>
               </mat-select>
-            </mat-form-field>
+            </mat-form-field> -->
 
           </div>
           <!-- HEADERS AND SELECT OPTIONS -->
@@ -130,7 +175,7 @@
               </button>
             </div>
             <div class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="95" fxFlex.gt-sm="95">
-              <strong> {{ 'WIDGETS.TITLES.OVERVIEW_BY_AGGREGATE_TYPE' | translate }} </strong>
+              <h2 class="text-bold no-margin center-text" >  {{ 'WIDGETS.TITLES.OVERVIEW_BY_AGGREGATE_TYPE' | translate }} </h2>
             </div>
 
             <!-- FILTER -->
@@ -141,10 +186,10 @@
             </div>
             <!-- FILTER -->
 
-            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+            <!-- <p fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
               {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
             </p>
-            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
               <mat-select class="simplified" [(ngModel)]="overViewByAggregateType.currentTimeRange" (change)="overViewByAggregateType.onScaleChanged($event.value)"
                 aria-label="Change range">
                 <mat-option *ngFor="let range of overViewByAggregateType.timeScales | keys" [value]="range.value">
@@ -152,18 +197,18 @@
                 </mat-option>
               </mat-select>
             </mat-form-field>
-            <div fxHide fxShow.gt-sm fxFlex.gt-sm="10"></div>
-            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+            <div fxHide fxShow.gt-xs fxFlex.gt-xs="15" fxFlex.gt-sm="10"></div>
+            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
               {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
             </p>
-            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="20" fxFlex.gt-sm="10">
+            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
               <mat-select class="simplified" [(ngModel)]="overViewByAggregateType.currentQuantity" (change)="overViewByAggregateType.onRangeChanged($event.value)"
                 aria-label="Change range">
                 <mat-option *ngFor="let qty of overViewByAggregateType.quantities | keys" [value]="qty.value">
                   {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
                 </mat-option>
               </mat-select>
-            </mat-form-field>
+            </mat-form-field> -->
 
           </div>
           <!-- HEADERS AND SELECT OPTIONS -->
