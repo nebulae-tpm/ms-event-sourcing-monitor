@@ -23,21 +23,21 @@ class EventSourcingMonitor {
     this.prepareSubjects();
   }
 
-  prepareSubjects(){
+  prepareSubjects() {
     this.frontendEventMonitorUpdated$
-    .map((eventUpdateTimestamp) => { return { timestamp: eventUpdateTimestamp , timeRange: 1 } })
-    .mergeMap((eventUpdate) => Rx.Observable.forkJoin(
-      Rx.Observable.of(eventUpdate),
-      CommonVarsDA.getVarValue$(lastEventMonitorUpdateSentToClientDBKey)
-      .map(result => result ? result.value : null)
-    ))
-    .map(([eventUpdate, lastFrontendEventUpdateSent]) => {
-      return { ...eventUpdate, lastFrontendEventUpdateSent }
-    })
-    .filter((eventUpdate) => (eventUpdate.timestamp + 5000) > eventUpdate.lastFrontendEventUpdateSent
-       || eventUpdate.lastFrontendEventUpdateSent == null
-    )
-    .mergeMap(() => CommonVarsDA.updateVarValue$(lastEventMonitorUpdateSentToClientDBKey, Date.now()))
+      .map((eventUpdateTimestamp) => { return { timestamp: eventUpdateTimestamp, timeRange: 1 } })
+      .mergeMap((eventUpdate) => Rx.Observable.forkJoin(
+        Rx.Observable.of(eventUpdate),
+        CommonVarsDA.getVarValue$(lastEventMonitorUpdateSentToClientDBKey)
+          .map(result => result ? result.value : null)
+      ))
+      .map(([eventUpdate, lastFrontendEventUpdateSent]) => {
+        return { ...eventUpdate, lastFrontendEventUpdateSent }
+      })
+      .filter((eventUpdate) => (eventUpdate.timestamp > (eventUpdate.lastFrontendEventUpdateSent + 5000)
+        || eventUpdate.lastFrontendEventUpdateSent == null)
+      )
+      .mergeMap((r) => CommonVarsDA.updateVarValue$(lastEventMonitorUpdateSentToClientDBKey, Date.now()))
       .mergeMap(() =>
         broker.send$(
           MATERIALIZED_VIEW_TOPIC,
@@ -45,9 +45,9 @@ class EventSourcingMonitor {
           Date.now()
         )
       )
-    .subscribe(
-      (ok) => { console.log(ok) },
-      error => console.log(error)),
+      .subscribe(
+        (ok) => { },
+        error => console.log(error)),
       () => console.log("COMPLETED !!")
   }
   
