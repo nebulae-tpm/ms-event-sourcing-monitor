@@ -10,7 +10,7 @@
                 "en": "System",
                 "es": "Sistema"
               },
-              "priority": 1000
+              "priority": 20000
             }
           ],
         "contents": [
@@ -25,7 +25,7 @@
                 "navURL": "/event-sourcing-monitor",
                 "path": "event-sourcing-monitor",
                 "loadChildren": "./main/content/event-sourcing-monitor/event-sourcing-monitor.module#EventSourcingMonitorModule",
-                "priority": 1000,
+                "priority": 2000,
                 "roles" : ["developer"],
                 "default" : false
             }            

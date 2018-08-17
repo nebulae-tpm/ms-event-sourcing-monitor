@@ -17,14 +17,14 @@ function getReponseFromBackEnd$(response) {
             }
             return resp.data;
         });
-        
+
 }
 
 
 module.exports = {
     //// QUERY ///////
     Query: {
-        getTimeFramesSinceTimestampFromEventSourcingMonitor(root, args, context){
+        getTimeFramesSinceTimestampFromEventSourcingMonitor(root, args, context) {
             return broker
                 .forwardAndGetReply$(
                     "EventSourcingSummary",
