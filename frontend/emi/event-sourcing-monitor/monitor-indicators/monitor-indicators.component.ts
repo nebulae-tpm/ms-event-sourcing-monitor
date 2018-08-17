@@ -1,5 +1,5 @@
 import { TimeRanges } from './../chart-helpers/Tool';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output , EventEmitter} from '@angular/core';
 import { EventSourcingMonitorService } from '../event-sourcing-monitor.service';
 // tslint:disable-next-line:import-blacklist
 import * as Rx from 'rxjs/Rx';
@@ -26,19 +26,13 @@ export interface Transaction {
 })
 
 export class MonitorIndicatorsComponent implements OnInit {
+  @Output() eventListReady = new EventEmitter();
   public cols: Observable<number>;
   topEvents: TopEvent[] = [];
   tableDataReady = false;
 
   displayedColumns: string[] = ['eventType', 'balance_0', 'balance_1', 'balance_2'];
-  transactions: Transaction[] = [
-    {item: 'Beach ball', cost: 4},
-    {item: 'Towel', cost: 5},
-    {item: 'Frisbee', cost: 2},
-    {item: 'Sunscreen', cost: 4},
-    {item: 'Cooler', cost: 25},
-    {item: 'Swim suit', cost: 15},
-  ];
+
 
   balanceTable = {
     datesHeaders: ['---', '---', '---'],
@@ -49,10 +43,6 @@ export class MonitorIndicatorsComponent implements OnInit {
       DAY: 3,
       MONTH: 4,
       YEAR: 5
-    },
-    onScaleChanged: (timeScale: number) => {
-      const timeScaleAsString = Object.entries(this.balanceTable.timeScales).filter(o => o[1] === timeScale)[0][0];
-      this.updateBalanceTable(timeScaleAsString);
     }
   };
 
@@ -61,8 +51,17 @@ export class MonitorIndicatorsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-
-    this.updateBalanceTable('MINUTE');
+    this.updateBalanceTable(TimeRanges[this.eventSourcingMonitorervice.chartFilter.timeScale]);
+    this.eventSourcingMonitorervice.onTimeScaleChanged$
+    .pipe(
+      tap(timeScale => {
+        console.log(timeScale);
+        this.updateBalanceTable(TimeRanges[timeScale])
+      })
+    ).subscribe(
+      () => {},
+      (error) => {}
+    )
   }
 
   updateBalanceTable(timeScale: string) {
@@ -110,6 +109,7 @@ export class MonitorIndicatorsComponent implements OnInit {
           this.topEvents = this.topEvents
           .sort((a, b) => b.totals.reduce((x, y) => x + y, 0) - a.totals.reduce((x, y) => x + y, 0))
           .slice(0, 7);
+          this.eventListReady.emit(this.topEvents);
           this.tableDataReady = true;
         },
         (e) => console.log(e),

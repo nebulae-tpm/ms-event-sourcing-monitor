@@ -46,7 +46,7 @@ export class GenericBaseChart{
   updateFiltersApplied: () => void;
 
 
-  constructor(chartName: string = ''){
+  constructor(chartName: string){
     this.name = chartName;
     this.ready = false;
     this.showFilterForm = false;

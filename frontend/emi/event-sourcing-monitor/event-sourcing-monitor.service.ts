@@ -10,11 +10,18 @@ import * as Rx from 'rxjs/Rx';
 import { mergeMap, map } from 'rxjs/operators';
 // tslint:disable-next-line:import-blacklist
 import { forkJoin } from 'rxjs';
+import { GenericBaseChart } from './chart-helpers/GenericBaseChart';
 
 @Injectable()
 export class EventSourcingMonitorService {
   lastDataQueried: any[] = [];
   listeningEvent$ = new Rx.Subject<boolean>();
+  chartFilter: { timeScale: number, timeRange: number, ranges: any } = {
+    timeScale: 1,
+    timeRange: 30,
+    ranges: GenericBaseChart.getDefaultsTimeRangesForscaleTime('MINUTE')
+  };
+  onTimeScaleChanged$ = new Rx.Subject<number>();
   constructor(private gateway: GatewayService) {}
 
 

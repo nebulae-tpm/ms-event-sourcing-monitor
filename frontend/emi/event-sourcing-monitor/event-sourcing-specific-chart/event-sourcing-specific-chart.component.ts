@@ -31,7 +31,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
   // @ViewChild('inputFilterValue') inputFilterValue: ElementRef;
   filterInput: FormControl = new FormControl();
 
-  eventTypeChart:  GenericBaseChart = new GenericBaseChart();
+  eventTypeChart:  GenericBaseChart = new GenericBaseChart('eventTypeChart');
   eventTypeVsByUsersChart: NgxChartsPieChart = new NgxChartsPieChart('eventTypeVsByUsersChart');
   eventTypeVsByVersionChart: NgxChartsPieChart = new NgxChartsPieChart('eventTypeVsByVersionChart');
   selectedEvent: string = null;
@@ -40,7 +40,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
 
   constructor(
     private translationLoader: FuseTranslationLoaderService,
-    private eventSourcingMonitorervice: EventSourcingMonitorService,
+    private eventSourcingMonitorService: EventSourcingMonitorService,
     private route: ActivatedRoute,
     private observableMedia: ObservableMedia
   ) {
@@ -78,9 +78,11 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
     };
 
     this.route.params
-      .pipe(mergeMap(params => {
+      .pipe(
+        filter(params => params['name']),
+        mergeMap(params => {
           this.selectedEvent = params['name'];
-          return this.updateEventTypeChart$(this.selectedEvent, 'MINUTE', 30);
+          return this.updateEventTypeChart$(this.selectedEvent, TimeRanges[this.eventTypeChart.currentTimeRange], this.eventTypeChart.currentQuantity);
         }))
       .subscribe(result => {});
 
@@ -123,7 +125,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
   updateEventTypeChart$(eventName: string, timeScale: string, timeRange: number) {
     this.eventTypeVsByUsersChart.clearResultData();
     this.eventTypeVsByVersionChart.clearResultData();
-    return this.eventSourcingMonitorervice.getTimeFrameswithFilter$(eventName, timeScale, timeRange)
+    return this.eventSourcingMonitorService.getTimeFrameswithFilter$(eventName, timeScale, timeRange)
       .pipe(
         mergeMap((array) => {
           return Rx.Observable.forkJoin(
@@ -257,13 +259,19 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
   setFunctionOnCharts(chartName: string): void {
     // function name to call when an update is required
     const functionToSubscribe = `update${chartName[0].toUpperCase()}${chartName.slice(1, chartName.length)}$`;
-    this[chartName].quantities = GenericBaseChart.getDefaultsTimeRangesForscaleTime(TimeRanges[TimeRanges.MINUTE]);
-    this[chartName].currentQuantity = GenericBaseChart.getDefaultLimitByTimeRangeType(TimeRanges[TimeRanges.MINUTE]);
+    this[chartName].quantities = Object.entries(this.eventSourcingMonitorService.chartFilter.ranges).length > 0 
+      ? this.eventSourcingMonitorService.chartFilter.ranges 
+      : GenericBaseChart.getDefaultsTimeRangesForscaleTime(TimeRanges[this.eventSourcingMonitorService.chartFilter.timeScale]);
+    this.eventTypeChart.currentQuantity = this.eventSourcingMonitorService.chartFilter.timeRange;
+    this.eventTypeChart.currentTimeRange = this.eventSourcingMonitorService.chartFilter.timeScale;
 
     // when Change the Scale of time like MINUTES, HOURS ....
     this[chartName].onScaleChanged = (scaleTime: number) => {
+      this.eventSourcingMonitorService.chartFilter.timeScale = scaleTime;
       this[chartName].quantities = GenericBaseChart.getDefaultsTimeRangesForscaleTime(TimeRanges[scaleTime]);
+      this.eventSourcingMonitorService.chartFilter.ranges = this[chartName].quantities;
       this[chartName].currentQuantity = GenericBaseChart.getDefaultLimitByTimeRangeType(TimeRanges[scaleTime]);
+      this.eventSourcingMonitorService.chartFilter.timeRange = this[chartName].currentQuantity;
 
       this[functionToSubscribe](this.selectedEvent, TimeRanges[scaleTime], this[chartName].currentQuantity)
       .subscribe(
@@ -275,6 +283,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
 
     // When change the range of time
     this[chartName].onRangeChanged = (timeRange: number) => {
+      this.eventSourcingMonitorService.chartFilter.timeRange = timeRange;
       this[functionToSubscribe](this.selectedEvent, TimeRanges[this.eventTypeChart.currentTimeRange], timeRange)
       .subscribe(
         (result) => { },

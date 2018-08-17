@@ -30,15 +30,16 @@ export interface FilterOption{
   animations: fuseAnimations
 })
 export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
-  generalEventsOverViewChart: GenericBaseChart = new GenericBaseChart();
-  overViewByEventType: GenericBaseChart = new GenericBaseChart();
-  overViewByAggregateType: GenericBaseChart = new GenericBaseChart();
+  generalEventsOverViewChart: GenericBaseChart = new GenericBaseChart('generalEventsOverViewChart');
+  overViewByEventType: GenericBaseChart = new GenericBaseChart('overViewByEventType');
+  overViewByAggregateType: GenericBaseChart = new GenericBaseChart('overViewByAggregateType');
   allSubscriptionis: Subscription[] = [];
   listeningEventSubscription: Subscription;
   listeningEvent = false;
+  topEventList = [];
 
   constructor(
-    private eventSourcingMonitorervice: EventSourcingMonitorService,
+    private eventSourcingMonitorService: EventSourcingMonitorService,
     private translationLoader: FuseTranslationLoaderService,
     private translateService: TranslateService) {
     this.translationLoader.loadTranslations(english, spanish);
@@ -46,15 +47,27 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.setFunctionOnCharts('generalEventsOverViewChart');
-    this.updateAllCharts$()
-    .subscribe(
-      (result) =>  {} ,
-      (error) => (console.log(error)),
-      () => {}
-    );
+    console.log(this.eventSourcingMonitorService.chartFilter);
+    this.setFunctionOnCharts(this.generalEventsOverViewChart.name);
+    this.setFunctionOnCharts(this.overViewByEventType.name);
+    this.setFunctionOnCharts(this.overViewByAggregateType.name);
 
-      this.eventSourcingMonitorervice.listeningEvent$
+    this.generalEventsOverViewChart.quantities =  this.eventSourcingMonitorService.chartFilter.ranges;
+    this.generalEventsOverViewChart.currentQuantity = this.eventSourcingMonitorService.chartFilter.timeRange;
+    this.generalEventsOverViewChart.currentTimeRange = this.eventSourcingMonitorService.chartFilter.timeScale;
+
+    this.updateAllCharts$(
+      TimeRanges[this.eventSourcingMonitorService.chartFilter.timeScale],
+      Date.now(),
+      this.eventSourcingMonitorService.chartFilter.timeRange
+    )
+      .subscribe(
+        (result) => { },
+        (error) => (console.log(error)),
+        () => { }
+      );
+
+    this.eventSourcingMonitorService.listeningEvent$
       .subscribe(
         (listeningEvents) => {
           listeningEvents ? this.startToListenEvents() : this.stopListeningEvents();
@@ -63,25 +76,22 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
 
         },
       );
-
-
-
   }
 
   ngOnDestroy() {
     this.allSubscriptionis.forEach(e => e.unsubscribe());
   }
 
-  updateAllCharts$(timeScale: string = 'MINUTE', timestamp: number = Date.now(), quantity: number = GenericBaseChart.getDefaultLimitByTimeRangeType('MINUTE') ){
-    return this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(timeScale, timestamp,  quantity)
+  updateAllCharts$(timeScale: string, timestamp: number, quantity: number ){
+    return this.eventSourcingMonitorService.getTimeFrameInRangeSince$(timeScale, timestamp,  quantity)
       .pipe(
         map(result => JSON.parse(JSON.stringify(result))),
         map(resultAsArray => resultAsArray.sort((a, b) =>  a.id - b.id)),
         mergeMap((arrayResult: any) =>
           forkJoin(
-            this.updateGeneralEventsOverViewChart$(arrayResult, TimeRanges[1]),
-            this.updateOverViewByEventType$(arrayResult, TimeRanges[1]),
-            this.updateOverViewByAggregateType$(arrayResult, TimeRanges[1])
+            this.updateGeneralEventsOverViewChart$(arrayResult, timeScale),
+            this.updateOverViewByEventType$(arrayResult, timeScale),
+            this.updateOverViewByAggregateType$(arrayResult, timeScale)
           )
         )
       ).toArray();
@@ -252,18 +262,23 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
    */
   setFunctionOnCharts(chartName: string): void {
     // function name to call when an update is required
-    const functionToSubscribe = `update${chartName[0].toUpperCase()}${chartName.slice(1, chartName.length)}$`;
-    this[chartName].quantities = GenericBaseChart.getDefaultsTimeRangesForscaleTime(TimeRanges[TimeRanges.MINUTE]);
-    this[chartName].currentQuantity = GenericBaseChart.getDefaultLimitByTimeRangeType(TimeRanges[TimeRanges.MINUTE]);
+    this[chartName].quantities = GenericBaseChart.getDefaultsTimeRangesForscaleTime(TimeRanges[this.eventSourcingMonitorService.chartFilter.timeScale]);
+    this[chartName].currentQuantity = GenericBaseChart.getDefaultLimitByTimeRangeType(TimeRanges[this.eventSourcingMonitorService.chartFilter.timeScale]);
 
     // when Change the Scale of time like MINUTES, HOURS ....
     this[chartName].onScaleChanged = (scaleTime: number) => {
-
+      this.eventSourcingMonitorService.onTimeScaleChanged$.next(scaleTime);
+      this.eventSourcingMonitorService.chartFilter.timeScale = this[chartName].currentTimeRange
       this[chartName].quantities = GenericBaseChart.getDefaultsTimeRangesForscaleTime(TimeRanges[scaleTime]);
+      this.eventSourcingMonitorService.chartFilter.ranges = this[chartName].quantities;
       this[chartName].currentQuantity = GenericBaseChart.getDefaultLimitByTimeRangeType(TimeRanges[scaleTime]);
+      this.eventSourcingMonitorService.chartFilter.timeRange = this[chartName].currentQuantity;
+
+      
+
       this.updateAllCharts$(TimeRanges[scaleTime], Date.now(), this[chartName].currentQuantity)
       .subscribe(
-        (result) =>  {},
+        (result) =>  {console.log(this.eventSourcingMonitorService.chartFilter);},
         (error) => (console.log(error)),
         () => {}
       );
@@ -271,17 +286,12 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     };
     // When change the range of time
     this[chartName].onRangeChanged = (timeRange: number) => {
-      this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(TimeRanges[this[chartName].currentTimeRange], Date.now(), timeRange)
-      .pipe(
-        map(result => JSON.parse(JSON.stringify(result))),
-        map(resultAsArray => resultAsArray.sort((a, b) =>  a.id - b.id)),
-        mergeMap((arrayResult: any[]) => this[functionToSubscribe](arrayResult, TimeRanges[this[chartName].currentTimeRange])
-        )
-      )
+      this.eventSourcingMonitorService.chartFilter.timeRange = timeRange;
+      this.updateAllCharts$(TimeRanges[this[chartName].currentTimeRange], Date.now(), timeRange )
       .subscribe(
-        (result) => { },
-        (error) => { console.log(error); },
-        () => { }
+        (result) =>  {console.log(this.eventSourcingMonitorService.chartFilter);},
+        (error) => (console.log(error)),
+        () => {}
       );
     };
     // To hide or show the filter helper component
@@ -302,7 +312,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
   }
 
   startToListenEvents(){
-    this.listeningEventSubscription = this.eventSourcingMonitorervice.listenAvailableUpdates$()
+    this.listeningEventSubscription = this.eventSourcingMonitorService.listenAvailableUpdates$()
       .pipe(
         mergeMap(() => this.updateAllCharts$(
           TimeRanges[this.generalEventsOverViewChart.currentTimeRange], Date.now(), this.generalEventsOverViewChart.currentQuantity) )
@@ -321,6 +331,13 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
 
   eventListenerSwicht(){
     this.listeningEvent = !this.listeningEvent;
-    this.eventSourcingMonitorervice.listeningEvent$.next(this.listeningEvent);
+    this.eventSourcingMonitorService.listeningEvent$.next(this.listeningEvent);
+  }
+
+  updateEventTopList(topEventList: any[]){
+    console.log('updateEventTopList...');
+    console.log(topEventList);
+    this.topEventList = topEventList.map(i => i.eventType);
+    console.log(this.topEventList);
   }
 }

@@ -1,20 +1,20 @@
-<div class="fuse-widget-front mat-white-bg mat-elevation-z2">
+<div class="fuse-widget-front mat-white-bg mat-elevation-z2 h-500">
   <!-- HEADER AND FILTER OPTIONS -->
-  <div style="height: 65px;" class="border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
-    <div fxLayout="column" fxLayoutAlign="center center" fxFlex="70">
+  <div style="height: 60px;" class="border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
+    <div fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
       <!-- <div class="h2 pr-16">{{ 'INDICATORS.TITLE' | translate }}</div> -->
-      <h2 class="no-margin" fxHide fxShow.gt-xs>{{ 'INDICATORS.TITLE' | translate }}</h2>
-      <h4 class="no-margin center-text" fxShow fxHide.gt-xs>{{ 'INDICATORS.TITLE' | translate }}</h4>
+      <h2 class="no-margin text-bold center-text" fxHide fxShow.gt-xs>{{ 'INDICATORS.TITLE' | translate }}</h2>
+      <h4 class="no-margin text-bold center-text" fxShow fxHide.gt-xs>{{ 'INDICATORS.TITLE' | translate }}</h4>
     </div>
 
-    <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="30">
+    <!-- <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="30">
       <mat-select class="simplified" [(ngModel)]="balanceTable.currentTimeRange" (change)="balanceTable.onScaleChanged($event.value)"
         aria-label="Change range">
         <mat-option *ngFor="let range of balanceTable.timeScales | keys" [value]="range.value">
           {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}{{'s'}}
         </mat-option>
       </mat-select>
-    </mat-form-field>
+    </mat-form-field> -->
   </div>
   <!-- HEADER AND FILTER OPTIONS -->
 

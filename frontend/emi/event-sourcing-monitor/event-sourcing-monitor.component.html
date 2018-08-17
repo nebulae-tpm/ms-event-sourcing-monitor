@@ -7,17 +7,12 @@
       <!-- TITLE BAR -->
       <div style="margin-top: 5px" fxLayoutWrap fxLayout="row" fxLayoutAlign="space-around center" class="widget" fxFlex="100">
 
-        <div fxFlex="85" fxLayoutAlign="center center">
+        <div fxFlex="100" fxLayoutAlign="center center">
           <h1 class="no-margin shadow center-text" fxHide fxShow.gt-xs> Event sourcing events monitor </h1>
           <h3 class="no-margin center-text text-bold" fxShow fxHide.gt-xs> Event sourcing events monitor </h3>
         </div>
-        <div fxFlex="15" fxLayoutAlign="center center">
-          <button mat-mini-fab [color]="listeningEvent ? 'accent' : ''" mat-icon-button (click)="eventListenerSwicht()">
-            <mat-icon *ngIf="listeningEvent">sync</mat-icon>
-            <mat-icon *ngIf="!listeningEvent">sync_disabled</mat-icon>
-          </button>
-        </div>
-        <div fxLayout="row" fxFlex="100" fxLayoutAlign="center center">
+        
+        <div fxLayout="row" fxFlex="100" fxFlex.gt-xs="80" fxLayoutAlign="center center">
           <h3 class="no-margin text-bold" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
             {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
           </h3>
@@ -42,13 +37,28 @@
             </mat-select>
           </mat-form-field>
         </div>
+        <div fxLayout="row" fxLayoutAlign="space-around center" fxFlex="100" fxFlex.gt-xs="20">
+          <div fxFlex="50" fxLayoutAlign="center center" >
+            <button mat-mini-fab [color]="listeningEvent ? 'accent' : ''" mat-icon-button (click)="eventListenerSwicht()">
+              <mat-icon *ngIf="listeningEvent">sync</mat-icon>
+              <mat-icon *ngIf="!listeningEvent">sync_disabled</mat-icon>
+            </button>
+          </div>
+          <div fxFlex="50" fxLayoutAlign="center center" >
+            <button *ngIf="topEventList.length > 0" mat-mini-fab mat-icon-button [routerLink]="[topEventList[0]]" >
+              <mat-icon>remove_red_eye</mat-icon>
+            </button>
+          </div>
+        
+        </div>
+       
 
 
       </div>
       <!-- TITLE BAR -->
 
       <fuse-widget class="widget h-500" class="widget" fxFlex.gt-xs="100" fxFlex.gt-md="40">
-        <app-monitor-indicators>
+        <app-monitor-indicators (eventListReady)="updateEventTopList($event)">
         </app-monitor-indicators>
       </fuse-widget>
       <!-- OVERVIEW GENERAL -->
@@ -61,29 +71,6 @@
             <div style="height: 60px;" class="h3 px-8 py-8 txt-a-center" fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
               <h2 class="text-bold no-margin" > {{ 'WIDGETS.TITLES.GENERAL_OVERVIEW' | translate }} </h2>
             </div>
-            <!-- <p fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10" >
-              {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
-            </p>
-            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10" >
-              <mat-select class="simplified" [(ngModel)]="generalEventsOverViewChart.currentTimeRange" (change)="generalEventsOverViewChart.onScaleChanged($event.value)"
-                aria-label="Change range">
-                <mat-option *ngFor="let range of generalEventsOverViewChart.timeScales | keys" [value]="range.value">
-                  {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-            <div fxHide fxShow.gt-xs fxFlex.gt-xs="15" fxFlex.gt-sm="10" ></div>
-            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10" >
-              {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
-            </p>
-            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10" >
-              <mat-select class="simplified" [(ngModel)]="generalEventsOverViewChart.currentQuantity" (change)="generalEventsOverViewChart.onRangeChanged($event.value)"
-                aria-label="Change range">
-                <mat-option *ngFor="let qty of generalEventsOverViewChart.quantities | keys" [value]="qty.value">
-                  {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field> -->
 
           </div>
           <!-- HEADERS AND SELECT OPTIONS -->
@@ -125,30 +112,6 @@
             </div>
             <!-- FILTER -->
 
-            <!-- <p fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
-              {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
-            </p>
-            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
-              <mat-select class="simplified" [(ngModel)]="overViewByEventType.currentTimeRange" (change)="overViewByEventType.onScaleChanged($event.value)"
-                aria-label="Change range">
-                <mat-option *ngFor="let range of overViewByEventType.timeScales | keys" [value]="range.value">
-                  {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-            <div fxHide fxShow.gt-xs fxFlex.gt-xs="15" fxFlex.gt-sm="10"></div>
-            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
-              {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
-            </p>
-            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
-              <mat-select class="simplified" [(ngModel)]="overViewByEventType.currentQuantity" (change)="overViewByEventType.onRangeChanged($event.value)"
-                aria-label="Change range">
-                <mat-option *ngFor="let qty of overViewByEventType.quantities | keys" [value]="qty.value">
-                  {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field> -->
-
           </div>
           <!-- HEADERS AND SELECT OPTIONS -->
           <!-- OVERVIEW BY EVENT TYPE CHART -->
@@ -185,30 +148,6 @@
               </app-monitor-filter-helper>
             </div>
             <!-- FILTER -->
-
-            <!-- <p fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
-              {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
-            </p>
-            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
-              <mat-select class="simplified" [(ngModel)]="overViewByAggregateType.currentTimeRange" (change)="overViewByAggregateType.onScaleChanged($event.value)"
-                aria-label="Change range">
-                <mat-option *ngFor="let range of overViewByAggregateType.timeScales | keys" [value]="range.value">
-                  {{ 'WIDGETS.TIMESCALES.' + range.key | translate }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-            <div fxHide fxShow.gt-xs fxFlex.gt-xs="15" fxFlex.gt-sm="10"></div>
-            <p fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
-              {{ 'OVERVIEW_WIDGET.RANGE' | translate }}
-            </p>
-            <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
-              <mat-select class="simplified" [(ngModel)]="overViewByAggregateType.currentQuantity" (change)="overViewByAggregateType.onRangeChanged($event.value)"
-                aria-label="Change range">
-                <mat-option *ngFor="let qty of overViewByAggregateType.quantities | keys" [value]="qty.value">
-                  {{ 'WIDGETS.TIMERANGES.' + qty.key | translate }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field> -->
 
           </div>
           <!-- HEADERS AND SELECT OPTIONS -->
