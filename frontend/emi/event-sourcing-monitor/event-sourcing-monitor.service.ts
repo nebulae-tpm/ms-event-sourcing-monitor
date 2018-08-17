@@ -16,6 +16,7 @@ import { GenericBaseChart } from './chart-helpers/GenericBaseChart';
 export class EventSourcingMonitorService {
   lastDataQueried: any[] = [];
   listeningEvent$ = new Rx.Subject<boolean>();
+  listeningEvents = false;
   chartFilter: { timeScale: number, timeRange: number, ranges: any } = {
     timeScale: 1,
     timeRange: 30,

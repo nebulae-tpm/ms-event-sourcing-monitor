@@ -36,7 +36,7 @@
           <!-- TITTLE AND SIDE-TOOGLE-BUTTONS -->
 
           <!-- HEADERS AND SELECT OPTIONS -->
-          <div>
+          <div fxFlex="100" fxLayoutWrap>
             <p fxLayout="column" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
               {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
             </p>
@@ -60,8 +60,19 @@
                 </mat-option>
               </mat-select>
             </mat-form-field>
+
+            <div fxLayout="row" fxLayoutAlign="space-around center" fxFlex="100" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
+                <div fxFlex="50" fxLayoutAlign="start center">
+                  <button mat-mini-fab [color]="listeningEvents ? 'accent' : ''" mat-icon-button 
+                    (click)="eventListenerSwicht()">
+                    <mat-icon *ngIf="listeningEvents">sync</mat-icon>
+                    <mat-icon *ngIf="!listeningEvents">sync_disabled</mat-icon>
+                  </button>
+                </div>            
+              </div>
             <!-- <div class="toolbar-separator" *ngIf="hasSelectedMails"></div> -->
           </div>
+          
           <!-- HEADERS AND SELECT OPTIONS -->
         </div>
       </div>

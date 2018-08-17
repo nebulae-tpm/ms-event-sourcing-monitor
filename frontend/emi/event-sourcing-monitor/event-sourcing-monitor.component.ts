@@ -66,7 +66,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
         (error) => (console.log(error)),
         () => { }
       );
-
+    this.listeningEvent = this.eventSourcingMonitorService.listeningEvents;
     this.eventSourcingMonitorService.listeningEvent$
       .subscribe(
         (listeningEvents) => {
@@ -330,14 +330,12 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
   }
 
   eventListenerSwicht(){
-    this.listeningEvent = !this.listeningEvent;
+    this.eventSourcingMonitorService.listeningEvents = !this.eventSourcingMonitorService.listeningEvents;
+    this.listeningEvent = this.eventSourcingMonitorService.listeningEvents;
     this.eventSourcingMonitorService.listeningEvent$.next(this.listeningEvent);
   }
 
   updateEventTopList(topEventList: any[]){
-    console.log('updateEventTopList...');
-    console.log(topEventList);
     this.topEventList = topEventList.map(i => i.eventType);
-    console.log(this.topEventList);
   }
 }

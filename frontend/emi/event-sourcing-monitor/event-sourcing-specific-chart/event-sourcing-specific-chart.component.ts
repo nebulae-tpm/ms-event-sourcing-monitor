@@ -36,6 +36,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
   eventTypeVsByVersionChart: NgxChartsPieChart = new NgxChartsPieChart('eventTypeVsByVersionChart');
   selectedEvent: string = null;
   filterValue: string = null;
+  listeningEvents = this.eventSourcingMonitorService.listeningEvents;
 
 
   constructor(
@@ -297,5 +298,11 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
     if ( mandatory || this.screenMode !== 3 ){
       this.sideNav.opened = !this.sideNav.opened;
     }
+  }
+
+  eventListenerSwicht(){
+    this.eventSourcingMonitorService.listeningEvents = !this.eventSourcingMonitorService.listeningEvents;
+    this.listeningEvents = this.eventSourcingMonitorService.listeningEvents;
+    this.eventSourcingMonitorService.listeningEvent$.next(this.listeningEvents);
   }
 }
