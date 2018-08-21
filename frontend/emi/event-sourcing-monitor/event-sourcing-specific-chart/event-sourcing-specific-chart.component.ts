@@ -15,6 +15,7 @@ import { GenericBaseChart } from '../chart-helpers/GenericBaseChart';
 import { NgxChartsPieChart } from '../chart-helpers/NgxChartsPieChart';
 import { ObservableMedia } from '@angular/flex-layout';
 import { FormControl } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -45,6 +46,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
 
   constructor(
     private translationLoader: FuseTranslationLoaderService,
+    private translateService: TranslateService,
     private eventSourcingMonitorService: EventSourcingMonitorService,
     private route: ActivatedRoute,
     private observableMedia: ObservableMedia
@@ -222,7 +224,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
               .pipe(
                 map((result) => {
                   readyResultByVersion[10] = {
-                    name: 'Otros',
+                    name: this.translateService.instant('ESPECIFIC_CHART.OTHERS'),
                     value: readyResultByVersion[10] ? readyResultByVersion[10].value + result.value : result.value
                   };
                 })
@@ -237,7 +239,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
             .pipe(
               map((result) => {
                 readyResultByUser[10] = {
-                  name: 'Otros',
+                  name: this.translateService.instant('ESPECIFIC_CHART.OTHERS'),
                   value: readyResultByUser[10] ? readyResultByUser[10].value + result.value : result.value
                 };
               })

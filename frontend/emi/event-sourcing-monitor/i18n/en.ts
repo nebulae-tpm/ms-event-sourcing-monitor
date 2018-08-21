@@ -10,7 +10,8 @@ export const locale = {
       USER_VS_CHART_TITLE: 'Comparison between Users',
       VERSION_VS_CHART_TITLE: 'Comparison between Versions',
       DIFFERENT_USERS_COUNT: 'Different users count: ',
-      DIFFERENT_VERSIONS_COUNT: 'Different versions count: '
+      DIFFERENT_VERSIONS_COUNT: 'Different versions count: ',
+      OTHERS: 'Others'
     },
     INDICATORS: {
         TITLE: 'Top events for',
