@@ -9,6 +9,8 @@ export const locale = {
       TITLE_TEMPLATE: 'Detalles acerca de ',
       USER_VS_CHART_TITLE: 'Comparación entre Usuarios',
       VERSION_VS_CHART_TITLE: 'Comparacion entre Versiones',
+      DIFFERENT_USERS_COUNT: 'Cantidad de usuarios: ',
+      DIFFERENT_VERSIONS_COUNT: 'Cantidad de versiones: '
     },
     INDICATORS: {
       TITLE: 'Top de eventos por ',

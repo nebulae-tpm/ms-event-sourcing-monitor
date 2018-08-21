@@ -112,7 +112,6 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
   }
 
   ngOnDestroy(): void {
-    console.log('ngOnDestroy ...');
     if (this.listeningEventSubscription){
       this.stopToListenUpdates();
     }
@@ -133,7 +132,6 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
   }
 
   updateEventTypeChart$(eventName: string, timeScale: string, timeRange: number) {
-    console.log('updateEventTypeChart$ ...', eventName, timeScale, timeRange);
     this.eventTypeVsByUsersChart.clearResultData();
     this.eventTypeVsByVersionChart.clearResultData();
     return this.eventSourcingMonitorService.getTimeFrameswithFilter$(eventName, timeScale, timeRange)
@@ -167,7 +165,6 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
                   );
                 });
                 this.eventTypeChart.ready = true;
-                console.log(this.eventTypeChart.datasets);
               })
             )
           );
@@ -211,27 +208,47 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
       .pipe(
         mergeMap(() => {
           // sorting the data by the total count per version
-          const resultsOrdered = this.eventTypeVsByVersionChart.results.sort((a, b) => b.value - a.value);
-          this.totalVersionsCount = resultsOrdered.length;
-          const readyResult = resultsOrdered.slice(0, 10);
-          return Rx.Observable.from(resultsOrdered.slice(10))
+          const resultsByVersionOrdered = this.eventTypeVsByVersionChart.results.sort((a, b) => b.value - a.value);
+          this.totalVersionsCount = resultsByVersionOrdered.length;
+
+          const resultsByUserOrdered = this.eventTypeVsByUsersChart.results.sort((a, b) => b.value - a.value);
+          this.totalUsersCount = resultsByUserOrdered.length;
+
+          const readyResultByVersion = resultsByVersionOrdered.slice(0, 10);
+          const readyResultByUser = resultsByUserOrdered.slice(0, 10);
+
+          return Rx.Observable.forkJoin(
+            Rx.Observable.from(resultsByVersionOrdered.slice(10))
+              .pipe(
+                map((result) => {
+                  readyResultByVersion[10] = {
+                    name: 'Otros',
+                    value: readyResultByVersion[10] ? readyResultByVersion[10].value + result.value : result.value
+                  };
+                })
+              ).toArray()
+              .pipe(
+                map(() => {
+                  // updating the data charts
+                  this.eventTypeVsByVersionChart.results = readyResultByVersion.slice();
+                })
+              ),
+            Rx.Observable.from(resultsByUserOrdered.slice(10))
             .pipe(
               map((result) => {
-                readyResult[10] = {
-                  name: 'otros',
-                  value: readyResult[10] ? readyResult[10].value + result.value : result.value
+                readyResultByUser[10] = {
+                  name: 'Otros',
+                  value: readyResultByUser[10] ? readyResultByUser[10].value + result.value : result.value
                 };
               })
             ).toArray()
             .pipe(
               map(() => {
                 // updating the data charts
-                this.eventTypeVsByUsersChart.results = this.eventTypeVsByUsersChart.results.slice();
-                this.totalUsersCount = this.eventTypeVsByUsersChart.results.length;
-
-                this.eventTypeVsByVersionChart.results = readyResult.slice();
+                this.eventTypeVsByUsersChart.results = readyResultByUser.slice();
               })
-            );
+            )
+          );
         }
         )
       );
@@ -316,7 +333,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
     this.eventSourcingMonitorService.listeningEvents = !this.eventSourcingMonitorService.listeningEvents;
     this.listeningEvents = this.eventSourcingMonitorService.listeningEvents;
     this.eventSourcingMonitorService.listeningEvent$.next(this.listeningEvents);
-    // this.listeningEvents ? this.startToListenUpdates() : this.stopToListenUpdates();
+    this.listeningEvents ? this.startToListenUpdates() : this.stopToListenUpdates();
   }
 
   startToListenUpdates(){
@@ -329,7 +346,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
         )
       )
     .subscribe(
-      (update) => console.log(update),
+      (update) => { },
       (error) => console.log(error)
     );
   }
