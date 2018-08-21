@@ -11,7 +11,7 @@
           <h1 class="no-margin shadow center-text" fxHide fxShow.gt-xs> Event sourcing events monitor </h1>
           <h3 class="no-margin center-text text-bold" fxShow fxHide.gt-xs> Event sourcing events monitor </h3>
         </div>
-        
+
         <div fxLayout="row" fxFlex="100" fxFlex.gt-xs="80" fxLayoutAlign="center center">
           <h3 class="no-margin text-bold" fxLayoutAlign="center center" fxFlex="25" fxFlex.gt-xs="15" fxFlex.gt-sm="10">
             {{ 'OVERVIEW_WIDGET.SCALE' | translate }}
@@ -48,12 +48,12 @@
             <button *ngIf="topEventList.length > 0" mat-mini-fab mat-icon-button [routerLink]="[topEventList[0]]" >
               <mat-icon>remove_red_eye</mat-icon>
             </button>
-          </div>        
+          </div>
         </div>
       </div>
       <!-- TITLE BAR -->
 
-      <fuse-widget class="widget h-500" class="widget" fxFlex.gt-xs="100" fxFlex.gt-md="40">
+      <fuse-widget class="widget h-500" fxFlex.gt-xs="100" fxFlex.gt-md="40">
         <app-monitor-indicators (eventListReady)="updateEventTopList($event)">
         </app-monitor-indicators>
       </fuse-widget>

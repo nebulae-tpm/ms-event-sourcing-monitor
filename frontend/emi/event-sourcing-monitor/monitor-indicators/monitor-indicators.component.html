@@ -1,10 +1,10 @@
-<div class="fuse-widget-front mat-white-bg mat-elevation-z2 h-500">
+<div style="height: 490px; min-height: 490px; max-height: 490px;" class="fuse-widget-front mat-white-bg mat-elevation-z2">
   <!-- HEADER AND FILTER OPTIONS -->
   <div style="height: 60px;" class="border-bottom" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
     <div fxLayout="column" fxLayoutAlign="center center" fxFlex="100">
       <!-- <div class="h2 pr-16">{{ 'INDICATORS.TITLE' | translate }}</div> -->
-      <h2 class="no-margin text-bold center-text" fxHide fxShow.gt-xs>{{ 'INDICATORS.TITLE' | translate }}</h2>
-      <h4 class="no-margin text-bold center-text" fxShow fxHide.gt-xs>{{ 'INDICATORS.TITLE' | translate }}</h4>
+      <h2 class="no-margin text-bold center-text" fxHide fxShow.gt-xs>{{ 'INDICATORS.TITLE' | translate }} {{ 'INDICATORS.FILTERS.' + selectedTimeRange | translate   }} </h2>
+      <h4 class="no-margin text-bold center-text" fxShow fxHide.gt-xs>{{ 'INDICATORS.TITLE' | translate }} {{ 'INDICATORS.FILTERS.' + selectedTimeRange | translate   }}</h4>
     </div>
 
     <!-- <mat-form-field fxLayout="column" fxLayoutAlign="center center" fxFlex="30">
@@ -19,7 +19,7 @@
   <!-- HEADER AND FILTER OPTIONS -->
 
   <!-- OPTION TABLE -->
-  <mat-table class="events-table" *ngIf="tableDataReady" [dataSource]="topEvents" fusePerfectScrollbar>
+  <mat-table class="events-table" [dataSource]="topEventsDataSource" fusePerfectScrollbar>
     <!-- EventName Column -->
     <ng-container cdkColumnDef="eventType">
       <mat-header-cell *cdkHeaderCellDef>{{'INDICATORS.EVENT_HEADER_NAME' | translate}}</mat-header-cell>

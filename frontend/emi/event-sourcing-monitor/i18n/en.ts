@@ -12,7 +12,14 @@ export const locale = {
     },
     INDICATORS: {
         TITLE: 'Top events for',
-        EVENT_HEADER_NAME: 'Event name'
+        EVENT_HEADER_NAME: 'Event name',
+        FILTERS: {
+          MINUTE: 'minutes',
+          HOUR: 'hours',
+          DAY: 'days',
+          MONTH: 'months',
+          YEAR: 'years'
+        }
       },
     WIDGETS: {
       TITLES: {

@@ -47,7 +47,6 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    console.log(this.eventSourcingMonitorService.chartFilter);
     this.setFunctionOnCharts(this.generalEventsOverViewChart.name);
     this.setFunctionOnCharts(this.overViewByEventType.name);
     this.setFunctionOnCharts(this.overViewByAggregateType.name);
@@ -62,11 +61,16 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       this.eventSourcingMonitorService.chartFilter.timeRange
     )
       .subscribe(
-        (result) => { },
+        (result) => {
+          if (this.listeningEvent){
+            this.startToListenEvents();
+          }
+         },
         (error) => (console.log(error)),
         () => { }
       );
     this.listeningEvent = this.eventSourcingMonitorService.listeningEvents;
+
     this.eventSourcingMonitorService.listeningEvent$
       .subscribe(
         (listeningEvents) => {
@@ -119,9 +123,6 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       );
     });
     this.generalEventsOverViewChart.ready = true;
-    // return Rx.Observable.from(allSummaries).pipe(
-    //   map((summary: any) => new Date(summary.id).toLocaleTimeString())
-    // );
     return Rx.Observable.of(allSummaries);
   }
 
@@ -268,17 +269,17 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
     // when Change the Scale of time like MINUTES, HOURS ....
     this[chartName].onScaleChanged = (scaleTime: number) => {
       this.eventSourcingMonitorService.onTimeScaleChanged$.next(scaleTime);
-      this.eventSourcingMonitorService.chartFilter.timeScale = this[chartName].currentTimeRange
+      this.eventSourcingMonitorService.chartFilter.timeScale = this[chartName].currentTimeRange;
       this[chartName].quantities = GenericBaseChart.getDefaultsTimeRangesForscaleTime(TimeRanges[scaleTime]);
       this.eventSourcingMonitorService.chartFilter.ranges = this[chartName].quantities;
       this[chartName].currentQuantity = GenericBaseChart.getDefaultLimitByTimeRangeType(TimeRanges[scaleTime]);
       this.eventSourcingMonitorService.chartFilter.timeRange = this[chartName].currentQuantity;
 
-      
+
 
       this.updateAllCharts$(TimeRanges[scaleTime], Date.now(), this[chartName].currentQuantity)
       .subscribe(
-        (result) =>  {console.log(this.eventSourcingMonitorService.chartFilter);},
+        (result) =>  {console.log(this.eventSourcingMonitorService.chartFilter); },
         (error) => (console.log(error)),
         () => {}
       );
@@ -289,7 +290,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       this.eventSourcingMonitorService.chartFilter.timeRange = timeRange;
       this.updateAllCharts$(TimeRanges[this[chartName].currentTimeRange], Date.now(), timeRange )
       .subscribe(
-        (result) =>  {console.log(this.eventSourcingMonitorService.chartFilter);},
+        (result) =>  {console.log(this.eventSourcingMonitorService.chartFilter); },
         (error) => (console.log(error)),
         () => {}
       );
@@ -312,6 +313,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
   }
 
   startToListenEvents(){
+    console.log('EMPREZANDO A ESCUCHAR ...');
     this.listeningEventSubscription = this.eventSourcingMonitorService.listenAvailableUpdates$()
       .pipe(
         mergeMap(() => this.updateAllCharts$(

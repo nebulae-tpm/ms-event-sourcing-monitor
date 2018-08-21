@@ -3,14 +3,14 @@
 :host {
   .mat-header-cell {
     color: #444444;
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .mat-header-row {
     position: sticky;
     top: 0;
-    background: white;
-    z-index: 9999
+    background: whitesmoke;
+    z-index: 9999;
   }
 
   .events-table {
@@ -19,14 +19,15 @@
     overflow: auto;
 
     .mat-header-row {
-      min-height: 60px;
+      min-height: 52px;
       padding: 0 12px !important;
+      height: 64px;
     }
 
     .mat-row {
       position: relative;
       cursor: pointer;
-      height: 51px;
+      height: 52px;
       padding: 0 12px !important;
     }
   }

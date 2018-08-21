@@ -1,3 +1,4 @@
+import { Subscription } from 'rxjs/Subscription';
 import { TimeRanges } from '../chart-helpers/ChartTools';
 import { Component, OnInit, ViewChild, OnDestroy, AfterViewInit, ElementRef } from '@angular/core';
 import { FuseTranslationLoaderService } from './../../../../core/services/translation-loader.service';
@@ -16,6 +17,7 @@ import { GenericBaseChart } from '../chart-helpers/GenericBaseChart';
 import { NgxChartsPieChart } from '../chart-helpers/NgxChartsPieChart';
 import { ObservableMedia } from '@angular/flex-layout';
 import { FormControl } from '@angular/forms';
+import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -30,6 +32,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
   @ViewChild('sidenav') public sideNav: MatSidenav;
   // @ViewChild('inputFilterValue') inputFilterValue: ElementRef;
   filterInput: FormControl = new FormControl();
+  @ViewChild('versionsChart') public eventTypeVsByUsersChartDirective: BaseChartDirective;
 
   eventTypeChart:  GenericBaseChart = new GenericBaseChart('eventTypeChart');
   eventTypeVsByUsersChart: NgxChartsPieChart = new NgxChartsPieChart('eventTypeVsByUsersChart');
@@ -37,6 +40,11 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
   selectedEvent: string = null;
   filterValue: string = null;
   listeningEvents = this.eventSourcingMonitorService.listeningEvents;
+
+  totalVersionsCount = 0;
+  totalUsersCount = 0;
+
+  listeningEventSubscription: Subscription;
 
 
   constructor(
@@ -46,10 +54,11 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
     private observableMedia: ObservableMedia
   ) {
     this.translationLoader.loadTranslations(english, spanish);
+    console.log('### ==> ', this.eventTypeVsByUsersChartDirective);
   }
 
 
-  eventOptionList: {eventName: string, count: number, show: boolean}[] = [];
+  eventOptionList: { eventName: string, count: number, show: boolean }[] = [];
   screenMode = 0;
 
   ngOnInit() {
@@ -61,6 +70,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
         start = cols;
       }
     });
+
     this.observableMedia.asObservable()
       .map(change => grid.get(change.mqAlias))
       .startWith(start)
@@ -69,12 +79,12 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
     this.initCharts();
 
     this.eventTypeVsByUsersChart.clearResultData = () => {
-      this.eventTypeVsByUsersChart.results.length = 0;
+      // this.eventTypeVsByUsersChart.results.length = 0;
       this.eventTypeVsByUsersChart.results = [];
     };
 
     this.eventTypeVsByVersionChart.clearResultData = () => {
-      this.eventTypeVsByVersionChart.results.length = 0;
+      // this.eventTypeVsByVersionChart.results.length = 0;
       this.eventTypeVsByVersionChart.results = [];
     };
 
@@ -86,6 +96,10 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
           return this.updateEventTypeChart$(this.selectedEvent, TimeRanges[this.eventTypeChart.currentTimeRange], this.eventTypeChart.currentQuantity);
         }))
       .subscribe(result => {});
+
+      if (this.eventSourcingMonitorService.listeningEvents){
+        this.startToListenUpdates();
+      }
 
 
     this.filterInput.valueChanges.subscribe(term => {
@@ -101,8 +115,12 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
     // const filterinputObservable = Rx.Observable.fromEvent(this.inputFilterValue.nativeElement, 'keyup');
 
   }
-  ngOnDestroy(): void {
 
+  ngOnDestroy(): void {
+    console.log('ngOnDestroy ...');
+    if (this.listeningEventSubscription){
+      this.stopToListenUpdates();
+    }
   }
 
   updateCharts(evtType: string) {
@@ -203,6 +221,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
         mergeMap(() => {
           // sorting the data by the total count per version
           const resultsOrdered = this.eventTypeVsByVersionChart.results.sort((a, b) => b.value - a.value);
+          this.totalVersionsCount = resultsOrdered.length;
           const readyResult = resultsOrdered.slice(0, 10);
           return Rx.Observable.from(resultsOrdered.slice(10))
             .pipe(
@@ -217,6 +236,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
               map(() => {
                 // updating the data charts
                 this.eventTypeVsByUsersChart.results = this.eventTypeVsByUsersChart.results.slice();
+
                 this.eventTypeVsByVersionChart.results = readyResult.slice();
               })
             );
@@ -260,8 +280,8 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
   setFunctionOnCharts(chartName: string): void {
     // function name to call when an update is required
     const functionToSubscribe = `update${chartName[0].toUpperCase()}${chartName.slice(1, chartName.length)}$`;
-    this[chartName].quantities = Object.entries(this.eventSourcingMonitorService.chartFilter.ranges).length > 0 
-      ? this.eventSourcingMonitorService.chartFilter.ranges 
+    this[chartName].quantities = Object.entries(this.eventSourcingMonitorService.chartFilter.ranges).length > 0
+      ? this.eventSourcingMonitorService.chartFilter.ranges
       : GenericBaseChart.getDefaultsTimeRangesForscaleTime(TimeRanges[this.eventSourcingMonitorService.chartFilter.timeScale]);
     this.eventTypeChart.currentQuantity = this.eventSourcingMonitorService.chartFilter.timeRange;
     this.eventTypeChart.currentTimeRange = this.eventSourcingMonitorService.chartFilter.timeScale;
@@ -304,5 +324,27 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
     this.eventSourcingMonitorService.listeningEvents = !this.eventSourcingMonitorService.listeningEvents;
     this.listeningEvents = this.eventSourcingMonitorService.listeningEvents;
     this.eventSourcingMonitorService.listeningEvent$.next(this.listeningEvents);
+    this.listeningEvents ? this.startToListenUpdates() : this.stopToListenUpdates();
   }
+
+  startToListenUpdates(){
+    this.listeningEventSubscription = this.eventSourcingMonitorService.listenAvailableUpdates$()
+      .pipe(
+        mergeMap(() => this.updateEventTypeChart$(
+          this.selectedEvent,
+          TimeRanges[this.eventSourcingMonitorService.chartFilter.timeScale],
+          this.eventSourcingMonitorService.chartFilter.timeRange)
+        )
+      )
+    .subscribe(
+      (update) => console.log(update),
+      (error) => console.log(error)
+    );
+  }
+
+  stopToListenUpdates(){
+    this.listeningEventSubscription.unsubscribe();
+  }
+
+
 }

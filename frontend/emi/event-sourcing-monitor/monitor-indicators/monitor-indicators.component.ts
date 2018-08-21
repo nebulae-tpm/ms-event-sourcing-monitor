@@ -1,4 +1,5 @@
 import { TimeRanges } from './../chart-helpers/Tool';
+import { Subscription } from 'rxjs/Subscription';
 import { Component, OnInit, Output , EventEmitter} from '@angular/core';
 import { EventSourcingMonitorService } from '../event-sourcing-monitor.service';
 // tslint:disable-next-line:import-blacklist
@@ -6,6 +7,7 @@ import * as Rx from 'rxjs/Rx';
 // tslint:disable-next-line:import-blacklist
 import { mergeMap, map, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs/Observable';
+import { MatTableDataSource } from '@angular/material';
 
 export interface TopEvent{
   eventType: string;
@@ -29,7 +31,8 @@ export class MonitorIndicatorsComponent implements OnInit {
   @Output() eventListReady = new EventEmitter();
   public cols: Observable<number>;
   topEvents: TopEvent[] = [];
-  tableDataReady = false;
+  topEventsDataSource = new MatTableDataSource();
+  listeningEventSubscription: Subscription;
 
   displayedColumns: string[] = ['eventType', 'balance_0', 'balance_1', 'balance_2'];
 
@@ -46,26 +49,40 @@ export class MonitorIndicatorsComponent implements OnInit {
     }
   };
 
+  selectedTimeRange: string;
+
   constructor(
     private eventSourcingMonitorervice: EventSourcingMonitorService
   ) { }
 
   ngOnInit() {
+    this.selectedTimeRange = TimeRanges[this.eventSourcingMonitorervice.chartFilter.timeScale];
     this.updateBalanceTable(TimeRanges[this.eventSourcingMonitorervice.chartFilter.timeScale]);
+
     this.eventSourcingMonitorervice.onTimeScaleChanged$
     .pipe(
       tap(timeScale => {
-        console.log(timeScale);
-        this.updateBalanceTable(TimeRanges[timeScale])
+        this.balanceTable.datesHeaders = ['---', '---', '---'];
+        this.selectedTimeRange = TimeRanges[timeScale];
+        this.updateBalanceTable(this.selectedTimeRange);
       })
     ).subscribe(
       () => {},
       (error) => {}
-    )
+    );
+
+    if (this.eventSourcingMonitorervice.listeningEvents){
+      this.startToListenUpdates();
+    }
+
+    this.eventSourcingMonitorervice.listeningEvent$.subscribe(
+      (listeningEvents) => listeningEvents ?  this.startToListenUpdates() : this.stopToListenUpdates()  ,
+      (error) => console.log('ERROR'),
+      () => console.log('Completed')
+    );
   }
 
   updateBalanceTable(timeScale: string) {
-    this.tableDataReady = false;
     this.topEvents = [];
     this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(timeScale, Date.now(), 3)
       .pipe(
@@ -109,8 +126,8 @@ export class MonitorIndicatorsComponent implements OnInit {
           this.topEvents = this.topEvents
           .sort((a, b) => b.totals.reduce((x, y) => x + y, 0) - a.totals.reduce((x, y) => x + y, 0))
           .slice(0, 7);
+          this.topEventsDataSource.data = this.topEvents;
           this.eventListReady.emit(this.topEvents);
-          this.tableDataReady = true;
         },
         (e) => console.log(e),
         () => { }
@@ -133,4 +150,17 @@ export class MonitorIndicatorsComponent implements OnInit {
       default: {}
     }
   }
+
+  startToListenUpdates(){
+    this.listeningEventSubscription = this.eventSourcingMonitorervice.listenAvailableUpdates$().subscribe(
+      (ok) => this.updateBalanceTable(TimeRanges[this.eventSourcingMonitorervice.chartFilter.timeScale]),
+      (error) => console.log(error),
+      () => console.log()
+    );
+  }
+
+  stopToListenUpdates(){
+    this.listeningEventSubscription.unsubscribe();
+  }
+
 }
