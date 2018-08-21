@@ -11,13 +11,10 @@ import { ActivatedRoute } from '@angular/router';
 import * as Rx from 'rxjs/Rx';
 // tslint:disable-next-line:import-blacklist
 import { mergeMap, map, tap, filter, toArray } from 'rxjs/operators';
-// tslint:disable-next-line:import-blacklist
-import { forkJoin, of, pipe } from 'rxjs';
 import { GenericBaseChart } from '../chart-helpers/GenericBaseChart';
 import { NgxChartsPieChart } from '../chart-helpers/NgxChartsPieChart';
 import { ObservableMedia } from '@angular/flex-layout';
 import { FormControl } from '@angular/forms';
-import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -32,7 +29,6 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
   @ViewChild('sidenav') public sideNav: MatSidenav;
   // @ViewChild('inputFilterValue') inputFilterValue: ElementRef;
   filterInput: FormControl = new FormControl();
-  @ViewChild('versionsChart') public eventTypeVsByUsersChartDirective: BaseChartDirective;
 
   eventTypeChart:  GenericBaseChart = new GenericBaseChart('eventTypeChart');
   eventTypeVsByUsersChart: NgxChartsPieChart = new NgxChartsPieChart('eventTypeVsByUsersChart');
@@ -54,7 +50,6 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
     private observableMedia: ObservableMedia
   ) {
     this.translationLoader.loadTranslations(english, spanish);
-    console.log('### ==> ', this.eventTypeVsByUsersChartDirective);
   }
 
 
@@ -76,15 +71,15 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
       .startWith(start)
       .subscribe((e: number) => { this.screenMode = e; console.log('Selected ==> ', e ); });
 
-    this.initCharts();
+    this.setFunctionOnCharts('eventTypeChart');
 
     this.eventTypeVsByUsersChart.clearResultData = () => {
-      // this.eventTypeVsByUsersChart.results.length = 0;
+      this.eventTypeVsByUsersChart.results.length = 0;
       this.eventTypeVsByUsersChart.results = [];
     };
 
     this.eventTypeVsByVersionChart.clearResultData = () => {
-      // this.eventTypeVsByVersionChart.results.length = 0;
+      this.eventTypeVsByVersionChart.results.length = 0;
       this.eventTypeVsByVersionChart.results = [];
     };
 
@@ -137,11 +132,8 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
     }
   }
 
-  initCharts(){
-    this.setFunctionOnCharts('eventTypeChart');
-  }
-
   updateEventTypeChart$(eventName: string, timeScale: string, timeRange: number) {
+    console.log('updateEventTypeChart$ ...', eventName, timeScale, timeRange);
     this.eventTypeVsByUsersChart.clearResultData();
     this.eventTypeVsByVersionChart.clearResultData();
     return this.eventSourcingMonitorService.getTimeFrameswithFilter$(eventName, timeScale, timeRange)
@@ -174,9 +166,8 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
                       .toLocaleString('es-CO', this.eventTypeChart.getLabelFormatter(timeScale))
                   );
                 });
-
                 this.eventTypeChart.ready = true;
-
+                console.log(this.eventTypeChart.datasets);
               })
             )
           );
@@ -236,6 +227,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
               map(() => {
                 // updating the data charts
                 this.eventTypeVsByUsersChart.results = this.eventTypeVsByUsersChart.results.slice();
+                this.totalUsersCount = this.eventTypeVsByUsersChart.results.length;
 
                 this.eventTypeVsByVersionChart.results = readyResult.slice();
               })
@@ -324,7 +316,7 @@ export class EventSourcingSpecificChartComponent implements OnInit, OnDestroy, A
     this.eventSourcingMonitorService.listeningEvents = !this.eventSourcingMonitorService.listeningEvents;
     this.listeningEvents = this.eventSourcingMonitorService.listeningEvents;
     this.eventSourcingMonitorService.listeningEvent$.next(this.listeningEvents);
-    this.listeningEvents ? this.startToListenUpdates() : this.stopToListenUpdates();
+    // this.listeningEvents ? this.startToListenUpdates() : this.stopToListenUpdates();
   }
 
   startToListenUpdates(){

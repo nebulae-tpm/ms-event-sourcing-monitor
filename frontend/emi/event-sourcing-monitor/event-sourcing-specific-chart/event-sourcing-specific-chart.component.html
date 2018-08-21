@@ -97,7 +97,7 @@
 
               <div class="h-400">
                 <canvas baseChart
-                  [data]="eventTypeChart.datasets"
+                  [datasets]="eventTypeChart.datasets"
                   [labels]="eventTypeChart.labels"
                   [colors]="eventTypeChart.colors"
                   [options]="eventTypeChart.options"
@@ -121,7 +121,7 @@
               </div>
 
               <div class="h-400">
-                <ngx-charts-pie-chart #versionsChart *fuseIfOnDom
+                <ngx-charts-pie-chart *fuseIfOnDom
                   [scheme]="eventTypeVsByVersionChart.scheme"
                   [results]="eventTypeVsByVersionChart.results"
                   [legend]="eventTypeVsByVersionChart.legend"
