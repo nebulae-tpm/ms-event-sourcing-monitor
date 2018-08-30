@@ -99,7 +99,6 @@
               <h2 class="text-bold no-margin" > {{ 'WIDGETS.TITLES.OVERVIEW_BY_EVENT_TYPE' | translate }} </h2>
             </div>
 
-
             <!-- FILTER -->
             <div *ngIf="overViewByEventType.showFilterForm" fxLayoutAlign="center center" fxFlex="100" fxFlex.gt-sm="100">
               <app-monitor-filter-helper fxFill [(listOptions)]="overViewByEventType.optionsToFilter" [filtersApplied]="overViewByEventType.filtersApplied"
