@@ -56,6 +56,11 @@ spec:
         # BACKEND PARAMETERS
         - name: GMT_TO_SERVE
           value: "GMT-5"
+        resources:
+          requests:
+            cpu: "50m"
+          limits:
+            cpu: "100m"
         
       volumes:
       - name: google-application-credentials

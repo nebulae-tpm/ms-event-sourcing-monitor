@@ -45,6 +45,11 @@ spec:
         volumeMounts:
         - name: esm-mongo-persistent-storage
           mountPath: /data/db
+        resources:
+          requests:
+            cpu: "50m"
+          limits:
+            cpu: "100m"
       volumes:
       - name: esm-mongo-persistent-storage
         persistentVolumeClaim:
