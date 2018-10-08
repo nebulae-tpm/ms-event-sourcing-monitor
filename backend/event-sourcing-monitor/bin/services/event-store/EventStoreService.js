@@ -90,7 +90,6 @@ class EventStoreService {
       .concatMap(params => this.subscribeEventRetrieval$(params))
   }
 
-
   /**
    * Create a subscrition to the event store and returns the subscription info     
    * @param {{aggregateType, eventType, onErrorHandler, onCompleteHandler}} params
