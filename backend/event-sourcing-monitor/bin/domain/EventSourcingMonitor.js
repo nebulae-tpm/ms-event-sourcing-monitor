@@ -58,7 +58,7 @@ class EventSourcingMonitor {
  */
   handleEventToCumulate$(evt){
     const date = new Date()
-    console.log("handleEventToCumulate$", evt.et, "TimestampEvent: ", evt.timestamp, date.toLocaleString(), "Millis: ", date.getMilliseconds() );
+    console.log("handleEventToCumulate$", evt.et, "TimestampEvent: ", new Date(evt.timestamp).toLocaleString(), "(", date.toLocaleString(), "Millis: ", date.getMilliseconds(), ")" );
     // return Rx.Observable.forkJoin(
     //   MinuteAccumulatorDA.cumulateEvent$(evt),
     //   HourAccumulatorDA.cumulateEvent$(evt),

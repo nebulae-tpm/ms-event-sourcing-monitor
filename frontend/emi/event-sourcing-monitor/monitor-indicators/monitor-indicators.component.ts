@@ -5,7 +5,7 @@ import { EventSourcingMonitorService } from '../event-sourcing-monitor.service';
 // tslint:disable-next-line:import-blacklist
 import * as Rx from 'rxjs/Rx';
 // tslint:disable-next-line:import-blacklist
-import { mergeMap, map, tap } from 'rxjs/operators';
+import { mergeMap, map, tap, filter } from 'rxjs/operators';
 import { Observable } from 'rxjs/Observable';
 import { MatTableDataSource } from '@angular/material';
 
@@ -86,6 +86,7 @@ export class MonitorIndicatorsComponent implements OnInit {
     this.topEvents = [];
     this.eventSourcingMonitorervice.getTimeFrameInRangeSince$(timeScale, Date.now(), 3)
       .pipe(
+        filter(result => result != null),
         map(result => JSON.parse(JSON.stringify(result))),
         map((resultAsArray: any[]) => resultAsArray.sort((a, b) => a.id - b.id)),
         mergeMap((arrayResult: any) =>

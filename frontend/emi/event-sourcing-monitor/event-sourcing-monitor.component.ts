@@ -9,7 +9,7 @@ import { locale as spanish } from './i18n/es';
 // tslint:disable-next-line:import-blacklist
 import * as Rx from 'rxjs/Rx';
 // tslint:disable-next-line:import-blacklist
-import { mergeMap, map, tap } from 'rxjs/operators';
+import { mergeMap, map, tap, filter } from 'rxjs/operators';
 // tslint:disable-next-line:import-blacklist
 import { forkJoin } from 'rxjs';
 import { GenericBaseChart } from './chart-helpers/GenericBaseChart';
@@ -89,6 +89,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
   updateAllCharts$(timeScale: string, timestamp: number, quantity: number ){
     return this.eventSourcingMonitorService.getTimeFrameInRangeSince$(timeScale, timestamp,  quantity)
       .pipe(
+        filter(result => result != null ),
         map(result => JSON.parse(JSON.stringify(result))),
         map(resultAsArray => resultAsArray.sort((a, b) =>  a.id - b.id)),
         mergeMap((arrayResult: any) =>
@@ -280,7 +281,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       this.updateAllCharts$(TimeRanges[scaleTime], Date.now(), this[chartName].currentQuantity)
       .subscribe(
         (result) =>  {
-          //console.log(this.eventSourcingMonitorService.chartFilter); 
+          // console.log(this.eventSourcingMonitorService.chartFilter);
         },
         (error) => (console.log(error)),
         () => {}
@@ -293,7 +294,7 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       this.updateAllCharts$(TimeRanges[this[chartName].currentTimeRange], Date.now(), timeRange )
       .subscribe(
         (result) =>  {
-          //console.log(this.eventSourcingMonitorService.chartFilter); 
+          // console.log(this.eventSourcingMonitorService.chartFilter);
         },
         (error) => (console.log(error)),
         () => {}

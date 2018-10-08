@@ -67,7 +67,7 @@ class EventStoreService {
         .mergeMap(evt => Rx.Observable.concat(
           handler.fn.call(handler.obj, evt),
           //MANDATORY:  ACKWOWLEDGE THIS EVENT WAS PROCESSED
-          // eventSourcing.eventStore.acknowledgeEvent$(evt, mbeKey),
+          eventSourcing.eventStore.acknowledgeEvent$(evt, mbeKey),
         ))
         .subscribe(
           (evt) => {
