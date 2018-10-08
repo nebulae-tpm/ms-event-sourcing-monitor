@@ -39,25 +39,13 @@ class GraphQlService {
     const subscription = broker
       .getMessageListener$([aggregateType], [messageType])
       //decode and verify the jwt token
-      .mergeMap(message => {        
-        return Rx.Observable.of(
-          {
-            authToken: jsonwebtoken.verify(message.data.jwt, jwtPublicKey),
-            message
-          }
-        )
-        .catch(err => {
-          return Rx.Observable.of(
-            {
-              response,
-              correlationId: message.id,
-              replyTo: message.attributes.replyTo 
-            }
+      .mergeMap(message =>
+        Rx.Observable.of({ authToken: jsonwebtoken.verify(message.data.jwt, jwtPublicKey), message } )
+          .catch(err =>
+            Rx.Observable.of({ response, correlationId: message.id, replyTo: message.attributes.replyTo })
+              .mergeMap(msg => this.sendResponseBack$(msg))
           )
-          .mergeMap(msg => this.sendResponseBack$(msg))
-
-        })
-      })
+      )
       //ROUTE MESSAGE TO RESOLVER
       .mergeMap(({ authToken, message }) =>
         handler.fn
@@ -71,9 +59,7 @@ class GraphQlService {
           })
       )
       .mergeMap(msg => this.sendResponseBack$(msg))
-      .catch(error => {
-        return Rx.Observable.of(null)
-      })
+      .catch(error => Rx.Observable.of(null))
       .subscribe(
         msg => {
           //  console.log(`GraphQlService: ${messageType} process: ${msg}`);
@@ -140,8 +126,6 @@ class GraphQlService {
     console.log("GraphQl Service starting ...");
 
     return [
-
-      //Sample incoming request, please remove
       {
         aggregateType: "EventSourcingSummary",
         messageType: "gateway.graphql.query.getTimeFramesSinceTimestamp",

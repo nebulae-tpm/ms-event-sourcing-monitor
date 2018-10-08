@@ -57,14 +57,16 @@ class EventSourcingMonitor {
  * @param {Event} evt 
  */
   handleEventToCumulate$(evt){
-    return Rx.Observable.forkJoin(
-      MinuteAccumulatorDA.cumulateEvent$(evt),
-      HourAccumulatorDA.cumulateEvent$(evt),
-      DayAccumulatorDA.cumulateEvent$(evt),
-      MonthAccumulatorDA.cumulateEvent$(evt),
-      YearAccumulatorDA.cumulateEvent$(evt)
-    )
-    .mergeMap(() => Rx.Observable.defer(() => this.frontendEventMonitorUpdated$.next(evt.timestamp)))
+    console.log("handleEventToCumulate$", new Date().toLocaleTimeString());
+    // return Rx.Observable.forkJoin(
+    //   MinuteAccumulatorDA.cumulateEvent$(evt),
+    //   HourAccumulatorDA.cumulateEvent$(evt),
+    //   DayAccumulatorDA.cumulateEvent$(evt),
+    //   MonthAccumulatorDA.cumulateEvent$(evt),
+    //   YearAccumulatorDA.cumulateEvent$(evt)
+    // )
+    return Rx.Observable.of({});
+    // .mergeMap(() => Rx.Observable.defer(() => this.frontendEventMonitorUpdated$.next(evt.timestamp)))
   }
 
   /**
@@ -100,27 +102,6 @@ class EventSourcingMonitor {
         return YearAccumulatorDA.getAccumulateDataInTimeRange$(startFlag, quantity)
         .mergeMap(result => this.objectKeyToArrayFormat$(result))
         .mergeMap(respond => this.buildSuccessResponse$(respond))
-        .catch(err => this.errorHandler$(err));
-      default: return Rx.Observable.of([{
-        id: 13412352345234,
-        globalHits: 324968,
-        eventTypeHits: [
-          { AAA: 123},
-          { BBB: 258} 
-        ],
-        userHits: [
-          { CCC: 123},
-          { DDD: 258}
-        ],
-        eventTypes: [
-          {
-            EEE: [
-              { FFF: 569},
-              { GGG : 9654 }
-            ]
-          }
-        ]
-      }]).mergeMap(respond => this.buildSuccessResponse$(respond))
         .catch(err => this.errorHandler$(err));
     }
   }
@@ -208,7 +189,9 @@ class EventSourcingMonitor {
 
 
 }
-
+/**
+ * @returns {EventSourcingMonitor}
+ */
 module.exports = () => {
   if (!instance) {
     instance = new EventSourcingMonitor();
