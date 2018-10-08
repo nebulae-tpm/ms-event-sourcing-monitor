@@ -186,8 +186,6 @@ class EventSourcingMonitor {
   }
 
   //#endregion
-
-
 }
 /**
  * @returns {EventSourcingMonitor}
