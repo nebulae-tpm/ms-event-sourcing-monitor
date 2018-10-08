@@ -156,8 +156,7 @@ class MinuteAccumulatorDA {
               ).setMilliseconds(0),
               TIMERANGE_KEY
             )
-              .do(r => console.log(new Date(r).toLocaleString()))
-              .mergeMap(idToSearch => collection.findOne({ id: idToSearch }))
+            .mergeMap(idToSearch => collection.findOne({ id: idToSearch }))
           )
         )
       )

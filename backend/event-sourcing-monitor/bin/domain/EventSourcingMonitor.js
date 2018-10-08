@@ -128,7 +128,6 @@ class EventSourcingMonitor {
 
   objectKeyToArrayFormat$(object) {
     return Rx.Observable.of(object)
-      // .do(r => console.log("$$$$$$$$$$$$$$$$$$$", r, "$$$$$$$$$$$$$$$$$$$$$"))
       .mergeMap(timeFrameArray => Rx.Observable.from(timeFrameArray)
       .filter(obj => obj != null)
         .map(timeFrameObj => {

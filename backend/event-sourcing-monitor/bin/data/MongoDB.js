@@ -24,7 +24,7 @@ class MongoDB {
         console.log("MongoDB.start$()... ");
         return Rx.Observable.bindNodeCallback(MongoClient.connect)(this.url)
             .map(client => {
-                console.log(this.url);
+                //console.log(this.url);
                 this.client = client;
                 this.db = this.client.db(this.dbName);
                 return `MongoDB connected to dbName= ${this.dbName}`;

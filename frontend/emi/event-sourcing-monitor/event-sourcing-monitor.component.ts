@@ -279,7 +279,9 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
 
       this.updateAllCharts$(TimeRanges[scaleTime], Date.now(), this[chartName].currentQuantity)
       .subscribe(
-        (result) =>  {console.log(this.eventSourcingMonitorService.chartFilter); },
+        (result) =>  {
+          //console.log(this.eventSourcingMonitorService.chartFilter); 
+        },
         (error) => (console.log(error)),
         () => {}
       );
@@ -290,7 +292,9 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
       this.eventSourcingMonitorService.chartFilter.timeRange = timeRange;
       this.updateAllCharts$(TimeRanges[this[chartName].currentTimeRange], Date.now(), timeRange )
       .subscribe(
-        (result) =>  {console.log(this.eventSourcingMonitorService.chartFilter); },
+        (result) =>  {
+          //console.log(this.eventSourcingMonitorService.chartFilter); 
+        },
         (error) => (console.log(error)),
         () => {}
       );
@@ -313,7 +317,6 @@ export class EventSourcingMonitorComponent implements OnInit, OnDestroy {
   }
 
   startToListenEvents(){
-    console.log('EMPREZANDO A ESCUCHAR ...');
     this.listeningEventSubscription = this.eventSourcingMonitorService.listenAvailableUpdates$()
       .pipe(
         mergeMap(() => this.updateAllCharts$(
