@@ -60,3 +60,31 @@
 //         });
 //     });
 // });
+
+
+// TO GENERATE EVENTS
+    // Rx.Observable.of({})
+    //   .delay(5000)
+    //   .mergeMap(() =>
+    //     Rx.Observable.interval(300)
+    //       .mergeMap(() => {
+    //         const eventTypes = ['BasicInfoTagCreated', 'EventA', 'EventB', 'EventC', 'EventD'];
+    //         const users = ['Felipe', 'Sebas', 'Camilo', 'Daniel', 'Esteban'];
+    //         return  eventSourcing.eventStore
+    //         .emitEvent$(
+    //           new Event({
+    //             eventType: eventTypes[Math.floor(Math.random() * eventTypes.length)],
+    //             eventTypeVersion: 1,
+    //             aggregateType: "Device",
+    //             aggregateId: Date.now(),
+    //             data: {},
+    //             user: users[Math.floor(Math.random() * users.length)]
+    //           })
+    //         );
+    //         })
+    //   )
+    //   .subscribe(
+    //     ok => { },
+    //     e => console.log(e),
+    //     () => { }
+    //   );

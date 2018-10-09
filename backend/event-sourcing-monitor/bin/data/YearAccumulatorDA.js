@@ -27,33 +27,25 @@ class MinuteAccumulatorDA {
    * @param {Event} event
    * @returns Observable that resolves to given event itself
    */
-  static cumulateEvent$(event) {
+  static cumulateEvent$(update) {
     const collection = mongoDB.db.collection(CollectionName);
     const updateOps = {
       upsert: true
     };
-    const update = { $inc: {} };
-    update["$inc"][`globalHits`] = 1;
-    update["$inc"][`eventTypeHits.${event.et.replace(/\./g, '-')}`] = 1;
-    update["$inc"][`userHits.${event.user.replace(/\./g, '-')}`] = 1;
-    update["$inc"][`eventTypes.${event.et.replace(/\./g, '-')}.userHits.${event.user.replace(/\./g, '-')}`] = 1;
-    update["$inc"][`eventTypes.${event.et.replace(/\./g, '-')}.versionHits.${event.etv}`] = 1;
-    update["$inc"][`aggregateTypeHits.${event.at.replace(/\./g, '-')}`] = 1;
-
     return (
       AccumulatorDAHelper.changeTimeStampPrecision$(
-        event.timestamp,
+        update.timestamp,
         TIMERANGE_KEY
       )
         .mergeMap(
           id =>
             Rx.Observable.defer(() =>
-              collection.updateOne({ id: id }, update, updateOps)
+              collection.updateOne({ id: id }, { $inc: update.$inc }, updateOps)
             )
           //TODO: comprobar que el result o modif count haya cambiado
         )
         // .do(r => console.log(r.result))
-        .mapTo(event)
+        .mapTo({})
     );
   }
 

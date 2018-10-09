@@ -21,6 +21,52 @@ class EventSourcingMonitor {
   constructor() {
     this.frontendEventMonitorUpdated$ = new Rx.Subject();
     this.prepareSubjects();
+    this.incommingEvents$ = new Rx.Subject();
+
+    this.startListenEvents$()
+    .subscribe(o => {}, e => console.log(e), () => {} )
+  }
+
+  startListenEvents$() {
+    return this.incommingEvents$
+      .bufferTime(3000)
+      .map(events =>
+        events.reduce((acc, event) => {
+          const eventType = event.et.replace(/\./g, '-');
+          const eventUser = event.user.replace(/\./g, '-');
+          const eventAggregateType = event.at.replace(/\./g, '-');
+          acc["$inc"][`globalHits`]++;
+
+          acc["$inc"][`eventTypeHits.${eventType}`] 
+            ? acc["$inc"][`eventTypeHits.${eventType}`] ++
+            : acc["$inc"][`eventTypeHits.${eventType}`] = 1;
+
+          acc["$inc"][`userHits.${eventUser}`]
+            ? acc["$inc"][`userHits.${eventUser}`]++
+            : acc["$inc"][`userHits.${eventUser}`] = 1;
+
+          acc["$inc"][`eventTypes.${eventType}.userHits.${eventUser}`]
+            ? acc["$inc"][`eventTypes.${eventType}.userHits.${eventUser}`]++
+            : acc["$inc"][`eventTypes.${eventType}.userHits.${eventUser}`] = 1;
+
+          acc["$inc"][`eventTypes.${eventType}.versionHits.${event.etv}`]
+            ? acc["$inc"][`eventTypes.${eventType}.versionHits.${event.etv}`]
+            : acc["$inc"][`eventTypes.${eventType}.versionHits.${event.etv}`] = 1;
+
+          acc["$inc"][`aggregateTypeHits.${eventAggregateType}`]
+             ? acc["$inc"][`aggregateTypeHits.${eventAggregateType}`]++
+             : acc["$inc"][`aggregateTypeHits.${eventAggregateType}`] =1;
+          acc['timestamp'] = event.timestamp;
+          return acc;
+        }, { $inc: { globalHits: 0 }, timestamp: 0 })
+      )
+      .mergeMap((update) => Rx.Observable.forkJoin(
+        MinuteAccumulatorDA.cumulateEvent$(update),
+        HourAccumulatorDA.cumulateEvent$(update),
+        DayAccumulatorDA.cumulateEvent$(update),
+        MonthAccumulatorDA.cumulateEvent$(update),
+        YearAccumulatorDA.cumulateEvent$(update)
+      ))
   }
 
   prepareSubjects() {
@@ -31,9 +77,7 @@ class EventSourcingMonitor {
         CommonVarsDA.getVarValue$(lastEventMonitorUpdateSentToClientDBKey)
           .map(result => result ? result.value : null)
       ))
-      .map(([eventUpdate, lastFrontendEventUpdateSent]) => {
-        return { ...eventUpdate, lastFrontendEventUpdateSent }
-      })
+      .map(([eventUpdate, lastFrontendEventUpdateSent]) => ({ ...eventUpdate, lastFrontendEventUpdateSent }) )
       .filter((eventUpdate) => (eventUpdate.timestamp > (eventUpdate.lastFrontendEventUpdateSent + 5000)
         || eventUpdate.lastFrontendEventUpdateSent == null)
       )
@@ -52,22 +96,17 @@ class EventSourcingMonitor {
   }
   
   
-/**
- * this method acumulate by one in the time frames
- * @param {Event} evt 
- */
-  handleEventToCumulate$(evt){
-    const date = new Date()
+  /**
+   * this method acumulate by one in the time frames
+   * @param {Event} evt 
+   */
+  handleEventToCumulate$(evt) {
+    const date = new Date();
     console.log("handleEventToCumulate$", evt.et, "TimestampEvent: ", new Date(evt.timestamp).toLocaleString(), "(", date.toLocaleString(), "Millis: ", date.getMilliseconds(), ")" );
-    // return Rx.Observable.forkJoin(
-    //   MinuteAccumulatorDA.cumulateEvent$(evt),
-    //   HourAccumulatorDA.cumulateEvent$(evt),
-    //   DayAccumulatorDA.cumulateEvent$(evt),
-    //   MonthAccumulatorDA.cumulateEvent$(evt),
-    //   YearAccumulatorDA.cumulateEvent$(evt)
-    // )
-    return Rx.Observable.of({});
-    // .mergeMap(() => Rx.Observable.defer(() => this.frontendEventMonitorUpdated$.next(evt.timestamp)))
+    return Rx.Observable.of(evt).do(event => this.incommingEvents$.next(event));     
+     
+    // return Rx.Observable.of({});
+    // // .mergeMap(() => Rx.Observable.defer(() => this.frontendEventMonitorUpdated$.next(evt.timestamp)))
   }
 
   /**
