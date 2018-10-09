@@ -61,7 +61,7 @@ class EventSourcingMonitor {
           return acc;
         }, { $inc: { globalHits: 0 }, timestamp: 0 })
       )
-      .do(u => console.log("UPDATE ==> ", u))
+      .do(u => console.log("UPDATE ==>  ", u))
       .mergeMap((update) => Rx.Observable.forkJoin(
         MinuteAccumulatorDA.cumulateEvent$(update),
         HourAccumulatorDA.cumulateEvent$(update),
