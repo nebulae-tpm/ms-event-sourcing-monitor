@@ -13,7 +13,7 @@ spec:
         app: event-sourcing-monitor
     spec:      
       containers:
-      - image: nebulaetpm/event-sourcing-monitor.backend.event-sourcing-monitor:0.0.31
+      - image: nebulaetpm/event-sourcing-monitor.backend.event-sourcing-monitor:0.0.32
         name: event-sourcing-monitor
         volumeMounts:
         - name: google-application-credentials
