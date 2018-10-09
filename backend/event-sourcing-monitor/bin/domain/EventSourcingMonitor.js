@@ -30,6 +30,7 @@ class EventSourcingMonitor {
   startListenEvents$() {
     return this.incommingEvents$
       .bufferTime(3000)
+      .do(items => console.log("Package size ==> ", items.length))
       .map(events =>
         events.reduce((acc, event) => {
           const eventType = event.et.replace(/\./g, '-');
@@ -60,6 +61,7 @@ class EventSourcingMonitor {
           return acc;
         }, { $inc: { globalHits: 0 }, timestamp: 0 })
       )
+      .do(u => console.log("UPDATE ==> ", u))
       .mergeMap((update) => Rx.Observable.forkJoin(
         MinuteAccumulatorDA.cumulateEvent$(update),
         HourAccumulatorDA.cumulateEvent$(update),
