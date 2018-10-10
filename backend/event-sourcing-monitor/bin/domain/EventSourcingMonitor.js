@@ -29,7 +29,8 @@ class EventSourcingMonitor {
 
   startListenEvents$() {
     return this.incommingEvents$
-      .bufferTime(3000)
+      .bufferTime(3000)      
+      .filter(items => items.length > 0)
       .do(items => console.log("Package size ==> ", items.length))
       .map(events =>
         events.reduce((acc, event) => {
