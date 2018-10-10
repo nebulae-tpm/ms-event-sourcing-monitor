@@ -104,10 +104,7 @@ class EventSourcingMonitor {
    * @param {Event} evt 
    */
   handleEventToCumulate$(evt) {
-    const date = new Date();
-    console.log("handleEventToCumulate$", evt.et, "TimestampEvent: ", new Date(evt.timestamp).toLocaleString(), "(", date.toLocaleString(), "Millis: ", date.getMilliseconds(), ")" );
-    return Rx.Observable.of(evt).do(event => this.incommingEvents$.next(event));     
-     
+    return Rx.Observable.of(evt).do(event => this.incommingEvents$.next(event));
     // return Rx.Observable.of({});
     // // .mergeMap(() => Rx.Observable.defer(() => this.frontendEventMonitorUpdated$.next(evt.timestamp)))
   }
