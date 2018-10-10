@@ -1,16 +1,14 @@
 "use strict";
 
 const Rx = require("rxjs");
-const CollectionName = "CollectionName"; // please change
 const { CustomError } = require("../tools/customError");
 const GMT_OFFSET = ((parseInt(process.env.GMT_TO_SERVE.replace('GMT', '') * 60)) + new Date().getTimezoneOffset()) * 60000;
 
 class AccumulatorDAHelper {
   /**
    * Converts a timestamp to a desired precision
-   * @param {number} timestamp utc millis
+   * @param {number} timestamp UTC millis
    * @param {string} precision MINUTE, HOUR, DAY, MONTH or YAER
-   * @returns <Rx.Observable>
    */
   static changeTimeStampPrecision$(timestamp, precision) {
     return Rx.Observable.of(timestamp).map(ts => {      
@@ -45,50 +43,27 @@ class AccumulatorDAHelper {
     switch (precision) {
       case "MINUTE":
         return AccumulatorDAHelper.changeTimeStampPrecision$(
-          new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate(),
-            now.getHours(),
-            now.getMinutes() - limit
-          ),
+          new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes() - limit ).setMilliseconds(0),
           precision
         );
       case "HOUR":
         return AccumulatorDAHelper.changeTimeStampPrecision$(
-          new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate(),
-            now.getHours() - limit,
-            0, 0),
+          new Date( now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() - limit, 0).setMilliseconds(0),
           precision
         );
       case "DAY":
         return AccumulatorDAHelper.changeTimeStampPrecision$(
-          new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate() - limit,
-            0, 0, 0 
-          ).setMilliseconds(0),
+          new Date( now.getFullYear(), now.getMonth(), now.getDate() - limit, 0, 0).setMilliseconds(0),
           precision
         );
       case "MONTH":
         return AccumulatorDAHelper.changeTimeStampPrecision$(
-          new Date(
-            now.getFullYear(),
-            now.getMonth() - limit,
-            1, 0, 0, 0
-          ).setMilliseconds(0),
+          new Date( now.getFullYear(), now.getMonth() - limit, 1, 0, 0).setMilliseconds(0),
           precision
         );
       case "YEAR":
         return AccumulatorDAHelper.changeTimeStampPrecision$(
-          new Date(
-            now.getFullYear() - limit,
-            1, 1, 1, 0, 0 
-          ).setMilliseconds(0),
+          new Date( now.getFullYear() - limit, 1, 1, 1, 0).setMilliseconds(0),
           precision
         );
       default:
@@ -96,4 +71,8 @@ class AccumulatorDAHelper {
     }
   }
 }
+
+/**
+ * @returns {AccumulatorDAHelper}
+ */
 module.exports = AccumulatorDAHelper;

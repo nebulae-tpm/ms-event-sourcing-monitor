@@ -6,7 +6,6 @@ const Rx = require("rxjs");
 const CollectionName = "dayBoxes"; //please change
 const { CustomError } = require("../tools/customError");
 const TIMERANGE_KEY = "DAY";
-const MAXIMUM_DOCUMENT_NUMBER = 60;
 
 class MinuteAccumulatorDA {
   static start$(mongoDbInstance) {
@@ -151,11 +150,12 @@ class MinuteAccumulatorDA {
 
 
   /**
-   * delete all obsoletes documents 
+   * 
+   * @param {number} threshold maximum number of documents that the day collection can store
    */
-  static clearTrashDocuments() {
+  static deleteObsoleteDocuments$(threshold) {
     const collection = mongoDB.db.collection(CollectionName);
-    return AccumulatorDAHelper.calculateObsoleteThreshold( Date.now(), TIMERANGE_KEY, MAXIMUM_DOCUMENT_NUMBER)
+    return AccumulatorDAHelper.calculateObsoleteThreshold$( Date.now(), TIMERANGE_KEY, threshold)
     .mergeMap(obsoleteThreshold => Rx.Observable.defer(() =>
       collection.remove({ id: { $lt: obsoleteThreshold } })
     ))
@@ -163,4 +163,7 @@ class MinuteAccumulatorDA {
 
 }
 
+/**
+ * @returns {MinuteAccumulatorDA}
+ */
 module.exports = MinuteAccumulatorDA;

@@ -6,7 +6,6 @@ const Rx = require("rxjs");
 const CollectionName = "yearBoxes"; //please change
 const { CustomError } = require("../tools/customError");
 const TIMERANGE_KEY = "YEAR";
-const MAXIMUM_DOCUMENT_NUMBER = 5;
 
 class MinuteAccumulatorDA {
   static start$(mongoDbInstance) {
@@ -155,16 +154,20 @@ class MinuteAccumulatorDA {
       .toArray();
   }
 
- /**
-   * delete all obsoletes documents 
+/**
+   * 
+   * @param {number} threshold maximum number of documents that the year collection can store
    */
-  static clearTrashDocuments() {
+  static deleteObsoleteDocuments$(threshold) {
     const collection = mongoDB.db.collection(CollectionName);
-    return AccumulatorDAHelper.calculateObsoleteThreshold( Date.now(), TIMERANGE_KEY, MAXIMUM_DOCUMENT_NUMBER)
+    return AccumulatorDAHelper.calculateObsoleteThreshold$( Date.now(), TIMERANGE_KEY, threshold)
     .mergeMap(obsoleteThreshold => Rx.Observable.defer(() =>
       collection.remove({ id: { $lt: obsoleteThreshold } })
     ))
   }
 }
 
+/**
+ * @returns {MinuteAccumulatorDA}
+ */
 module.exports = MinuteAccumulatorDA;

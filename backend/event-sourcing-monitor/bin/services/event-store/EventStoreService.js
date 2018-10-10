@@ -117,6 +117,10 @@ class EventStoreService {
       "*": {
         fn: eventSourcingMonitor.handleEventToCumulate$,
         obj: eventSourcingMonitor
+      },
+      "CleanEventSourcingManagerHistoryJobTriggered": {
+        fn: eventSourcingMonitor.handleCleanHistory$,
+        obj: eventSourcingMonitor
       }
     };
   }  
@@ -129,6 +133,10 @@ class EventStoreService {
       {
         aggregateType: "*",
         eventType: "*"
+      },
+      {
+        aggregateType: "Cronjob",
+        eventType: "CleanEventSourcingManagerHistoryJobTriggered"
       }
     ]
   }

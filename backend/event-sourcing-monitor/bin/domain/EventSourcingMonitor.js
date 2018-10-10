@@ -148,8 +148,32 @@ class EventSourcingMonitor {
         .catch(err => this.errorHandler$(err));
     }
   }
-  //#region  mappers for API responses
 
+  /**
+   * Event handler to clean up the databases
+   * @param {any} evt 
+   */
+  handleCleanHistory$(evt) {
+    return Rx.Observable.of(evt.data)
+      .map(data => ({
+        now: Date.now(),
+        minuteLimit: (data && data.minuteObsoleteThreshold) ? data.minuteObsoleteThreshold : 190,
+        hourLimit: (data && data.hourObsoleteThreshold) ? data.hourObsoleteThreshold : 75,
+        dayLimit: (data && data.dayObsoleteThreshold) ? data.dayObsoleteThreshold : 62,
+        monthLimit: (data && data.monthObsoleteThreshold) ? data.monthObsoleteThreshold : 14,
+        yearLimit: (data && data.yearObsoleteThreshold) ? data.yearObsoleteThreshold : 6
+      }))
+      .mergeMap(obsoleteThreshold => Rx.Observable.forkJoin(
+        MinuteAccumulatorDA.deleteObsoleteDocuments$(obsoleteThreshold.minuteLimit),
+        HourAccumulatorDA.deleteObsoleteDocuments$(obsoleteThreshold.hourLimit),
+        DayAccumulatorDA.deleteObsoleteDocuments$(obsoleteThreshold.dayLimit),
+        MonthAccumulatorDA.deleteObsoleteDocuments$(obsoleteThreshold.monthLimit),
+        YearAccumulatorDA.deleteObsoleteDocuments$(obsoleteThreshold.yearLimit)
+      ));
+  }
+
+
+  //#region  mappers for API responses
   objectKeyToArrayFormat$(object) {
     return Rx.Observable.of(object)
       .mergeMap(timeFrameArray => Rx.Observable.from(timeFrameArray)

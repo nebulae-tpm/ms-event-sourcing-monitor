@@ -3,10 +3,9 @@ const mongoDB = require("./MongoDB").singleton(); // to prod
 // let mongoDB = undefined; // to test
 const AccumulatorDAHelper = require("./AccumulatorDAHelper");
 const Rx = require("rxjs");
-const CollectionName = "minuteBoxes"; //please change
+const CollectionName = "minuteBoxes";
 const { CustomError } = require("../tools/customError");
 const TIMERANGE_KEY = "MINUTE";
-const MAXIMUM_DOCUMENT_NUMBER = 180;
 
 class MinuteAccumulatorDA {
   static start$(mongoDbInstance) {
@@ -152,16 +151,20 @@ class MinuteAccumulatorDA {
   }
 
   /**
-   * delete all obsoletes documents 
+   * 
+   * @param {number} threshold maximum number of documents that the minutes collection can store
    */
-  static clearTrashDocuments() {
+  static deleteObsoleteDocuments$(threshold) {
     const collection = mongoDB.db.collection(CollectionName);
-    return AccumulatorDAHelper.calculateObsoleteThreshold( Date.now(), TIMERANGE_KEY, MAXIMUM_DOCUMENT_NUMBER)
+
+    return AccumulatorDAHelper.calculateObsoleteThreshold$( Date.now(), TIMERANGE_KEY, threshold)
     .mergeMap(obsoleteThreshold => Rx.Observable.defer(() =>
       collection.remove({ id: { $lt: obsoleteThreshold } })
     ))
   }
 
 }
-
+/**
+ * @returns {MinuteAccumulatorDA}
+ */
 module.exports = MinuteAccumulatorDA;
