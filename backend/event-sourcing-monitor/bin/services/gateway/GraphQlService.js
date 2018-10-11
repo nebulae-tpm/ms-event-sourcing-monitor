@@ -37,33 +37,21 @@ class GraphQlService {
   }) {
     const handler = this.functionMap[messageType];
     const subscription = broker
-      .getMessageListener$([aggregateType], [messageType])
-      //decode and verify the jwt token
-      .mergeMap(message =>
-        Rx.Observable.of({ authToken: jsonwebtoken.verify(message.data.jwt, jwtPublicKey), message } )
-          .catch(err =>
-            Rx.Observable.of({ response, correlationId: message.id, replyTo: message.attributes.replyTo })
-              .mergeMap(msg => this.sendResponseBack$(msg))
+      .getMessageListener$([aggregateType], [messageType])      
+      .mergeMap(message => this.verifyRequest$(message))
+      .mergeMap(request => ( request.failedValidations.length > 0)
+        ? Rx.Observable.of(request.errorResponse)
+        : Rx.Observable.of(request)
+          //ROUTE MESSAGE TO RESOLVER
+          .mergeMap(({ authToken, message }) =>
+            handler.fn
+              .call(handler.obj, message.data, authToken)
+              .map(response => ({ response, correlationId: message.id, replyTo: message.attributes.replyTo }))
           )
-      )
-      //ROUTE MESSAGE TO RESOLVER
-      .mergeMap(({ authToken, message }) =>
-        handler.fn
-          .call(handler.obj, message.data, authToken)
-          .map(response => {
-            return {
-              response,
-              correlationId: message.id,
-              replyTo: message.attributes.replyTo              
-            };
-          })
-      )
+      )    
       .mergeMap(msg => this.sendResponseBack$(msg))
-      .catch(error => Rx.Observable.of(null))
       .subscribe(
-        msg => {
-          //  console.log(`GraphQlService: ${messageType} process: ${msg}`);
-        },
+        msg => { /* console.log(`GraphQlService: ${messageType} process: ${msg}`); */ },
         onErrorHandler,
         onCompleteHandler
       );
@@ -97,6 +85,28 @@ class GraphQlService {
       })
   }
 
+  /**
+   * Verify the message if the request is valid.
+   * @param {any} request request message
+   * @returns { Rx.Observable< []{request: any, failedValidations: [] }>}  Observable object that containg the original request and the failed validations
+   */
+  verifyRequest$(request) {
+    return Rx.Observable.of(request)
+      //decode and verify the jwt token
+      .mergeMap(message =>
+        Rx.Observable.of(message)
+          .map(message => ({ authToken: jsonwebtoken.verify(message.data.jwt, jwtPublicKey), message, failedValidations: [] }))
+          .catch(err =>
+            EventSourcingMonitor.errorHandler$(err)
+              .map(response => ({
+                errorResponse: { response, correlationId: message.id, replyTo: message.attributes.replyTo },
+                failedValidations: ['JWT']
+              }
+              ))
+          )
+      )
+  }
+
   stop$() {
     Rx.Observable.from(this.subscriptions).map(subscription => {
       subscription.subscription.unsubscribe();
@@ -114,7 +124,7 @@ class GraphQlService {
    */
   getSubscriptionDescriptors() {
     //default on error handler
-    const onErrorHandler = error => {
+    const onErrorHandler = (error) => {
       console.error("Error handling  GraphQl incoming event", error);
       process.exit(1);
     };
