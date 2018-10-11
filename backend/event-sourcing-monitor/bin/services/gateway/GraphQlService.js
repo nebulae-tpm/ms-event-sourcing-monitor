@@ -21,8 +21,19 @@ class GraphQlService {
    * Starts GraphQL actions listener
    */
   start$() {
+    //default on error handler
+    const onErrorHandler = (error) => {
+      console.error("Error handling  GraphQl incoming event", error);
+      process.exit(1);
+    };
+
+    //default onComplete handler
+    const onCompleteHandler = () => {
+      () => console.log("GraphQlService incoming event subscription completed");
+    };
+    console.log("GraphQl Service starting ...");
     return Rx.Observable.from(this.getSubscriptionDescriptors())
-      .map(params => this.subscribeEventHandler(params));
+      .map(params => this.subscribeEventHandler({...params, onErrorHandler, onCompleteHandler }));
   }
 
   /**
@@ -68,7 +79,10 @@ class GraphQlService {
     };
   }
 
-  // send response back if neccesary
+  /**
+   * send response back if neccesary
+   * @param {any} msg Object with data necessary  to send response
+   */
   sendResponseBack$(msg) {
     return Rx.Observable.of(msg)
       .mergeMap(({ response, correlationId, replyTo }) =>
@@ -116,25 +130,11 @@ class GraphQlService {
    * returns an array of broker subscriptions for listening to GraphQL requests
    */
   getSubscriptionDescriptors() {
-    //default on error handler
-    const onErrorHandler = (error) => {
-      console.error("Error handling  GraphQl incoming event", error);
-      process.exit(1);
-    };
-
-    //default onComplete handler
-    const onCompleteHandler = () => {
-      () => console.log("GraphQlService incoming event subscription completed");
-    };
-    console.log("GraphQl Service starting ...");
-
     return [
       {
         aggregateType: "EventSourcingSummary",
-        messageType: "gateway.graphql.query.getTimeFramesSinceTimestamp",
-        onErrorHandler,
-        onCompleteHandler
-      }     
+        messageType: "gateway.graphql.query.getTimeFramesSinceTimestamp"
+      }
     ];
   }
 
