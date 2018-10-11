@@ -71,18 +71,11 @@ class GraphQlService {
   // send response back if neccesary
   sendResponseBack$(msg) {
     return Rx.Observable.of(msg)
-      .mergeMap(({ response, correlationId, replyTo }) => {
-        if (replyTo) {
-          return broker.send$(
-            replyTo,
-            "gateway.graphql.Query.response",
-            response,
-            { correlationId }
-          );
-        } else {
-          return Rx.Observable.of(undefined);
-        }
-      })
+      .mergeMap(({ response, correlationId, replyTo }) =>
+        replyTo
+          ? broker.send$( replyTo, "gateway.graphql.Query.response", response,  { correlationId } )
+          : Rx.Observable.of(undefined)
+      )
   }
 
   /**
@@ -160,7 +153,9 @@ class GraphQlService {
 
 }
 
-
+/**
+ * @returns {GraphQlService}
+ */
 module.exports = () => {
   if (!instance) {
     instance = new GraphQlService();
