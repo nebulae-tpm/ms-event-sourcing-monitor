@@ -104,45 +104,33 @@ class EventSourcingMonitor {
    * @param {Event} evt 
    */
   handleEventToCumulate$(evt) {
-    return Rx.Observable.of(evt).do(event => this.incommingEvents$.next(event));
-    // return Rx.Observable.of({});
-    // // .mergeMap(() => Rx.Observable.defer(() => this.frontendEventMonitorUpdated$.next(evt.timestamp)))
+    return Rx.Observable.of(evt).do(event => this.incommingEvents$.next(event))
+    .mergeMap(() => Rx.Observable.defer(() => this.frontendEventMonitorUpdated$.next(evt.timestamp)))
   }
 
   /**
    * return Array where each element has the quantized data of the relevant attributes of the events 
    * @param {Object} rqst 
    */
-  getTimeFramesSince$({args}) {
+  getTimeFramesSince$({ args }) {
     const timeFrameType = args.timeFrameType;
     const startFlag = args.initTimestamp;
     const quantity = args.quantity;
+    return this.getAccumulatorDA$(timeFrameType)
+      .mergeMap(acumulator => acumulator.getAccumulateDataInTimeRange$(startFlag, quantity))
+      .mergeMap(result => this.objectKeyToArrayFormat$(result))
+      .mergeMap(respond => this.buildSuccessResponse$(respond))
+      .catch(err => this.errorHandler$(err));
+  }
+
+  getAccumulatorDA$(timeFrameType){
     switch (timeFrameType) {
-      case "MINUTE":
-        return MinuteAccumulatorDA.getAccumulateDataInTimeRange$(startFlag, quantity)          
-          .mergeMap(result => this.objectKeyToArrayFormat$(result))
-          .mergeMap(respond => this.buildSuccessResponse$(respond))
-          .catch(err => this.errorHandler$(err));
-      case "HOUR":
-        return HourAccumulatorDA.getAccumulateDataInTimeRange$(startFlag, quantity)
-          .mergeMap(result => this.objectKeyToArrayFormat$(result))
-          .mergeMap(respond => this.buildSuccessResponse$(respond))
-          .catch(err => this.errorHandler$(err));
-      case "DAY": 
-        return DayAccumulatorDA.getAccumulateDataInTimeRange$(startFlag, quantity)
-        .mergeMap(result => this.objectKeyToArrayFormat$(result))
-        .mergeMap(respond => this.buildSuccessResponse$(respond))
-        .catch(err => this.errorHandler$(err));
-      case "MONTH": 
-        return MonthAccumulatorDA.getAccumulateDataInTimeRange$(startFlag, quantity)
-        .mergeMap(result => this.objectKeyToArrayFormat$(result))
-        .mergeMap(respond => this.buildSuccessResponse$(respond))
-        .catch(err => this.errorHandler$(err));
-      case "YEAR": 
-        return YearAccumulatorDA.getAccumulateDataInTimeRange$(startFlag, quantity)
-        .mergeMap(result => this.objectKeyToArrayFormat$(result))
-        .mergeMap(respond => this.buildSuccessResponse$(respond))
-        .catch(err => this.errorHandler$(err));
+      case "MINUTE": return Rx.Observable.of(MinuteAccumulatorDA);
+      case "HOUR": return Rx.Observable.of(HourAccumulatorDA);
+      case "DAY": return Rx.Observable.of(DayAccumulatorDA);
+      case "MONTH": return Rx.Observable.of(MonthAccumulatorDA);
+      case "YEAR": return Rx.Observable.of(YearAccumulatorDA);
+      default: return Rx.Observable.throw(new Error("Unexpeted  frame type"));
     }
   }
 
