@@ -3,7 +3,7 @@ const mongoDB = require("./MongoDB").singleton(); // to prod
 // let mongoDB = undefined; // to test
 const AccumulatorDAHelper = require("./AccumulatorDAHelper");
 const Rx = require("rxjs");
-const CollectionName = "monthBoxes"; //please change
+const CollectionName = "monthBoxes";
 const { CustomError } = require("../tools/customError");
 const TIMERANGE_KEY = "MONTH";
 

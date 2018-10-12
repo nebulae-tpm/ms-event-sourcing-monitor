@@ -50,8 +50,17 @@ class MongoDB {
     createIndexes$() {
         return Rx.Observable.create(async (observer) => {
 
-            //observer.next('Creating index for DB_NAME.COLLECTION_NAME => ({ xxxx: 1 })  ');
-            //await this.db.collection('COLLECTION_NAME').createIndex( { xxxx: 1});     
+            observer.next('Creating index for eventSourcingMonitor.minuteBoxes => ({ id: 1 })  ');
+            await this.db.collection('minuteBoxes').createIndex( { id: 1});     
+            observer.next('Creating index for eventSourcingMonitor.hourBoxes => ({ id: 1 })  ');
+            await this.db.collection('hourBoxes').createIndex( { id: 1}); 
+            observer.next('Creating index for eventSourcingMonitor.dayBoxes => ({ id: 1 })  ');
+            await this.db.collection('dayBoxes').createIndex( { id: 1}); 
+            observer.next('Creating index for eventSourcingMonitor.monthBoxes => ({ id: 1 })  ');
+            await this.db.collection('monthBoxes').createIndex( { id: 1});
+            observer.next('Creating index for eventSourcingMonitor.yearBoxes => ({ id: 1 })  ');
+            await this.db.collection('yearBoxes').createIndex( { id: 1}); 
+
 
             observer.next('All indexes created');
             observer.complete();
@@ -60,6 +69,9 @@ class MongoDB {
 
 }
 
+/**
+ * @returns {MongoDB}
+ */
 module.exports = {
     MongoDB,
     singleton() {
