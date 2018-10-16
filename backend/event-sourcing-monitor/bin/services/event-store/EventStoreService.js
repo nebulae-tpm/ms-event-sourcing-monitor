@@ -70,9 +70,7 @@ class EventStoreService {
           eventSourcing.eventStore.acknowledgeEvent$(evt, mbeKey),
         ))
         .subscribe(
-          (evt) => {
-            // console.log(`EventStoreService: ${eventType} process: ${evt}`);
-          },
+          (evt) => { /* console.log(`EventStoreService: ${eventType} process: ${evt}`);*/ },
           onErrorHandler,
           onCompleteHandler
         );
