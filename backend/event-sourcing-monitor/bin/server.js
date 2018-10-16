@@ -18,9 +18,7 @@ const start = () => {
         mongoDB.start$(),
         graphQlService.start$()
     ).subscribe(
-        (evt) => {
-            // console.log(evt)
-        },
+        () => { },
         (error) => {
             console.error('Failed to start', error);
             process.exit(1);
