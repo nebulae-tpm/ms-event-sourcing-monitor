@@ -1,6 +1,6 @@
 {
   "name": "@nebulae-tpm/mbe-event-sourcing-monitor",
-  "version": "0.0.42",
+  "version": "0.0.43",
   "description": "BackEnd for the event-sourcing-monitor Microservice",
   "main": "server.js",
   "bin": {

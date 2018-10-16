@@ -1,7 +1,6 @@
 "use strict";
 
 const Rx = require("rxjs");
-const { CustomError } = require("../tools/customError");
 const GMT_OFFSET = ((parseInt(process.env.GMT_TO_SERVE.replace('GMT', '') * 60)) + new Date().getTimezoneOffset()) * 60000;
 
 class AccumulatorDAHelper {

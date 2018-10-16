@@ -30,9 +30,7 @@ class EventSourcingMonitor {
     return this.incommingEvents$
       .bufferTime(3000)
       .filter(items => items.length > 0)
-      // .do(items => {
-      //   console.log(" Package size==> ", items.length);
-      // })
+      .do(items => console.log(" Package size==> ", items.length))
       .map(events => events.reduce((acc, event) => {
           const eventType = event.et.replace(/\./g, "-");
           const eventUser = event.user.replace(/\./g, "-");

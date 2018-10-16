@@ -1,10 +1,8 @@
 "use strict";
-const mongoDB = require("./MongoDB").singleton(); // to prod
-// let mongoDB = undefined; // to test
+let mongoDB = undefined;
 const AccumulatorDAHelper = require("./AccumulatorDAHelper");
 const Rx = require("rxjs");
 const CollectionName = "hourBoxes";
-const { CustomError } = require("../tools/customError");
 const TIMERANGE_KEY = "HOUR";
 
 class MinuteAccumulatorDA {

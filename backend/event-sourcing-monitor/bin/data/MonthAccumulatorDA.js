@@ -1,6 +1,5 @@
 "use strict";
-const mongoDB = require("./MongoDB").singleton(); // to prod
-// let mongoDB = undefined; // to test
+let mongoDB = undefined;
 const AccumulatorDAHelper = require("./AccumulatorDAHelper");
 const Rx = require("rxjs");
 const CollectionName = "monthBoxes";
