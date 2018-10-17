@@ -59,8 +59,7 @@ class MongoDB {
             observer.next('Creating index for eventSourcingMonitor.monthBoxes => ({ id: 1 })  ');
             await this.db.collection('monthBoxes').createIndex( { id: 1});
             observer.next('Creating index for eventSourcingMonitor.yearBoxes => ({ id: 1 })  ');
-            await this.db.collection('yearBoxes').createIndex( { id: 1}); 
-
+            await this.db.collection('yearBoxes').createIndex( { id: 1});
 
             observer.next('All indexes created');
             observer.complete();

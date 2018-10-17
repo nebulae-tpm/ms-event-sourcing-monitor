@@ -37,7 +37,7 @@ class EventStoreService {
     console.log("EventStoreService starting ...");
 
     return Rx.Observable.from(this.aggregateEventsArray)
-      .map(aggregateEvent => { return { ...aggregateEvent, onErrorHandler, onCompleteHandler } })
+      .map(aggregateEvent => ({ ...aggregateEvent, onErrorHandler, onCompleteHandler }) )
       .map(params => this.subscribeEventHandler(params));
   }
 
@@ -140,6 +140,9 @@ class EventStoreService {
   }
 }
 
+/**
+ * @returns {EventStoreService}
+ */
 module.exports = () => {
   if (!instance) {
     instance = new EventStoreService();

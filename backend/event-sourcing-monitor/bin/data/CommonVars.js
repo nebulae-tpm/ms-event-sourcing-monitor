@@ -25,4 +25,7 @@ class CommonVarsDA {
   }
 }
 
+/**
+ * @returns {CommonVarsDA}
+ */
 module.exports = CommonVarsDA;
