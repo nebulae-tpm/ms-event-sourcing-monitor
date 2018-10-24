@@ -5,7 +5,6 @@ const broker = require("../../tools/broker/BrokerFactory")();
 const Rx = require("rxjs");
 const jsonwebtoken = require("jsonwebtoken");
 const jwtPublicKey = process.env.JWT_PUBLIC_KEY.replace(/\\n/g, "\n");
-const { CustomError, DefaultError } = require("../../tools/customError");
 
 let instance;
 
