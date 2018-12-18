@@ -1,12 +1,14 @@
 const withFilter = require("graphql-subscriptions").withFilter;
 const PubSub = require("graphql-subscriptions").PubSub;
 const pubsub = new PubSub();
-const Rx = require("rxjs");
+const { of } = require("rxjs");
+const { mergeMap, catchError, map } = require("rxjs/operators");
 const broker = require("../../broker/BrokerFactory")();
 
 function getReponseFromBackEnd$(response) {
-    return Rx.Observable.of(response)
-        .map(resp => {
+    return of(response)
+    .pipe(
+        map(resp => {
             if (resp.result.code != 200) {
                 const err = new Error();
                 err.name = 'Error';
@@ -16,8 +18,8 @@ function getReponseFromBackEnd$(response) {
                 throw err;
             }
             return resp.data;
-        });
-
+        })
+    );
 }
 
 
@@ -31,8 +33,9 @@ module.exports = {
                     "gateway.graphql.query.getTimeFramesSinceTimestamp",
                     { root, args, jwt: context.encodedToken },
                     2000
+                ).pipe(
+                    mergeMap(response => getReponseFromBackEnd$(response))
                 )
-                .mergeMap(response => getReponseFromBackEnd$(response))
                 .toPromise();
         }
     },
