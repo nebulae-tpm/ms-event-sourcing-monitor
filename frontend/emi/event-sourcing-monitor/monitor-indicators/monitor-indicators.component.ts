@@ -77,7 +77,7 @@ export class MonitorIndicatorsComponent implements OnInit {
 
     this.eventSourcingMonitorervice.listeningEvent$.subscribe(
       (listeningEvents) => listeningEvents ?  this.startToListenUpdates() : this.stopToListenUpdates()  ,
-      (error) => console.log('ERROR'),
+      (error) => console.log('ERROR ', error),
       () => console.log('Completed')
     );
   }
